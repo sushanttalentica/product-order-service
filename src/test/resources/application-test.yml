@@ -1,0 +1,166 @@
+# Test configuration for Product Order Service
+# 
+# Design Principles Applied:
+# - Test-specific Configuration: Separate configuration for tests
+# - Database Configuration: Uses H2 in-memory database for tests
+# - Security Configuration: Disables security for easier testing
+# - Logging Configuration: Reduced logging for test performance
+# - Cache Configuration: Uses simple cache for tests
+# - Kafka Configuration: Uses embedded Kafka for tests
+
+server:
+  port: 0  # Random port for tests
+
+spring:
+  application:
+    name: product-order-service-test
+  
+  # Database Configuration for Tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  # JPA Configuration for Tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+  
+  # H2 Console Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Cache Configuration for Tests
+  cache:
+    type: simple
+    cache-names:
+      - products
+      - categories
+      - orders
+  
+  # Kafka Configuration for Tests
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  
+  # Redis Configuration for Tests
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+# Security Configuration for Tests
+security:
+  jwt:
+    secret: testSecretKey
+    expiration: 3600000  # 1 hour for tests
+
+# Management and Monitoring for Tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: false
+
+# Logging Configuration for Tests
+logging:
+  level:
+    com.ecommerce.productorder: INFO
+    org.springframework.security: WARN
+    org.springframework.kafka: WARN
+    org.springframework.data.jpa: WARN
+    org.hibernate: WARN
+    org.springframework.cache: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Test-specific Properties
+test:
+  data:
+    cleanup: true
+    sample-size: 100
+  performance:
+    timeout: 30s
+    max-memory: 512MB
+  kafka:
+    embedded: true
+    topics:
+      - order.created
+      - order.status.updated
+      - order.cancelled
+      - order.completed
+      - payment.processed
+      - payment.failed
+      - payment.refunded
+      - payment.cancelled
+      - inventory.reserved
+      - inventory.released
+      - inventory.updated
+      - notification.email
+      - notification.sms
+      - notification.push
+
+# AWS Configuration for Tests
+aws:
+  s3:
+    bucket-name: test-bucket
+    region: us-east-1
+    access-key: test-access-key
+    secret-key: test-secret-key
+    endpoint: http://localhost:4566  # LocalStack endpoint
+
+# Test Data Configuration
+test-data:
+  products:
+    count: 1000
+    categories:
+      - Electronics
+      - Clothing
+      - Books
+      - Home & Garden
+      - Sports
+  orders:
+    count: 100
+    statuses:
+      - PENDING
+      - CONFIRMED
+      - PROCESSING
+      - SHIPPED
+      - DELIVERED
+      - CANCELLED
+  payments:
+    count: 100
+    statuses:
+      - PENDING
+      - PROCESSING
+      - COMPLETED
+      - FAILED
+      - CANCELLED
+      - REFUNDED
