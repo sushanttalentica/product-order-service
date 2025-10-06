@@ -117,6 +117,14 @@ springdoc:
     tagsSorter: alpha
   show-actuator: true
 
+# AWS S3 Configuration
+aws:
+  s3:
+    bucket-name: ${S3_BUCKET:my-pos-bucket-125}
+    region: ${S3_REGION:ap-south-1}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+
 # Logging Configuration
 logging:
   level:

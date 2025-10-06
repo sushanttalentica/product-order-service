@@ -1,579 +1,275 @@
-# Product Order Service - Database Schema
+# Database Schema Documentation
 
-## Overview
+## Product Order Service Database Schema
 
-The Product Order Service uses a relational database design with MySQL as the primary database. The schema follows Domain-Driven Design (DDD) principles and implements proper normalization with foreign key relationships.
+This document describes the database schema for the Product Order Service.
 
-## Entity Relationship Diagram (ERD)
+### Database Overview
+- **Database Type**: H2 (In-Memory)
+- **ORM Framework**: JPA/Hibernate
+- **Connection Pool**: HikariCP
+
+### Entity Relationships
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              DATABASE SCHEMA                                  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              ENTITY RELATIONSHIP DIAGRAM                      │
-└─────────────────────────────────────────────────────────────────────────────────┘
-
-                    ┌─────────────────┐
-                    │    CATEGORY     │
-                    │                 │
-                    │ + id (PK)       │
-                    │ + name          │
-                    │ + description   │
-                    │ + is_active     │
-                    │ + created_at    │
-                    │ + updated_at    │
-                    └─────────┬───────┘
-                              │
-                              │ 1:N
-                              │
-                    ┌─────────▼───────┐
-                    │     PRODUCT     │
-                    │                 │
-                    │ + id (PK)       │
-                    │ + name          │
-                    │ + description   │
-                    │ + price         │
-                    │ + sku           │
-                    │ + stock_quantity│
-                    │ + is_active     │
-                    │ + category_id   │
-                    │ + created_at    │
-                    │ + updated_at    │
-                    └─────────┬───────┘
-                              │
-                              │ 1:N
-                              │
-                    ┌─────────▼───────┐
-                    │      ORDER      │
-                    │                 │
-                    │ + id (PK)       │
-                    │ + order_number  │
-                    │ + customer_id   │
-                    │ + total_amount  │
-                    │ + status        │
-                    │ + shipping_addr│
-                    │ + created_at    │
-                    │ + updated_at    │
-                    └─────────┬───────┘
-                              │
-                              │ 1:N
-                              │
-                    ┌─────────▼───────┐
-                    │   ORDER_ITEM    │
-                    │                 │
-                    │ + id (PK)       │
-                    │ + order_id (FK) │
-                    │ + product_id (FK)│
-                    │ + quantity      │
-                    │ + unit_price   │
-                    │ + total_price   │
-                    │ + created_at   │
-                    │ + updated_at    │
-                    └─────────────────┘
+Customer (1) ──── (N) Order (1) ──── (N) OrderItem (N) ──── (1) Product
+    │                                    │
+    │                                    │
+    └─── Address (Embedded)              └─── Category (N) ──── (1) Product
+                                                                    │
+                                                                    │
+Payment (1) ──── (1) Order              Invoice (1) ──── (1) Order
 ```
 
-## Table Definitions
+### Entity Definitions
 
-### 1. Categories Table
+#### 1. Customer Entity
+```sql
+CREATE TABLE customers (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    date_of_birth DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
+-- Address (Embedded in Customer)
+-- street VARCHAR(255)
+-- city VARCHAR(100)
+-- state VARCHAR(100)
+-- postal_code VARCHAR(20)
+-- country VARCHAR(100)
+```
+
+#### 2. Category Entity
 ```sql
 CREATE TABLE categories (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    INDEX idx_categories_name (name),
-    INDEX idx_categories_active (is_active),
-    INDEX idx_categories_created (created_at)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 ```
 
-**Purpose**: Stores product categories for organization and filtering.
-
-**Key Features**:
-- Unique category names
-- Soft delete with `is_active` flag
-- Optimized indexes for common queries
-- Audit fields for tracking changes
-
-### 2. Products Table
-
+#### 3. Product Entity
 ```sql
 CREATE TABLE products (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    price DECIMAL(10,2) NOT NULL,
     sku VARCHAR(100) UNIQUE NOT NULL,
-    stock_quantity INT DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    category_id BIGINT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    stock_quantity INTEGER NOT NULL DEFAULT 0,
+    category_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
-    
-    INDEX idx_products_name (name),
-    INDEX idx_products_sku (sku),
-    INDEX idx_products_category (category_id),
-    INDEX idx_products_active (is_active),
-    INDEX idx_products_price (price),
-    INDEX idx_products_stock (stock_quantity),
-    INDEX idx_products_created (created_at),
-    
-    CONSTRAINT chk_products_price CHECK (price >= 0),
-    CONSTRAINT chk_products_stock CHECK (stock_quantity >= 0)
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 ```
 
-**Purpose**: Stores product information including pricing, inventory, and categorization.
-
-**Key Features**:
-- Unique SKU constraint
-- Foreign key relationship with categories
-- Price and stock validation
-- Comprehensive indexing for search and filtering
-- Soft delete capability
-
-### 3. Orders Table
-
+#### 4. Order Entity
 ```sql
 CREATE TABLE orders (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    order_number VARCHAR(50) UNIQUE NOT NULL,
-    customer_id VARCHAR(100) NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_number VARCHAR(100) UNIQUE NOT NULL,
+    customer_id BIGINT NOT NULL,
+    customer_email VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     total_amount DECIMAL(10,2) NOT NULL,
-    status ENUM('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED') DEFAULT 'PENDING',
-    shipping_address JSON,
+    shipping_address TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    INDEX idx_orders_number (order_number),
-    INDEX idx_orders_customer (customer_id),
-    INDEX idx_orders_status (status),
-    INDEX idx_orders_created (created_at),
-    INDEX idx_orders_amount (total_amount),
-    
-    CONSTRAINT chk_orders_amount CHECK (total_amount >= 0)
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
 ```
 
-**Purpose**: Stores order information including customer details, status, and shipping information.
-
-**Key Features**:
-- Unique order number generation
-- JSON storage for flexible shipping address
-- Status enum for order lifecycle management
-- Customer-based indexing for queries
-- Amount validation
-
-### 4. Order Items Table
-
+#### 5. OrderItem Entity
 ```sql
 CREATE TABLE order_items (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
-    quantity INT NOT NULL,
+    quantity INTEGER NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
-    total_price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+#### 6. Payment Entity
+```sql
+CREATE TABLE payments (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    payment_id VARCHAR(100) UNIQUE NOT NULL,
+    order_id BIGINT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    transaction_id VARCHAR(100),
+    gateway_response TEXT,
+    failure_reason TEXT,
+    refunded_amount DECIMAL(10,2) DEFAULT 0.00,
+    processed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
-    
-    INDEX idx_order_items_order (order_id),
-    INDEX idx_order_items_product (product_id),
-    INDEX idx_order_items_created (created_at),
-    
-    CONSTRAINT chk_order_items_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_order_items_unit_price CHECK (unit_price >= 0),
-    CONSTRAINT chk_order_items_total_price CHECK (total_price >= 0)
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 ```
 
-**Purpose**: Stores individual items within orders, maintaining product details at the time of purchase.
-
-**Key Features**:
-- Cascade delete with orders
-- Restrict delete with products (preserve order history)
-- Quantity and price validation
-- Optimized indexing for order and product queries
-
-## Database Indexes Strategy
-
-### Primary Indexes
-- **Primary Keys**: All tables have auto-incrementing BIGINT primary keys
-- **Unique Constraints**: SKU, order_number for data integrity
-
-### Secondary Indexes
-- **Search Indexes**: Name, description fields for text search
-- **Filter Indexes**: Status, is_active for filtering
-- **Foreign Key Indexes**: All foreign key relationships
-- **Time-based Indexes**: created_at for temporal queries
-- **Business Indexes**: Price, stock_quantity for business logic
-
-### Composite Indexes
+#### 7. Invoice Entity
 ```sql
--- For product search and filtering
-CREATE INDEX idx_products_search ON products (is_active, category_id, price);
-
--- For order status and customer queries
-CREATE INDEX idx_orders_customer_status ON orders (customer_id, status, created_at);
-
--- For order item analysis
-CREATE INDEX idx_order_items_analysis ON order_items (order_id, product_id, quantity);
+CREATE TABLE invoices (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_id BIGINT NOT NULL,
+    invoice_number VARCHAR(100) UNIQUE NOT NULL,
+    s3_key VARCHAR(500) NOT NULL,
+    s3_url VARCHAR(1000) NOT NULL,
+    file_size BIGINT,
+    content_type VARCHAR(100) DEFAULT 'application/pdf',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
 ```
 
-## Data Types and Constraints
+### Indexes
 
-### Numeric Types
-- **BIGINT**: Primary keys and foreign keys (64-bit integers)
-- **DECIMAL(10,2)**: Monetary values with precision
-- **INT**: Quantities and counts
+#### Performance Indexes
+```sql
+-- Customer indexes
+CREATE INDEX idx_customer_email ON customers(email);
+CREATE INDEX idx_customer_created_at ON customers(created_at);
 
-### String Types
-- **VARCHAR(255)**: Names and descriptions
-- **VARCHAR(100)**: SKUs and codes
-- **VARCHAR(50)**: Order numbers
-- **TEXT**: Long descriptions
+-- Product indexes
+CREATE INDEX idx_product_sku ON products(sku);
+CREATE INDEX idx_product_category ON products(category_id);
+CREATE INDEX idx_product_name ON products(name);
 
-### Special Types
-- **JSON**: Flexible shipping address storage
-- **ENUM**: Status values for data integrity
-- **BOOLEAN**: Active flags and boolean values
-- **TIMESTAMP**: Audit and temporal fields
+-- Order indexes
+CREATE INDEX idx_order_customer ON orders(customer_id);
+CREATE INDEX idx_order_status ON orders(status);
+CREATE INDEX idx_order_created_at ON orders(created_at);
+CREATE INDEX idx_order_number ON orders(order_number);
+
+-- OrderItem indexes
+CREATE INDEX idx_order_item_order ON order_items(order_id);
+CREATE INDEX idx_order_item_product ON order_items(product_id);
+
+-- Payment indexes
+CREATE INDEX idx_payment_order ON payments(order_id);
+CREATE INDEX idx_payment_status ON payments(status);
+CREATE INDEX idx_payment_created_at ON payments(created_at);
+
+-- Invoice indexes
+CREATE INDEX idx_invoice_order ON invoices(order_id);
+CREATE INDEX idx_invoice_number ON invoices(invoice_number);
+```
+
+### Data Types
+
+#### Decimal Precision
+- **Price Fields**: DECIMAL(10,2) - Up to 99,999,999.99
+- **Amount Fields**: DECIMAL(10,2) - Up to 99,999,999.99
+- **Quantity Fields**: INTEGER - Up to 2,147,483,647
+
+#### String Lengths
+- **Names**: VARCHAR(50-255)
+- **Emails**: VARCHAR(100)
+- **SKUs**: VARCHAR(100)
+- **Status**: VARCHAR(20)
+- **Phone**: VARCHAR(20)
+
+#### Timestamps
+- **Created At**: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+- **Updated At**: TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 ### Constraints
-- **NOT NULL**: Required fields
-- **UNIQUE**: Unique identifiers
-- **CHECK**: Business rule validation
-- **FOREIGN KEY**: Referential integrity
 
-## Database Views
+#### Primary Keys
+- All entities have auto-incrementing BIGINT primary keys
+- Composite keys avoided for simplicity
 
-### 1. Product Summary View
+#### Foreign Keys
+- Order → Customer (customer_id)
+- OrderItem → Order (order_id)
+- OrderItem → Product (product_id)
+- Product → Category (category_id)
+- Payment → Order (order_id)
+- Invoice → Order (order_id)
+
+#### Unique Constraints
+- Customer email
+- Product SKU
+- Order number
+- Payment ID
+- Invoice number
+
+#### Check Constraints
+- Price > 0
+- Quantity > 0
+- Amount > 0
+- Valid status values
+
+### Sample Data
+
+#### Categories
 ```sql
-CREATE VIEW product_summary AS
-SELECT 
-    p.id,
-    p.name,
-    p.sku,
-    p.price,
-    p.stock_quantity,
-    p.is_active,
-    c.name as category_name,
-    CASE 
-        WHEN p.stock_quantity = 0 THEN 'OUT_OF_STOCK'
-        WHEN p.stock_quantity < 10 THEN 'LOW_STOCK'
-        ELSE 'IN_STOCK'
-    END as stock_status
-FROM products p
-JOIN categories c ON p.category_id = c.id
-WHERE p.is_active = TRUE;
+INSERT INTO categories (name, description) VALUES
+('Electronics', 'Electronic devices and accessories'),
+('Clothing', 'Apparel and fashion items'),
+('Books', 'Books and educational materials');
 ```
 
-### 2. Order Summary View
+#### Products
 ```sql
-CREATE VIEW order_summary AS
-SELECT 
-    o.id,
-    o.order_number,
-    o.customer_id,
-    o.total_amount,
-    o.status,
-    o.created_at,
-    COUNT(oi.id) as item_count,
-    SUM(oi.quantity) as total_quantity
-FROM orders o
-LEFT JOIN order_items oi ON o.id = oi.order_id
-GROUP BY o.id, o.order_number, o.customer_id, o.total_amount, o.status, o.created_at;
+INSERT INTO products (name, description, sku, price, stock_quantity, category_id) VALUES
+('iPhone 15', 'Latest iPhone model', 'IPHONE15-001', 999.99, 100, 1),
+('Samsung Galaxy', 'Android smartphone', 'SAMSUNG-001', 899.99, 50, 1),
+('MacBook Pro', 'Apple laptop', 'MACBOOK-001', 1999.99, 25, 1);
 ```
 
-### 3. Sales Analytics View
-```sql
-CREATE VIEW sales_analytics AS
-SELECT 
-    DATE(o.created_at) as sale_date,
-    COUNT(o.id) as order_count,
-    SUM(o.total_amount) as total_revenue,
-    AVG(o.total_amount) as average_order_value,
-    COUNT(DISTINCT o.customer_id) as unique_customers
-FROM orders o
-WHERE o.status IN ('CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED')
-GROUP BY DATE(o.created_at);
-```
+### Database Configuration
 
-## Database Triggers
-
-### 1. Order Number Generation
-```sql
-DELIMITER //
-CREATE TRIGGER tr_orders_generate_number
-BEFORE INSERT ON orders
-FOR EACH ROW
-BEGIN
-    IF NEW.order_number IS NULL OR NEW.order_number = '' THEN
-        SET NEW.order_number = CONCAT('ORD-', DATE_FORMAT(NOW(), '%Y%m%d'), '-', LPAD(LAST_INSERT_ID(), 6, '0'));
-    END IF;
-END//
-DELIMITER ;
-```
-
-### 2. Stock Update Trigger
-```sql
-DELIMITER //
-CREATE TRIGGER tr_order_items_update_stock
-AFTER INSERT ON order_items
-FOR EACH ROW
-BEGIN
-    UPDATE products 
-    SET stock_quantity = stock_quantity - NEW.quantity,
-        updated_at = NOW()
-    WHERE id = NEW.product_id;
-END//
-DELIMITER ;
-```
-
-### 3. Order Total Calculation
-```sql
-DELIMITER //
-CREATE TRIGGER tr_order_items_calculate_total
-BEFORE INSERT ON order_items
-FOR EACH ROW
-BEGIN
-    SET NEW.total_price = NEW.quantity * NEW.unit_price;
-END//
-DELIMITER ;
-```
-
-## Database Procedures
-
-### 1. Create Order Procedure
-```sql
-DELIMITER //
-CREATE PROCEDURE sp_create_order(
-    IN p_customer_id VARCHAR(100),
-    IN p_shipping_address JSON,
-    OUT p_order_id BIGINT,
-    OUT p_order_number VARCHAR(50)
-)
-BEGIN
-    DECLARE v_order_id BIGINT;
-    DECLARE v_order_number VARCHAR(50);
-    
-    -- Generate order number
-    SET v_order_number = CONCAT('ORD-', DATE_FORMAT(NOW(), '%Y%m%d'), '-', LPAD(LAST_INSERT_ID(), 6, '0'));
-    
-    -- Insert order
-    INSERT INTO orders (order_number, customer_id, shipping_address)
-    VALUES (v_order_number, p_customer_id, p_shipping_address);
-    
-    SET v_order_id = LAST_INSERT_ID();
-    
-    SET p_order_id = v_order_id;
-    SET p_order_number = v_order_number;
-END//
-DELIMITER ;
-```
-
-### 2. Update Order Status Procedure
-```sql
-DELIMITER //
-CREATE PROCEDURE sp_update_order_status(
-    IN p_order_id BIGINT,
-    IN p_new_status VARCHAR(20)
-)
-BEGIN
-    DECLARE v_current_status VARCHAR(20);
-    
-    -- Get current status
-    SELECT status INTO v_current_status FROM orders WHERE id = p_order_id;
-    
-    -- Validate status transition
-    IF v_current_status = 'DELIVERED' AND p_new_status != 'DELIVERED' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot change status of delivered order';
-    END IF;
-    
-    IF v_current_status = 'CANCELLED' AND p_new_status != 'CANCELLED' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot change status of cancelled order';
-    END IF;
-    
-    -- Update status
-    UPDATE orders 
-    SET status = p_new_status, updated_at = NOW()
-    WHERE id = p_order_id;
-END//
-DELIMITER ;
-```
-
-## Database Functions
-
-### 1. Calculate Order Total
-```sql
-DELIMITER //
-CREATE FUNCTION fn_calculate_order_total(p_order_id BIGINT)
-RETURNS DECIMAL(10,2)
-READS SQL DATA
-DETERMINISTIC
-BEGIN
-    DECLARE v_total DECIMAL(10,2) DEFAULT 0;
-    
-    SELECT COALESCE(SUM(total_price), 0) INTO v_total
-    FROM order_items
-    WHERE order_id = p_order_id;
-    
-    RETURN v_total;
-END//
-DELIMITER ;
-```
-
-### 2. Check Product Availability
-```sql
-DELIMITER //
-CREATE FUNCTION fn_check_product_availability(p_product_id BIGINT, p_quantity INT)
-RETURNS BOOLEAN
-READS SQL DATA
-DETERMINISTIC
-BEGIN
-    DECLARE v_stock INT DEFAULT 0;
-    DECLARE v_is_active BOOLEAN DEFAULT FALSE;
-    
-    SELECT stock_quantity, is_active INTO v_stock, v_is_active
-    FROM products
-    WHERE id = p_product_id;
-    
-    RETURN v_is_active AND v_stock >= p_quantity;
-END//
-DELIMITER ;
-```
-
-## Database Optimization
-
-### 1. Partitioning Strategy
-```sql
--- Partition orders table by creation date (monthly partitions)
-ALTER TABLE orders PARTITION BY RANGE (YEAR(created_at) * 100 + MONTH(created_at)) (
-    PARTITION p202401 VALUES LESS THAN (202402),
-    PARTITION p202402 VALUES LESS THAN (202403),
-    PARTITION p202403 VALUES LESS THAN (202404),
-    -- Add more partitions as needed
-    PARTITION p_future VALUES LESS THAN MAXVALUE
-);
-```
-
-### 2. Query Optimization
-```sql
--- Optimized product search query
-EXPLAIN SELECT p.*, c.name as category_name
-FROM products p
-JOIN categories c ON p.category_id = c.id
-WHERE p.is_active = TRUE
-  AND p.stock_quantity > 0
-  AND p.price BETWEEN 10.00 AND 100.00
-  AND c.name = 'Electronics'
-ORDER BY p.created_at DESC
-LIMIT 20;
-```
-
-### 3. Connection Pooling
+#### H2 Configuration
 ```yaml
-# HikariCP Configuration
 spring:
   datasource:
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      leak-detection-threshold: 60000
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 ```
 
-## Database Security
-
-### 1. User Roles and Permissions
-```sql
--- Application user with limited permissions
-CREATE USER 'product_order_app'@'%' IDENTIFIED BY 'secure_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON ecommerce_db.* TO 'product_order_app'@'%';
-
--- Read-only user for reporting
-CREATE USER 'product_order_readonly'@'%' IDENTIFIED BY 'readonly_password';
-GRANT SELECT ON ecommerce_db.* TO 'product_order_readonly'@'%';
-
--- Admin user for maintenance
-CREATE USER 'product_order_admin'@'%' IDENTIFIED BY 'admin_password';
-GRANT ALL PRIVILEGES ON ecommerce_db.* TO 'product_order_admin'@'%';
+#### JPA Configuration
+```yaml
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
 ```
 
-### 2. Data Encryption
-```sql
--- Encrypt sensitive data
-ALTER TABLE orders 
-ADD COLUMN customer_email_encrypted VARBINARY(255);
+### Migration Strategy
 
--- Create encryption function
-DELIMITER //
-CREATE FUNCTION fn_encrypt_data(data VARCHAR(255))
-RETURNS VARBINARY(255)
-DETERMINISTIC
-BEGIN
-    RETURN AES_ENCRYPT(data, 'encryption_key');
-END//
-DELIMITER ;
-```
+#### Development
+- H2 in-memory database
+- Schema auto-creation
+- Test data seeding
 
-## Database Backup and Recovery
-
-### 1. Backup Strategy
-```bash
-# Full database backup
-mysqldump --single-transaction --routines --triggers ecommerce_db > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# Incremental backup
-mysqlbinlog --start-datetime="2024-01-01 00:00:00" mysql-bin.000001 > incremental_backup.sql
-```
-
-### 2. Recovery Procedures
-```bash
-# Restore from full backup
-mysql ecommerce_db < backup_20240101_120000.sql
-
-# Restore from incremental backup
-mysqlbinlog incremental_backup.sql | mysql ecommerce_db
-```
-
-## Database Monitoring
-
-### 1. Performance Monitoring
-```sql
--- Monitor slow queries
-SHOW VARIABLES LIKE 'slow_query_log';
-SHOW VARIABLES LIKE 'long_query_time';
-
--- Monitor connection usage
-SHOW STATUS LIKE 'Threads_connected';
-SHOW STATUS LIKE 'Max_used_connections';
-```
-
-### 2. Health Checks
-```sql
--- Database health check
-SELECT 
-    'Database Status' as check_type,
-    CASE 
-        WHEN COUNT(*) > 0 THEN 'HEALTHY'
-        ELSE 'UNHEALTHY'
-    END as status
-FROM information_schema.tables 
-WHERE table_schema = 'ecommerce_db';
-```
-
-This database schema provides a robust, scalable, and maintainable foundation for the Product Order Service with proper indexing, constraints, and optimization strategies.
+#### Production
+- PostgreSQL/MySQL database
+- Flyway migrations
+- Data backup strategies

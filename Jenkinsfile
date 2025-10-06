@@ -2,27 +2,13 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REGISTRY = 'your-docker-registry.com'
-        IMAGE_NAME = 'product-order-service'
-        MAVEN_OPTS = '-Xmx1024m'
-    }
-    
-    parameters {
-        choice(
-            name: 'ENVIRONMENT',
-            choices: ['dev', 'uat', 'prod'],
-            description: 'Target environment for deployment'
-        )
-        booleanParam(
-            name: 'RUN_TESTS',
-            defaultValue: true,
-            description: 'Run tests before deployment'
-        )
-        booleanParam(
-            name: 'SKIP_TESTS',
-            defaultValue: false,
-            description: 'Skip running tests'
-        )
+        APP_NAME = 'product-order-service'
+        REGISTRY_URL = 'your-registry.com'
+        KUBECONFIG = credentials('kubeconfig')
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        S3_BUCKET = 'my-pos-bucket-125'
+        S3_REGION = 'ap-south-1'
     }
     
     stages {
@@ -34,7 +20,7 @@ pipeline {
                         script: 'git rev-parse --short HEAD',
                         returnStdout: true
                     ).trim()
-                    env.BUILD_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
+                    env.BUILD_TAG = "${APP_NAME}:${BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
                 }
             }
         }
@@ -42,36 +28,58 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh """
-                        mvn clean compile -DskipTests=${params.SKIP_TESTS}
-                    """
+                    echo "Building application..."
+                    sh 'mvn clean compile'
                 }
             }
         }
         
         stage('Test') {
-            when {
-                not { params.SKIP_TESTS }
-                expression { params.RUN_TESTS }
-            }
-            steps {
-                script {
-                    sh """
-                        mvn test -Dspring.profiles.active=${params.ENVIRONMENT}
-                    """
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        script {
+                            echo "Running unit tests..."
+                            sh 'mvn test'
+                        }
+                    }
+                }
+                
+                stage('Integration Tests') {
+                    steps {
+                        script {
+                            echo "Running integration tests..."
+                            sh 'mvn verify -Pintegration-tests'
+                        }
+                    }
+                }
+                
+                stage('Security Scan') {
+                    steps {
+                        script {
+                            echo "Running security scan..."
+                            sh 'mvn dependency-check:check'
+                        }
+                    }
                 }
             }
-            post {
-                always {
-                    publishTestResults testResultsPattern: 'target/surefire-reports/*.xml'
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'target/site/surefire-reports',
-                        reportFiles: 'index.html',
-                        reportName: 'Test Report'
-                    ])
+        }
+        
+        stage('Quality Gate') {
+            steps {
+                script {
+                    echo "Running quality gate..."
+                    sh 'mvn jacoco:report'
+                    
+                    // Check coverage threshold
+                    def coverage = sh(
+                        script: 'mvn jacoco:check | grep -o "[0-9]*%" | head -1 | sed "s/%//"',
+                        returnStdout: true
+                    ).trim()
+                    
+                    if (coverage.toInteger() < 80) {
+                        error "Coverage threshold not met: ${coverage}% < 80%"
+                    }
                 }
             }
         }
@@ -79,117 +87,78 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    sh """
-                        mvn package -DskipTests=true -Dspring.profiles.active=${params.ENVIRONMENT}
-                    """
+                    echo "Packaging application..."
+                    sh 'mvn package -DskipTests'
                 }
             }
         }
         
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    def imageTag = "${env.DOCKER_REGISTRY}/${env.IMAGE_NAME}:${env.BUILD_TAG}"
-                    def latestTag = "${env.DOCKER_REGISTRY}/${env.IMAGE_NAME}:latest-${params.ENVIRONMENT}"
-                    
-                    sh """
-                        docker build -t ${imageTag} .
-                        docker tag ${imageTag} ${latestTag}
-                    """
-                    
-                    env.DOCKER_IMAGE = imageTag
-                    env.DOCKER_IMAGE_LATEST = latestTag
+                    echo "Building Docker image..."
+                    sh "docker build -t ${env.BUILD_TAG} ."
+                    sh "docker tag ${env.BUILD_TAG} ${REGISTRY_URL}/${APP_NAME}:latest"
                 }
             }
         }
         
-        stage('Docker Push') {
+        stage('Push to Registry') {
             steps {
                 script {
-                    sh """
-                        docker push ${env.DOCKER_IMAGE}
-                        docker push ${env.DOCKER_IMAGE_LATEST}
-                    """
-                }
-            }
-        }
-        
-        stage('Deploy to Dev') {
-            when {
-                expression { params.ENVIRONMENT == 'dev' }
-            }
-            steps {
-                script {
-                    sh """
-                        # Deploy to development environment
-                        kubectl apply -f k8s/dev/namespace.yaml
-                        kubectl apply -f k8s/dev/configmap.yaml
-                        kubectl apply -f k8s/dev/secret.yaml
-                        kubectl set image deployment/product-order-service product-order-service=${env.DOCKER_IMAGE} -n dev
-                        kubectl rollout status deployment/product-order-service -n dev
-                    """
+                    echo "Pushing to registry..."
+                    sh "docker push ${REGISTRY_URL}/${APP_NAME}:${BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
+                    sh "docker push ${REGISTRY_URL}/${APP_NAME}:latest"
                 }
             }
         }
         
         stage('Deploy to UAT') {
             when {
-                expression { params.ENVIRONMENT == 'uat' }
+                branch 'develop'
             }
             steps {
                 script {
-                    sh """
-                        # Deploy to UAT environment
-                        kubectl apply -f k8s/uat/namespace.yaml
-                        kubectl apply -f k8s/uat/configmap.yaml
-                        kubectl apply -f k8s/uat/secret.yaml
-                        kubectl set image deployment/product-order-service product-order-service=${env.DOCKER_IMAGE} -n uat
-                        kubectl rollout status deployment/product-order-service -n uat
-                    """
+                    echo "Deploying to UAT..."
+                    sh "kubectl set image deployment/${APP_NAME} ${APP_NAME}=${REGISTRY_URL}/${APP_NAME}:${BUILD_NUMBER}-${env.GIT_COMMIT_SHORT} -n uat"
+                    sh "kubectl rollout status deployment/${APP_NAME} -n uat"
                 }
             }
         }
         
-        stage('Deploy to Prod') {
+        stage('UAT Tests') {
             when {
-                expression { params.ENVIRONMENT == 'prod' }
+                branch 'develop'
             }
             steps {
                 script {
-                    // Production deployment with approval
-                    input message: 'Deploy to Production?', ok: 'Deploy'
-                    
-                    sh """
-                        # Deploy to production environment
-                        kubectl apply -f k8s/prod/namespace.yaml
-                        kubectl apply -f k8s/prod/configmap.yaml
-                        kubectl apply -f k8s/prod/secret.yaml
-                        kubectl set image deployment/product-order-service product-order-service=${env.DOCKER_IMAGE} -n prod
-                        kubectl rollout status deployment/product-order-service -n prod
-                    """
+                    echo "Running UAT tests..."
+                    sh "mvn verify -Puat-tests -Dtest.server.url=http://uat-api.yourdomain.com"
                 }
             }
         }
         
-        stage('Health Check') {
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
-                    def healthCheckUrl = getHealthCheckUrl(params.ENVIRONMENT)
-                    sh """
-                        # Wait for service to be ready
-                        sleep 30
-                        
-                        # Health check
-                        for i in {1..10}; do
-                            if curl -f ${healthCheckUrl}/actuator/health; then
-                                echo "Health check passed"
-                                break
-                            else
-                                echo "Health check failed, retrying in 10 seconds..."
-                                sleep 10
-                            fi
-                        done
-                    """
+                    echo "Deploying to production..."
+                    sh "kubectl set image deployment/${APP_NAME} ${APP_NAME}=${REGISTRY_URL}/${APP_NAME}:${BUILD_NUMBER}-${env.GIT_COMMIT_SHORT} -n prod"
+                    sh "kubectl rollout status deployment/${APP_NAME} -n prod"
+                }
+            }
+        }
+        
+        stage('Production Smoke Tests') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    echo "Running production smoke tests..."
+                    sh "mvn verify -Psmoke-tests -Dtest.server.url=https://api.yourdomain.com"
                 }
             }
         }
@@ -197,41 +166,46 @@ pipeline {
     
     post {
         always {
-            cleanWs()
+            script {
+                echo "Cleaning up..."
+                sh 'docker system prune -f'
+            }
         }
+        
         success {
             script {
-                def message = """
-                ✅ Deployment Successful!
-                Environment: ${params.ENVIRONMENT}
-                Image: ${env.DOCKER_IMAGE}
-                Build: ${env.BUILD_TAG}
-                """
-                echo message
+                echo "Pipeline completed successfully!"
+                // Send success notification
+                slackSend(
+                    channel: '#deployments',
+                    color: 'good',
+                    message: "✅ ${APP_NAME} deployed successfully to ${env.BRANCH_NAME} (Build #${BUILD_NUMBER})"
+                )
             }
         }
+        
         failure {
             script {
-                def message = """
-                ❌ Deployment Failed!
-                Environment: ${params.ENVIRONMENT}
-                Build: ${env.BUILD_TAG}
-                """
-                echo message
+                echo "Pipeline failed!"
+                // Send failure notification
+                slackSend(
+                    channel: '#deployments',
+                    color: 'danger',
+                    message: "❌ ${APP_NAME} deployment failed on ${env.BRANCH_NAME} (Build #${BUILD_NUMBER})"
+                )
             }
         }
-    }
-}
-
-def getHealthCheckUrl(environment) {
-    switch(environment) {
-        case 'dev':
-            return 'http://product-order-service-dev.example.com'
-        case 'uat':
-            return 'http://product-order-service-uat.example.com'
-        case 'prod':
-            return 'http://product-order-service.example.com'
-        default:
-            return 'http://localhost:8080'
+        
+        unstable {
+            script {
+                echo "Pipeline completed with warnings!"
+                // Send warning notification
+                slackSend(
+                    channel: '#deployments',
+                    color: 'warning',
+                    message: "⚠️ ${APP_NAME} deployment completed with warnings on ${env.BRANCH_NAME} (Build #${BUILD_NUMBER})"
+                )
+            }
+        }
     }
 }
