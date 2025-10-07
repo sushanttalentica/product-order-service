@@ -14,11 +14,13 @@ import com.ecommerce.productorder.service.OrderEventPublisher;
 import com.ecommerce.productorder.exception.BusinessException;
 import com.ecommerce.productorder.exception.ResourceNotFoundException;
 import com.ecommerce.productorder.util.Constants;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -52,7 +54,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrderServiceImpl implements OrderService {
     
-    // Use constants from Constants class
+    // Constants for concurrency handling
+    private static final int MAX_RETRIES = 3;
+    private static final long RETRY_DELAY_MS = 50;
     
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -63,40 +67,65 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Creates a new order
      * Handles order creation and triggers downstream workflows
+     * Includes retry logic for optimistic lock conflicts
      * 
      * @param request the order creation request
      * @return OrderResponse containing order details
      * @throws BusinessException if order creation fails
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderResponse createOrder(CreateOrderRequest request) {
         log.info("Creating order for customer ID: {}", request.getCustomerId());
         
-        try {
-            // Validate request
-            validateOrderRequest(request);
-            
-            // Check product availability and reduce stock
-            validateAndReserveProducts(request);
-            
-            // Create order entity
-            Order order = createOrderEntity(request);
-            
-            // Save order
-            Order savedOrder = orderRepository.save(order);
-            log.info("Order created with ID: {}", savedOrder.getId());
-            
-            // Publish order created event
-            orderEventPublisher.publishOrderCreatedEvent(savedOrder);
-            
-            log.info("Order created successfully for customer ID: {}", request.getCustomerId());
-            return orderMapper.toResponse(savedOrder);
-            
-        } catch (Exception e) {
-            log.error("Error creating order for customer ID: {}", request.getCustomerId(), e);
-            throw new BusinessException("Failed to create order: " + e.getMessage());
+        int attempt = 0;
+        while (attempt < MAX_RETRIES) {
+            try {
+                return createOrderInternal(request);
+            } catch (OptimisticLockException e) {
+                attempt++;
+                if (attempt >= MAX_RETRIES) {
+                    log.error("Failed to create order after {} retries due to high concurrency", MAX_RETRIES);
+                    throw new BusinessException("High traffic detected. Please try again in a moment.");
+                }
+                log.warn("Optimistic lock conflict on attempt {}/{}, retrying...", attempt, MAX_RETRIES);
+                try {
+                    Thread.sleep(RETRY_DELAY_MS * attempt); // Exponential backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new BusinessException("Order creation interrupted");
+                }
+            }
         }
+        throw new BusinessException("Failed to create order after retries");
+    }
+    
+    /**
+     * Internal order creation logic
+     * Separated for retry mechanism
+     * 
+     * @param request the order creation request
+     * @return OrderResponse containing order details
+     */
+    private OrderResponse createOrderInternal(CreateOrderRequest request) {
+        // Validate request
+        validateOrderRequest(request);
+        
+        // Check product availability and reduce stock atomically
+        validateAndReserveProductsAtomic(request);
+        
+        // Create order entity
+        Order order = createOrderEntity(request);
+        
+        // Save order
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order created with ID: {}", savedOrder.getId());
+        
+        // Publish order created event
+        orderEventPublisher.publishOrderCreatedEvent(savedOrder);
+        
+        log.info("Order created successfully for customer ID: {}", request.getCustomerId());
+        return orderMapper.toResponse(savedOrder);
     }
     
     /**
@@ -373,15 +402,60 @@ public class OrderServiceImpl implements OrderService {
     }
     
     /**
-     * Validates and reserves products
-     * Encapsulates product validation and stock reservation logic
+     * Validates and reserves products using atomic SQL operations
+     * Prevents race conditions with database-level atomicity
+     * 
+     * @param request the order request
+     * @throws BusinessException if validation fails or insufficient stock
+     */
+    private void validateAndReserveProductsAtomic(CreateOrderRequest request) {
+        for (var orderItem : request.getOrderItems()) {
+            // First, check if product exists and is available
+            Product product = productRepository.findById(orderItem.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + orderItem.getProductId()));
+            
+            if (!product.isAvailableForPurchase()) {
+                throw new BusinessException("Product is not available for purchase: " + product.getName());
+            }
+            
+            // Atomic stock reduction - prevents race conditions
+            int rowsUpdated = productRepository.reduceStockAtomic(
+                orderItem.getProductId(),
+                orderItem.getQuantity()
+            );
+            
+            if (rowsUpdated == 0) {
+                // Atomic update failed - either product deleted or insufficient stock
+                // Re-fetch to get current stock for error message
+                Product currentProduct = productRepository.findById(orderItem.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + orderItem.getProductId()));
+                
+                throw new BusinessException(String.format(
+                    "Insufficient stock for product: %s (Available: %d, Requested: %d)",
+                    currentProduct.getName(),
+                    currentProduct.getStockQuantity(),
+                    orderItem.getQuantity()
+                ));
+            }
+            
+            log.info("Atomically reduced stock for product ID: {} by {}", 
+                orderItem.getProductId(), orderItem.getQuantity());
+        }
+    }
+    
+    /**
+     * Validates and reserves products (legacy method kept for backward compatibility)
+     * Now uses pessimistic locking to prevent race conditions
      * 
      * @param request the order request
      * @throws BusinessException if validation fails
+     * @deprecated Use validateAndReserveProductsAtomic for better performance
      */
+    @Deprecated
     private void validateAndReserveProducts(CreateOrderRequest request) {
         for (var orderItem : request.getOrderItems()) {
-            Product product = productRepository.findById(orderItem.getProductId())
+            // Use pessimistic write lock to prevent concurrent modifications
+            Product product = productRepository.findByIdWithLock(orderItem.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + orderItem.getProductId()));
             
             if (!product.isAvailableForPurchase()) {
@@ -392,9 +466,10 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("Insufficient stock for product: " + product.getName());
             }
             
-            // Reserve stock
+            // Reserve stock (lock prevents race conditions)
             product.reduceStock(orderItem.getQuantity());
             productRepository.save(product);
+            // Lock released when transaction commits
         }
     }
     

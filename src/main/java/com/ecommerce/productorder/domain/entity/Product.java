@@ -35,6 +35,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Version
+    private Long version;  // Optimistic locking for concurrent stock updates
+    
     @Column(nullable = false, length = 200)
     private String name;
     

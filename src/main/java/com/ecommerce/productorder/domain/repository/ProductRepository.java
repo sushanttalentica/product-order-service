@@ -1,9 +1,12 @@
 package com.ecommerce.productorder.domain.repository;
 
 import com.ecommerce.productorder.domain.entity.Product;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -90,4 +93,45 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * Uses Spring Data JPA query derivation with join
      */
     Page<Product> findByCategoryNameContainingIgnoreCaseAndIsActiveTrue(String categoryName, Pageable pageable);
+    
+    /**
+     * Find product by ID with pessimistic write lock
+     * Prevents concurrent modifications to the same product
+     * Used for stock updates to avoid race conditions
+     * 
+     * @param productId the product ID
+     * @return Optional containing locked product if found
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id = :productId")
+    Optional<Product> findByIdWithLock(@Param("productId") Long productId);
+    
+    /**
+     * Atomically reduce product stock
+     * Uses database-level atomic operation to prevent race conditions
+     * Only updates if sufficient stock is available
+     * 
+     * @param productId the product ID
+     * @param quantity the quantity to reduce
+     * @return number of rows updated (1 if successful, 0 if insufficient stock)
+     */
+    @Modifying
+    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity - :quantity " +
+           "WHERE p.id = :productId AND p.stockQuantity >= :quantity")
+    int reduceStockAtomic(@Param("productId") Long productId, 
+                          @Param("quantity") Integer quantity);
+    
+    /**
+     * Atomically restore product stock
+     * Used for order cancellations and refunds
+     * 
+     * @param productId the product ID
+     * @param quantity the quantity to restore
+     * @return number of rows updated
+     */
+    @Modifying
+    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity + :quantity " +
+           "WHERE p.id = :productId")
+    int restoreStockAtomic(@Param("productId") Long productId, 
+                           @Param("quantity") Integer quantity);
 }

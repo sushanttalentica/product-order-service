@@ -14,13 +14,17 @@ import com.ecommerce.productorder.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,9 +46,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductServiceImpl implements ProductService {
     
+    private static final String STOCK_UPDATE_TOPIC = "product.stock.updated";
+    
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     
     @Override
     @CacheEvict(value = "products", allEntries = true)
@@ -211,7 +218,8 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    @CacheEvict(value = "products", allEntries = true)
+    @CacheEvict(value = "products", key = "#productId")
+    @CachePut(value = "products", key = "#result.id")
     public ProductResponse updateProductStock(Long productId, Integer newStock) {
         log.info("Updating product stock for id: {} to {}", productId, newStock);
         
@@ -225,12 +233,15 @@ public class ProductServiceImpl implements ProductService {
         product.setStockQuantity(newStock);
         Product updatedProduct = productRepository.save(product);
         
+        // Publish stock update event for real-time broadcasting
+        publishStockUpdateEvent(updatedProduct);
+        
         log.info("Product stock updated successfully for id: {}", productId);
         return productMapper.toResponse(updatedProduct);
     }
     
     @Override
-    @CacheEvict(value = "products", allEntries = true)
+    @CacheEvict(value = "products", key = "#productId")
     public void reduceProductStock(Long productId, Integer quantity) {
         log.info("Reducing product stock for id: {} by {}", productId, quantity);
         
@@ -243,9 +254,35 @@ public class ProductServiceImpl implements ProductService {
         
         // Use business method from entity
         product.reduceStock(quantity);
-        productRepository.save(product);
+        Product updatedProduct = productRepository.save(product);
+        
+        // Publish stock update event for real-time broadcasting
+        publishStockUpdateEvent(updatedProduct);
         
         log.info("Product stock reduced successfully for id: {}", productId);
+    }
+    
+    /**
+     * Publishes stock update event to Kafka
+     * Enables real-time stock updates via WebSocket
+     * 
+     * @param product the updated product
+     */
+    private void publishStockUpdateEvent(Product product) {
+        try {
+            Map<String, Object> event = new HashMap<>();
+            event.put("productId", product.getId());
+            event.put("productName", product.getName());
+            event.put("stockQuantity", product.getStockQuantity());
+            event.put("timestamp", System.currentTimeMillis());
+            event.put("eventType", "STOCK_UPDATED");
+            
+            kafkaTemplate.send(STOCK_UPDATE_TOPIC, product.getId().toString(), event);
+            log.debug("Stock update event published for product ID: {}", product.getId());
+        } catch (Exception e) {
+            log.error("Failed to publish stock update event for product ID: {}", product.getId(), e);
+            // Don't throw - stock update broadcast is not critical for order flow
+        }
     }
     
     @Override
