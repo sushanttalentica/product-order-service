@@ -13,6 +13,7 @@ import com.ecommerce.productorder.mapper.OrderMapper;
 import com.ecommerce.productorder.service.OrderEventPublisher;
 import com.ecommerce.productorder.exception.BusinessException;
 import com.ecommerce.productorder.exception.ResourceNotFoundException;
+import com.ecommerce.productorder.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 public class OrderServiceImpl implements OrderService {
+    
+    // Use constants from Constants class
     
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -343,7 +346,7 @@ public class OrderServiceImpl implements OrderService {
         
         // This would typically involve complex business logic
         // For now, returning orders that are pending for more than 24 hours
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(24);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(Constants.HOURS_FOR_ATTENTION_CHECK);
         
         return orderRepository.findByStatusAndCreatedAtBefore(Order.OrderStatus.PENDING, cutoffTime)
                 .stream()
@@ -352,8 +355,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     /**
-     * Validates order request
-     * Encapsulates validation logic
+     * Validates order request for business rules
      * 
      * @param request the order request to validate
      * @throws BusinessException if validation fails
@@ -435,17 +437,32 @@ public class OrderServiceImpl implements OrderService {
      * @return calculated total amount
      */
     private BigDecimal calculateOrderTotal(CreateOrderRequest request) {
-        BigDecimal total = BigDecimal.ZERO;
-        
-        for (var orderItem : request.getOrderItems()) {
-            Product product = productRepository.findById(orderItem.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + orderItem.getProductId()));
-            
-            BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
-            total = total.add(itemTotal);
-        }
-        
-        return total;
+        return request.getOrderItems().stream()
+                .map(this::calculateItemTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    /**
+     * Calculates total for a single order item
+     * 
+     * @param orderItem the order item
+     * @return calculated item total
+     */
+    private BigDecimal calculateItemTotal(CreateOrderRequest.OrderItemRequest orderItem) {
+        Product product = findProductById(orderItem.getProductId());
+        return product.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
+    }
+    
+    /**
+     * Finds product by ID with proper error handling
+     * 
+     * @param productId the product ID
+     * @return Product entity
+     * @throws ResourceNotFoundException if product not found
+     */
+    private Product findProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
     }
     
     /**
