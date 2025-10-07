@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-order-service-config
+  namespace: dev
+data:
+  application.yml: |
+    spring:
+      profiles:
+        active: dev
+      
+      datasource:
+        url: jdbc:h2:mem:testdb
+        driver-class-name: org.h2.Driver
+        username: sa
+        password: password
+      
+      jpa:
+        hibernate:
+          ddl-auto: create-drop
+        show-sql: true
+        properties:
+          hibernate:
+            format_sql: true
+            dialect: org.hibernate.dialect.H2Dialect
+      
+      h2:
+        console:
+          enabled: true
+          path: /h2-console
+      
+      cache:
+        type: redis
+        redis:
+          time-to-live: 600000
+          cache-null-values: false
+          enable-statistics: true
+      
+      data:
+        redis:
+          host: redis-dev
+          port: 6379
+          timeout: 2000ms
+          lettuce:
+            pool:
+              max-active: 10
+              max-idle: 5
+              min-idle: 2
+              max-wait: 1000ms
+      
+      kafka:
+        bootstrap-servers: kafka-dev:9092
+        consumer:
+          group-id: product-order-service-dev
+          auto-offset-reset: earliest
+        producer:
+          acks: all
+          retries: 3
+    
+    server:
+      port: 8080
+      servlet:
+        context-path: /api/v1
+    
+    security:
+      jwt:
+        secret: devSecretKey123456789012345678901234567890
+        expiration: 86400000
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,metrics,prometheus
+      endpoint:
+        health:
+          show-details: always
+    
+    logging:
+      level:
+        com.ecommerce.productorder: DEBUG
+        org.springframework.kafka: DEBUG
+      pattern:
+        console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    
+    app:
+      environment: dev
+      debug: true
+      mock-services: true
