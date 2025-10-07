@@ -1,7 +1,16 @@
 package com.ecommerce.productorder.invoice.service.impl;
 
 import com.ecommerce.productorder.domain.entity.Order;
+import com.ecommerce.productorder.domain.entity.OrderItem;
 import com.ecommerce.productorder.invoice.service.PdfGeneratorService;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.io.font.constants.StandardFonts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,22 +56,66 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
             // Validate order
             validateOrderForPdf(order);
             
-            // Generate PDF content
+            // Create PDF using iText
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PdfWriter writer = new PdfWriter(outputStream);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
             
-            // Create PDF content (simplified implementation)
-            String pdfContent = createInvoiceContent(order);
-            outputStream.write(pdfContent.getBytes());
+            // Add invoice header
+            Paragraph header = new Paragraph("INVOICE")
+                    .setFontSize(24)
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
+                    .setTextAlignment(TextAlignment.CENTER);
+            document.add(header);
+            
+            document.add(new Paragraph("\n"));
+            
+            // Add invoice details
+            document.add(new Paragraph("Invoice Number: " + order.getOrderNumber()));
+            document.add(new Paragraph("Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            document.add(new Paragraph("Customer Email: " + order.getCustomerEmail()));
+            document.add(new Paragraph("Shipping Address: " + order.getShippingAddress()));
+            
+            document.add(new Paragraph("\n"));
+            
+            // Add order items table
+            Paragraph itemsHeader = new Paragraph("Order Items:")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD));
+            document.add(itemsHeader);
+            Table table = new Table(4);
+            table.addHeaderCell("Product");
+            table.addHeaderCell("Quantity");
+            table.addHeaderCell("Unit Price");
+            table.addHeaderCell("Subtotal");
+            
+            for (OrderItem item : order.getOrderItems()) {
+                table.addCell(item.getProduct().getName());
+                table.addCell(String.valueOf(item.getQuantity()));
+                table.addCell("$" + item.getUnitPrice());
+                table.addCell("$" + item.getSubtotal());
+            }
+            
+            document.add(table);
+            
+            document.add(new Paragraph("\n"));
+            
+            // Add total
+            Paragraph total = new Paragraph("Total Amount: $" + order.getTotalAmount())
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
+                    .setFontSize(14);
+            document.add(total);
+            
+            document.add(new Paragraph("\nStatus: " + order.getStatus()));
+            document.add(new Paragraph("Order Date: " + order.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            
+            // Close document
+            document.close();
             
             byte[] pdfBytes = outputStream.toByteArray();
-            outputStream.close();
-            
-            log.info("PDF invoice generated successfully for order ID: {}", order.getId());
+            log.info("PDF invoice generated successfully for order ID: {} ({} bytes)", order.getId(), pdfBytes.length);
             return pdfBytes;
             
-        } catch (IOException e) {
-            log.error("Error generating PDF invoice for order ID: {}", order.getId(), e);
-            throw new RuntimeException("Failed to generate PDF invoice: " + e.getMessage());
         } catch (Exception e) {
             log.error("Error generating PDF invoice for order ID: {}", order.getId(), e);
             throw new RuntimeException("Failed to generate PDF invoice: " + e.getMessage());
