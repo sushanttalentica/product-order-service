@@ -26,17 +26,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Integration tests for ProductController
- * 
- * Design Principles Applied:
- * - Integration Testing: Tests the full stack
- * - Spring Boot Test: Uses Spring Boot test context
- * - MockMvc: Tests HTTP endpoints
- * - Security Testing: Tests authentication and authorization
- * - Transaction Management: Uses @Transactional for test isolation
- * - Test Profiles: Uses test-specific configuration
- */
+
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")

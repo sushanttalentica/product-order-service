@@ -2,13 +2,6 @@
 
 # User data script for EC2 instance
 # 
-# Design Principles Applied:
-# - Automation: Automates application deployment
-# - Error Handling: Includes proper error handling
-# - Logging: Provides comprehensive logging
-# - Security: Implements security best practices
-# - Monitoring: Sets up monitoring and health checks
-
 set -e
 
 # Variables

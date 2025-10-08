@@ -24,17 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Performance tests for ProductService
- * 
- * Design Principles Applied:
- * - Performance Testing: Tests system performance under load
- * - Concurrent Testing: Tests concurrent operations
- * - Load Testing: Tests with multiple users/threads
- * - Memory Testing: Tests memory usage and leaks
- * - Database Performance: Tests database query performance
- * - Caching Performance: Tests caching effectiveness
- */
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

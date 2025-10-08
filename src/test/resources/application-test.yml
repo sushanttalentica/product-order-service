@@ -1,13 +1,5 @@
 # Test configuration for Product Order Service
 # 
-# Design Principles Applied:
-# - Test-specific Configuration: Separate configuration for tests
-# - Database Configuration: Uses H2 in-memory database for tests
-# - Security Configuration: Disables security for easier testing
-# - Logging Configuration: Reduced logging for test performance
-# - Cache Configuration: Uses simple cache for tests
-# - Kafka Configuration: Uses embedded Kafka for tests
-
 server:
   port: 0  # Random port for tests
 

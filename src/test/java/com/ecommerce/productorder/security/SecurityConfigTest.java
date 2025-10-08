@@ -16,17 +16,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Security configuration tests
- * 
- * Design Principles Applied:
- * - Security Testing: Tests authentication and authorization
- * - Spring Boot Test: Uses Spring Boot test context
- * - MockMvc: Tests HTTP endpoints with security
- * - Test Profiles: Uses test-specific configuration
- * - Role-based Testing: Tests different user roles
- * - Endpoint Testing: Tests public and protected endpoints
- */
+
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")

@@ -1,14 +1,5 @@
 # Application configuration
 # 
-# Design Principles Applied:
-# - Configuration by Convention: Uses Spring Boot's configuration conventions
-# - Environment-specific Configuration: Separate configurations for different environments
-# - Security Configuration: JWT and security settings
-# - Database Configuration: H2 for development, MySQL for production
-# - Caching Configuration: Caffeine cache settings
-# - Kafka Configuration: Message broker settings
-# - Logging Configuration: Logback settings
-
 server:
   port: 8080
   servlet:

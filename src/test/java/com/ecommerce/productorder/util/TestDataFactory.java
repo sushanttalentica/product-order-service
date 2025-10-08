@@ -13,17 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Test data factory for creating test objects
- * 
- * Design Principles Applied:
- * - Factory Pattern: Creates test objects with sensible defaults
- * - Builder Pattern: Uses builder pattern for object creation
- * - Test Data Generation: Generates realistic test data
- * - Randomization: Uses randomization for varied test data
- * - Reusability: Provides reusable test data creation methods
- * - Maintainability: Easy to maintain and update test data
- */
+
 public class TestDataFactory {
 
     private static final Random random = new Random();

@@ -24,18 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for PaymentServiceImpl
- * 
- * Design Principles Applied:
- * - Test-Driven Development: Comprehensive test coverage
- * - AAA Pattern: Arrange, Act, Assert
- * - Mocking: Proper use of mocks for dependencies
- * - Test Isolation: Each test is independent
- * - Descriptive Test Names: Clear test method names
- * - Edge Case Testing: Tests for boundary conditions
- * - Exception Testing: Tests for error scenarios
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Payment Service Tests")
 class PaymentServiceImplTest {
