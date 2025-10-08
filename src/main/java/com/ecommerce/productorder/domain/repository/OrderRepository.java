@@ -12,15 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for Order entity
- * 
- * Design Principles Applied:
- * - Repository Pattern: Abstracts data access logic
- * - Interface Segregation: Only exposes necessary data access methods
- * - Dependency Inversion: Depends on abstraction, not concrete implementation
- * - Spring Data JPA: Leverages Spring's repository abstraction
- */
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     

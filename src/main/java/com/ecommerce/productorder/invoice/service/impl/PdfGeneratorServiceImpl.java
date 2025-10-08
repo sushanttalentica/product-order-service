@@ -20,20 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Implementation of PdfGeneratorService
- * Generates PDF documents for invoices, receipts, and shipping labels
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates PDF generation logic
- * - Single Responsibility: Only handles PDF generation
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Exception Handling: Proper exception handling with custom exceptions
- * - Logging: Uses SLF4J for comprehensive logging
- * - Factory Pattern: Uses static factory methods for PDF creation
- * - Builder Pattern: Uses Builder pattern for PDF content creation
- * - Template Method: Uses template method pattern for PDF generation
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

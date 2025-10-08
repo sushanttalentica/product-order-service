@@ -2,17 +2,7 @@ package com.ecommerce.productorder.service;
 
 import com.ecommerce.productorder.domain.entity.Order;
 
-/**
- * Service interface for Order Event Publishing
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary event publishing operations
- * - Single Responsibility: Only handles order event publishing
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Observer Pattern: Publishes events for other services to observe
- * - Event-Driven Architecture: Enables loose coupling between services
- * - Business Logic Encapsulation: Encapsulates event publishing logic
- */
+
 public interface OrderEventPublisher {
     
     /**

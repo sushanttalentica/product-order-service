@@ -9,15 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for Category entity
- * 
- * Design Principles Applied:
- * - Repository Pattern: Abstracts data access logic
- * - Interface Segregation: Only exposes necessary data access methods
- * - Dependency Inversion: Depends on abstraction, not concrete implementation
- * - Spring Data JPA: Leverages Spring's repository abstraction
- */
+
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     

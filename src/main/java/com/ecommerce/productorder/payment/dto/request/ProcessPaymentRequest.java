@@ -8,17 +8,7 @@ import lombok.NoArgsConstructor;
 
  
 
-/**
- * Request DTO for processing payment
- * 
- * Design Principles Applied:
- * - Data Transfer Object: Encapsulates payment processing request data
- * - Validation: Uses Bean Validation annotations for input validation
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles payment processing request data
- * - Encapsulation: All payment processing data encapsulated
- * - Value Objects: Uses BigDecimal for monetary precision
- */
+
 @Data
 @Builder
 @NoArgsConstructor

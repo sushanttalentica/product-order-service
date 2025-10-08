@@ -6,17 +6,7 @@ import com.ecommerce.productorder.dto.request.UpdateCustomerRequest;
 import com.ecommerce.productorder.dto.response.CustomerResponse;
 import org.springframework.stereotype.Component;
 
-/**
- * Customer Mapper
- * 
- * Mapper for converting between Customer entities and DTOs.
- * 
- * Design Principles Applied:
- * - Mapper Pattern: Separates entity-DTO conversion logic
- * - Single Responsibility: Focuses only on mapping operations
- * - Null Safety: Handles null values gracefully
- * - Immutability: Creates new objects rather than modifying existing ones
- */
+
 @Component
 public class CustomerMapper {
 

@@ -2,16 +2,7 @@ package com.ecommerce.productorder.invoice.service;
 
 import java.util.Optional;
 
-/**
- * Service interface for AWS S3 operations
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary S3 operations
- * - Single Responsibility: Only handles S3 operations
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Optional Return Types: Uses Optional for null-safe operations
- * - Business Logic Encapsulation: Encapsulates S3 operations logic
- */
+
 public interface S3Service {
     
     /**

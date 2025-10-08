@@ -14,16 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for Product entity
- * 
- * Design Principles Applied:
- * - Repository Pattern: Abstracts data access logic
- * - Interface Segregation: Only exposes necessary data access methods
- * - Dependency Inversion: Depends on abstraction, not concrete implementation
- * - Spring Data JPA: Leverages Spring's repository abstraction
- * - Query Methods: Uses Spring Data's query derivation
- */
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     

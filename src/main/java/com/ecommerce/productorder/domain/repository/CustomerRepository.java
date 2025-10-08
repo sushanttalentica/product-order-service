@@ -11,17 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Customer Repository
- * 
- * Repository interface for Customer entity operations.
- * 
- * Design Principles Applied:
- * - Repository Pattern: Encapsulates data access logic
- * - Spring Data JPA: Provides automatic query generation
- * - Custom Queries: Defines specific business queries
- * - Pagination Support: Uses Pageable for large datasets
- */
+
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 

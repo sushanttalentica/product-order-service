@@ -12,16 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Order entity representing customer orders
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Core business aggregate root
- * - Single Responsibility: Manages order data and business rules
- * - Encapsulation: All order-related data and behavior encapsulated
- * - Aggregate Pattern: Order is the aggregate root for OrderItems
- * - State Pattern: Order status represents different states
- */
+
 @Entity
 @Table(name = "orders")
 @Data

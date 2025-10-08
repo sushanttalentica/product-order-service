@@ -19,23 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of InventoryService
- * Handles inventory management and integrates with external inventory services
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates inventory business logic
- * - Single Responsibility: Only handles inventory operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Event-Driven Architecture: Listens to Kafka events for inventory updates
- * - Logging: Uses SLF4J for comprehensive logging
- * - Exception Handling: Proper exception handling with graceful degradation
- * - Optional: Uses Optional for null-safe operations
- * - Builder Pattern: Uses Builder pattern for object creation
- * - Factory Pattern: Uses static factory methods for event creation
- * - Stream API: Uses Java Streams for data processing
- * - Transaction Management: Uses @Transactional for data consistency
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

@@ -1,14 +1,6 @@
 package com.ecommerce.productorder.util;
 
-/**
- * Application constants
- * 
- * Design Principles Applied:
- * - Single Responsibility: Contains only application constants
- * - Immutability: All constants are final and static
- * - Organization: Groups related constants together
- * - Naming: Uses descriptive names with UPPER_CASE convention
- */
+
 public final class Constants {
     
     // Private constructor to prevent instantiation

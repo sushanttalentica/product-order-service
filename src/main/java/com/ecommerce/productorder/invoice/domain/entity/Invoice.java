@@ -11,19 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Invoice entity representing generated invoices
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Core business entity for invoice domain
- * - Single Responsibility: Manages only invoice-related data and behavior
- * - Encapsulation: All invoice data and business rules encapsulated
- * - Value Objects: Uses BigDecimal for monetary precision
- * - State Pattern: Invoice status represents different states
- * - Aggregate Root: Invoice is the aggregate root for invoice operations
- * - Immutability: Uses Builder pattern for object creation
- * - JPA Best Practices: Proper entity mapping with constraints
- */
+
 @Entity
 @Table(name = "invoices")
 @Data

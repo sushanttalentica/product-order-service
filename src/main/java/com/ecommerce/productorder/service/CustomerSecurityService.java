@@ -6,16 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-/**
- * Customer Security Service
- * 
- * Service for customer security and authorization checks.
- * 
- * Design Principles Applied:
- * - Security Service: Handles authorization logic
- * - Single Responsibility: Focuses on security-related operations
- * - Dependency Injection: Uses CustomerService for data access
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

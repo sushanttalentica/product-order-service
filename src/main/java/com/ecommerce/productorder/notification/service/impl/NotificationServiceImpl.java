@@ -14,22 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Implementation of NotificationService
- * Handles email notifications and integrates with external notification services
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates notification business logic
- * - Single Responsibility: Only handles notification operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Event-Driven Architecture: Listens to Kafka events for notifications
- * - Logging: Uses SLF4J for comprehensive logging
- * - Exception Handling: Proper exception handling with graceful degradation
- * - Optional: Uses Optional for null-safe operations
- * - Builder Pattern: Uses Builder pattern for object creation
- * - Factory Pattern: Uses static factory methods for notification creation
- * - Template Method: Uses template method pattern for email generation
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

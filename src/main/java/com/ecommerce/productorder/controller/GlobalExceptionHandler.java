@@ -17,29 +17,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Global exception handler for the application
- * 
- * Design Principles Applied:
- * - Single Responsibility: Only handles exception processing
- * - Centralized Error Handling: All exceptions handled in one place
- * - Consistent Error Responses: Standardized error response format
- * - Logging: Logs all exceptions for debugging
- * - HTTP Status Mapping: Maps exceptions to appropriate HTTP status codes
- * - Validation Error Handling: Handles Bean Validation errors
- */
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     
-    /**
-     * Handles resource not found exceptions
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 404 Not Found
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     */
+    
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         log.error("Resource not found: {}", ex.getMessage());
@@ -55,14 +38,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
     
-    /**
-     * Handles business rule violations
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 400 Bad Request
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     */
+    
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, WebRequest request) {
         log.error("Business rule violation: {}", ex.getMessage());
@@ -78,15 +54,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     
-    /**
-     * Handles validation errors
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 400 Bad Request
-     * - Detailed Validation Errors: Provides field-specific error messages
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     */
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, WebRequest request) {
         log.error("Validation error: {}", ex.getMessage());
@@ -110,14 +78,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     
-    /**
-     * Handles access denied exceptions
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 403 Forbidden
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     */
+    
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
         log.error("Access denied: {}", ex.getMessage());
@@ -133,14 +94,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
     
-    /**
-     * Handles authentication failures
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 401 Unauthorized
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     */
+    
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
         log.error("Authentication failed: {}", ex.getMessage());
@@ -156,15 +110,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
     
-    /**
-     * Handles all other exceptions
-     * 
-     * Design Principles Applied:
-     * - HTTP Status Mapping: Maps to 500 Internal Server Error
-     * - Consistent Response: Standardized error response format
-     * - Logging: Logs the exception for debugging
-     * - Generic Handling: Catches all unhandled exceptions
-     */
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
         log.error("Unexpected error occurred: ", ex);
@@ -180,14 +126,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
     
-    /**
-     * Error response DTO
-     * 
-     * Design Principles Applied:
-     * - Data Transfer Object: Transfers error information
-     * - Immutability: Uses Builder pattern for object creation
-     * - Single Responsibility: Only handles error response data
-     */
+    
     @lombok.Data
     @lombok.Builder
     @lombok.NoArgsConstructor

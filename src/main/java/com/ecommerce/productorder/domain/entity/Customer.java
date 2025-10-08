@@ -14,18 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Customer Entity
- * 
- * Represents a customer in the e-commerce system.
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Represents the customer domain concept
- * - JPA Entity: Mapped to database table with proper annotations
- * - Validation: Uses Bean Validation for data integrity
- * - Audit Fields: Includes created/updated timestamps
- * - Builder Pattern: Uses Lombok builder for object creation
- */
+
 @Entity
 @Table(name = "customers")
 @Data

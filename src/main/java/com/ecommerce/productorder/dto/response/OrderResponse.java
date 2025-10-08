@@ -9,16 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * DTO for order response
- * 
- * Design Principles Applied:
- * - Data Transfer Object Pattern: Transfers data between layers
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles order response data
- * - Encapsulation: All order response data encapsulated
- * - Read-Only: No setters, only getters for data transfer
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,14 +27,7 @@ public class OrderResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
-    /**
-     * DTO for order item information in order response
-     * 
-     * Design Principles Applied:
-     * - Inner Class: Encapsulates order item data within order context
-     * - Immutability: Uses Builder pattern for object creation
-     * - Single Responsibility: Only handles order item response data
-     */
+    
     @Data
     @Builder
     @NoArgsConstructor
@@ -55,14 +39,7 @@ public class OrderResponse {
         private BigDecimal unitPrice;
         private BigDecimal subtotal;
         
-        /**
-         * DTO for product information in order item
-         * 
-         * Design Principles Applied:
-         * - Inner Class: Encapsulates product data within order item context
-         * - Immutability: Uses Builder pattern for object creation
-         * - Single Responsibility: Only handles product info data
-         */
+        
         @Data
         @Builder
         @NoArgsConstructor

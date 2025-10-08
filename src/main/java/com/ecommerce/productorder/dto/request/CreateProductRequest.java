@@ -8,16 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-/**
- * DTO for creating a new product
- * 
- * Design Principles Applied:
- * - Data Transfer Object Pattern: Transfers data between layers
- * - Validation: Uses Bean Validation annotations for input validation
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles product creation data
- * - Encapsulation: All product creation data encapsulated
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -9,17 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Response DTO for payment operations
- * 
- * Design Principles Applied:
- * - Data Transfer Object: Encapsulates payment response data
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles payment response data
- * - Encapsulation: All payment response data encapsulated
- * - Value Objects: Uses BigDecimal for monetary precision
- * - Factory Pattern: Uses static factory methods for creation
- */
+
 @Data
 @Builder
 @NoArgsConstructor

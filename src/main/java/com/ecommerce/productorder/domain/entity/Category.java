@@ -12,16 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Category entity representing product categories
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Represents a core business concept
- * - Single Responsibility: Manages only category-related data and behavior
- * - Encapsulation: All category data is encapsulated within this entity
- * - Immutability: Uses Builder pattern for object creation
- * - JPA Best Practices: Proper entity mapping with relationships
- */
+
 @Entity
 @Table(name = "categories")
 @Data

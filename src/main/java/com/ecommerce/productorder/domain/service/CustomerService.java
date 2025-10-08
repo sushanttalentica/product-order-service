@@ -10,16 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Customer Service Interface
- * 
- * Service interface for Customer business operations.
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates business logic
- * - Interface Segregation: Defines specific customer operations
- * - Dependency Inversion: Depends on abstractions, not implementations
- */
+
 public interface CustomerService {
 
     /**

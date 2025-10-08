@@ -13,16 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Product entity representing e-commerce products
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Core business entity
- * - Single Responsibility: Manages product data and business rules
- * - Encapsulation: All product-related data and behavior encapsulated
- * - Value Objects: Uses BigDecimal for monetary values to avoid precision issues
- * - JPA Best Practices: Proper entity relationships and constraints
- */
+
 @Entity
 @Table(name = "products")
 @Data

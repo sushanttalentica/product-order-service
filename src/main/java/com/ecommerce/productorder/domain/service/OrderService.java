@@ -8,17 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service interface for Order operations
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary order operations
- * - Single Responsibility: Only handles order business logic
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Command Query Separation: Separates read and write operations
- * - Optional Return Types: Uses Optional for null-safe operations
- * - Business Logic Encapsulation: Encapsulates order business rules
- */
+
 public interface OrderService {
     
     /**

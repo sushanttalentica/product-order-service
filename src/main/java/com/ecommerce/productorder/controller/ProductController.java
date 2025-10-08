@@ -24,19 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * REST Controller for Product operations
- * 
- * Design Principles Applied:
- * - RESTful Design: Follows REST conventions for HTTP methods and status codes
- * - Single Responsibility: Only handles Product HTTP operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Security: Uses Spring Security annotations for authorization
- * - Validation: Uses Bean Validation for input validation
- * - Error Handling: Delegates to global exception handler
- * - Logging: Uses SLF4J for logging
- * - Pagination: Supports pagination for list operations
- */
+
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -46,15 +34,7 @@ public class ProductController {
     
     private final ProductService productService;
     
-    /**
-     * Creates a new product
-     * 
-     * Design Principles Applied:
-     * - POST for creation: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Validation: Validates request body
-     * - Response: Returns created product with 201 status
-     */
+    
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a new product", description = "Create a new product (Admin only)")
@@ -72,15 +52,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
-    /**
-     * Updates an existing product
-     * 
-     * Design Principles Applied:
-     * - PUT for updates: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Validation: Validates request body
-     * - Path Variable: Uses path variable for resource identification
-     */
+    
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,
@@ -90,15 +62,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves a product by ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Public access for product details
-     * - Path Variable: Uses path variable for resource identification
-     * - Optional Response: Handles case when product not found
-     */
+    
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
         log.debug("Retrieving product with id: {}", productId);
@@ -107,15 +71,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Retrieves a product by SKU
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Public access for product details
-     * - Query Parameter: Uses query parameter for SKU
-     * - Optional Response: Handles case when product not found
-     */
+    
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
         log.debug("Retrieving product with SKU: {}", sku);
@@ -124,15 +80,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Retrieves all products with pagination
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Public access for product listing
-     * - Pagination: Supports pagination parameters
-     * - Pageable: Uses Spring's Pageable for pagination
-     */
+    
     @GetMapping
     @Operation(summary = "Get all products", description = "Retrieve a paginated list of all active products")
     @ApiResponses(value = {
@@ -146,15 +94,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Searches products by name or query
-     * 
-     * Design Principles Applied:
-     * - GET for search: Follows REST conventions
-     * - Security: Public access for product search
-     * - Query Parameter: Uses query parameter for search term
-     * - Pagination: Supports pagination for search results
-     */
+    
     @GetMapping("/search")
     public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(required = false) String query,
                                                                @RequestParam(required = false) String name,
@@ -170,15 +110,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves products by category
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Public access for product listing
-     * - Path Variable: Uses path variable for category identification
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<ProductResponse>> getProductsByCategory(@PathVariable Long categoryId,
                                                                       @PageableDefault(size = 20) Pageable pageable) {
@@ -187,15 +119,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Searches products by price range
-     * 
-     * Design Principles Applied:
-     * - GET for search: Follows REST conventions
-     * - Security: Public access for product search
-     * - Query Parameters: Uses query parameters for price range
-     * - Pagination: Supports pagination for search results
-     */
+    
     @GetMapping("/price-range")
     public ResponseEntity<Page<ProductResponse>> getProductsByPriceRange(@RequestParam BigDecimal minPrice,
                                                                         @RequestParam BigDecimal maxPrice,
@@ -205,15 +129,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Advanced product search with multiple criteria
-     * 
-     * Design Principles Applied:
-     * - GET for search: Follows REST conventions
-     * - Security: Public access for product search
-     * - Query Parameters: Uses optional query parameters for flexible search
-     * - Pagination: Supports pagination for search results
-     */
+    
     @GetMapping("/search/advanced")
     public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(required = false) String name,
                                                                @RequestParam(required = false) Long categoryId,
@@ -226,15 +142,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Deletes a product (soft delete)
-     * 
-     * Design Principles Applied:
-     * - DELETE for deletion: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - No Content: Returns 204 status for successful deletion
-     */
+    
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
@@ -243,15 +151,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
     
-    /**
-     * Gets products with low stock
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Query Parameter: Uses query parameter for threshold
-     * - List Response: Returns list of products with low stock
-     */
+    
     @GetMapping("/low-stock")
     // @PreAuthorize("hasRole('ADMIN')") // DISABLED FOR TESTING
     public ResponseEntity<List<ProductResponse>> getProductsWithLowStock(@RequestParam(defaultValue = "10") Integer threshold) {
@@ -260,15 +160,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Updates product stock
-     * 
-     * Design Principles Applied:
-     * - PATCH for partial updates: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Query Parameter: Uses query parameter for new stock value
-     */
+    
     @PatchMapping("/{productId}/stock")
     // @PreAuthorize("hasRole('ADMIN')") // DISABLED FOR TESTING
     public ResponseEntity<ProductResponse> updateProductStock(@PathVariable Long productId,

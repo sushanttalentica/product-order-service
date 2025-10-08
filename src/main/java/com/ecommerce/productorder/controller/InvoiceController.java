@@ -19,17 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * REST Controller for Invoice operations
- * 
- * Design Principles Applied:
- * - RESTful Design: Follows REST conventions for HTTP methods and status codes
- * - Single Responsibility: Only handles Invoice HTTP operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Security: Uses Spring Security annotations for authorization
- * - Error Handling: Delegates to global exception handler
- * - Logging: Uses SLF4J for logging
- */
+
 @RestController
 @RequestMapping("/api/v1/invoices")
 @RequiredArgsConstructor
@@ -40,15 +30,7 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
     private final OrderRepository orderRepository;
     
-    /**
-     * Generates invoice for order
-     * 
-     * Design Principles Applied:
-     * - POST for creation: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for order identification
-     * - Response: Returns invoice URL with 201 status
-     */
+    
     @PostMapping("/order/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Generate invoice for order", description = "Generate PDF invoice for an order and upload to S3")
@@ -78,15 +60,7 @@ public class InvoiceController {
         }
     }
     
-    /**
-     * Gets invoice URL for order
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for order identification
-     * - Optional Response: Handles case when invoice not found
-     */
+    
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Get invoice URL for order", description = "Retrieve the S3 URL for an order's invoice")
@@ -110,15 +84,7 @@ public class InvoiceController {
         }
     }
     
-    /**
-     * Checks if invoice exists for order
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for order identification
-     * - Boolean Response: Returns existence status
-     */
+    
     @GetMapping("/order/{orderId}/exists")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Check if invoice exists for order", description = "Check if an invoice has been generated for an order")
@@ -136,15 +102,7 @@ public class InvoiceController {
         return ResponseEntity.ok(Map.of("exists", exists));
     }
     
-    /**
-     * Deletes invoice for order
-     * 
-     * Design Principles Applied:
-     * - DELETE for deletion: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for order identification
-     * - No Content: Returns 204 status for successful deletion
-     */
+    
     @DeleteMapping("/order/{orderId}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete invoice for order", description = "Delete invoice from S3 and database (Admin only)")

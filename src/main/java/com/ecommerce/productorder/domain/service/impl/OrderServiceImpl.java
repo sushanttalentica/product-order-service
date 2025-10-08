@@ -31,23 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of OrderService
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates business logic
- * - Single Responsibility: Only handles order business logic
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Transaction Management: Uses @Transactional for data consistency
- * - Exception Handling: Proper exception handling with custom exceptions
- * - Logging: Uses SLF4J for comprehensive logging
- * - Stream API: Uses Java Streams for data processing
- * - Optional: Uses Optional for null-safe operations
- * - Builder Pattern: Uses Builder pattern for object creation
- * - Factory Pattern: Uses static factory methods
- * - Command Query Separation: Separates read and write operations
- * - Event-Driven Architecture: Publishes events for downstream workflows
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

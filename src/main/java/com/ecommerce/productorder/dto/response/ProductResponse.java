@@ -8,16 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * DTO for product response
- * 
- * Design Principles Applied:
- * - Data Transfer Object Pattern: Transfers data between layers
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles product response data
- * - Encapsulation: All product response data encapsulated
- * - Read-Only: No setters, only getters for data transfer
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -35,14 +26,7 @@ public class ProductResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
-    /**
-     * DTO for category information in product response
-     * 
-     * Design Principles Applied:
-     * - Inner Class: Encapsulates category data within product context
-     * - Immutability: Uses Builder pattern for object creation
-     * - Single Responsibility: Only handles category response data
-     */
+    
     @Data
     @Builder
     @NoArgsConstructor

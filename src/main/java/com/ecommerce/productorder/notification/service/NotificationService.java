@@ -4,16 +4,7 @@ import com.ecommerce.productorder.domain.entity.Order;
 
 import java.util.Optional;
 
-/**
- * Service interface for Notification operations
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary notification operations
- * - Single Responsibility: Only handles notification business logic
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Optional Return Types: Uses Optional for null-safe operations
- * - Business Logic Encapsulation: Encapsulates notification business rules
- */
+
 public interface NotificationService {
     
     /**

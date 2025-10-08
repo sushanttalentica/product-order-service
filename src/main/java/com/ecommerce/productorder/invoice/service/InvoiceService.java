@@ -4,16 +4,7 @@ import com.ecommerce.productorder.domain.entity.Order;
 
 import java.util.Optional;
 
-/**
- * Service interface for Invoice operations
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary invoice operations
- * - Single Responsibility: Only handles invoice business logic
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Optional Return Types: Uses Optional for null-safe operations
- * - Business Logic Encapsulation: Encapsulates invoice business rules
- */
+
 public interface InvoiceService {
     
     /**

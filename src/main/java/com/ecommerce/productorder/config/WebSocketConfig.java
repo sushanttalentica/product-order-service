@@ -6,21 +6,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-/**
- * WebSocket configuration for real-time updates
- * 
- * Design Principles Applied:
- * - Real-Time Communication: WebSocket for bi-directional communication
- * - Publish-Subscribe Pattern: STOMP protocol for message routing
- * - Scalability: Can broadcast to thousands of connected clients
- * - Low Latency: Sub-second stock update delivery
- * 
- * Use Cases:
- * - Real-time stock updates when products are purchased
- * - Live order status notifications
- * - Inventory alerts
- * - Price change notifications
- */
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {

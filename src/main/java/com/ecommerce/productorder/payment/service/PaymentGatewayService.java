@@ -6,17 +6,7 @@ import com.ecommerce.productorder.payment.dto.response.PaymentResponse;
 
 import java.math.BigDecimal;
 
-/**
- * Service interface for Payment Gateway operations
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary gateway operations
- * - Single Responsibility: Only handles payment gateway communication
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Strategy Pattern: Allows different gateway implementations
- * - Adapter Pattern: Adapts external gateway APIs to internal interfaces
- * - Business Logic Encapsulation: Encapsulates gateway-specific logic
- */
+
 public interface PaymentGatewayService {
     
     /**

@@ -6,16 +6,7 @@ import com.ecommerce.productorder.dto.request.UpdateProductRequest;
 import com.ecommerce.productorder.dto.response.ProductResponse;
 import org.mapstruct.*;
 
-/**
- * MapStruct mapper for Product entity and DTOs
- * 
- * Design Principles Applied:
- * - Mapper Pattern: Separates entity-to-DTO conversion logic
- * - Single Responsibility: Only handles Product mapping operations
- * - Interface Segregation: Only exposes necessary mapping methods
- * - MapStruct: Uses compile-time code generation for performance
- * - Null Safety: Handles null values gracefully
- */
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
     

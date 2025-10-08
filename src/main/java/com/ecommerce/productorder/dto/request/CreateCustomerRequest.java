@@ -11,17 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Create Customer Request DTO
- * 
- * DTO for creating a new customer.
- * 
- * Design Principles Applied:
- * - Data Transfer Object: Separates API contract from entity
- * - Validation: Uses Bean Validation for input validation
- * - Builder Pattern: Uses Lombok builder for object creation
- * - Immutability: Uses final fields where possible
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -12,15 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 
-/**
- * gRPC server configuration
- * 
- * Design Principles Applied:
- * - Configuration by Convention: Uses Spring Boot conventions
- * - Single Responsibility: Only handles gRPC server setup
- * - Dependency Injection: Provides gRPC server bean
- * - Lifecycle Management: Proper server startup and shutdown
- */
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j

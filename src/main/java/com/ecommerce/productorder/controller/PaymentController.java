@@ -23,19 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REST Controller for Payment operations
- * 
- * Design Principles Applied:
- * - RESTful Design: Follows REST conventions for HTTP methods and status codes
- * - Single Responsibility: Only handles Payment HTTP operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Security: Uses Spring Security annotations for authorization
- * - Validation: Uses Bean Validation for input validation
- * - Error Handling: Delegates to global exception handler
- * - Logging: Uses SLF4J for logging
- * - Pagination: Supports pagination for list operations
- */
+
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
@@ -45,16 +33,7 @@ public class PaymentController {
     
     private final PaymentService paymentService;
     
-    /**
-     * Processes a payment
-     * 
-     * Design Principles Applied:
-     * - POST for creation: Follows REST conventions
-     * - Security: Requires CUSTOMER role
-     * - Validation: Validates request body
-     * - Response: Returns created payment with 201 status
-     * - Workflow Trigger: Triggers payment processing workflow
-     */
+    
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Process payment", description = "Process a payment for an order (Customer only)")
@@ -72,15 +51,7 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
-    /**
-     * Retrieves a payment by ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Optional Response: Handles case when payment not found
-     */
+    
     @GetMapping("/{paymentId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Get payment by ID", description = "Retrieve payment details by payment ID")
@@ -98,15 +69,7 @@ public class PaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Retrieves payment by order ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for order identification
-     * - Optional Response: Handles case when payment not found
-     */
+    
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Get payment by order ID", description = "Retrieve payment details by order ID")
@@ -124,15 +87,7 @@ public class PaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Retrieves payments by customer ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for customer identification
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     @Operation(summary = "Get payments by customer ID", description = "Retrieve all payments for a specific customer")
@@ -148,16 +103,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Refunds a payment
-     * 
-     * Design Principles Applied:
-     * - POST for action: Follows REST conventions for actions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Request Body: Uses request body for refund amount
-     * - Workflow Trigger: Triggers refund processing workflow
-     */
+    
     @PostMapping("/{paymentId}/refund")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Refund payment", description = "Refund a payment (Admin only)")
@@ -177,15 +123,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Cancels a payment
-     * 
-     * Design Principles Applied:
-     * - DELETE for cancellation: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Workflow Trigger: Triggers payment cancellation workflow
-     */
+    
     @DeleteMapping("/{paymentId}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cancel payment", description = "Cancel a payment (Admin only)")
@@ -202,15 +140,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves all payments with pagination
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Pagination: Supports pagination parameters
-     * - Pageable: Uses Spring's Pageable for pagination
-     */
+    
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all payments", description = "Retrieve all payments with pagination (Admin only)")
@@ -226,14 +156,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Gets payment statistics
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Statistics: Returns payment statistics
-     */
+    
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payment statistics", description = "Retrieve payment statistics (Admin only)")

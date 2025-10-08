@@ -10,18 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for Payment entity
- * 
- * Design Principles Applied:
- * - Repository Pattern: Encapsulates data access logic
- * - Single Responsibility: Only handles Payment data access
- * - Interface Segregation: Provides only necessary methods
- * - Spring Data JPA: Leverages Spring Data JPA for automatic implementation
- * - Query Methods: Uses Spring Data query method naming conventions
- * - Custom Queries: Uses @Query for complex queries
- * - Optional Return Types: Uses Optional for null-safe operations
- */
+
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     

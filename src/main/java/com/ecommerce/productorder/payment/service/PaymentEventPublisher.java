@@ -2,17 +2,7 @@ package com.ecommerce.productorder.payment.service;
 
 import com.ecommerce.productorder.payment.domain.entity.Payment;
 
-/**
- * Service interface for Payment Event Publishing
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary event publishing operations
- * - Single Responsibility: Only handles payment event publishing
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Observer Pattern: Publishes events for other services to observe
- * - Event-Driven Architecture: Enables loose coupling between services
- * - Business Logic Encapsulation: Encapsulates event publishing logic
- */
+
 public interface PaymentEventPublisher {
     
     /**

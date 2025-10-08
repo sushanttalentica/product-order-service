@@ -15,21 +15,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-/**
- * Implementation of PaymentGatewayService
- * Simulates payment gateway communication for demonstration purposes
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates gateway communication logic
- * - Single Responsibility: Only handles payment gateway communication
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Strategy Pattern: Implements gateway-specific strategies
- * - Adapter Pattern: Adapts external gateway APIs to internal interfaces
- * - Simulation Pattern: Simulates external gateway behavior
- * - Logging: Uses SLF4J for comprehensive logging
- * - Exception Handling: Proper exception handling with custom exceptions
- * - Factory Pattern: Uses static factory methods for response creation
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

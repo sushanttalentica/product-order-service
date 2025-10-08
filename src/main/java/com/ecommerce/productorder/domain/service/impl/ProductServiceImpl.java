@@ -28,18 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of ProductService
- * 
- * Design Principles Applied:
- * - Service Pattern: Implements business logic
- * - Single Responsibility: Only handles Product business operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Transaction Management: Uses Spring's declarative transaction management
- * - Caching: Uses Spring's caching abstraction for performance
- * - Error Handling: Proper exception handling with custom exceptions
- * - Logging: Uses SLF4J for logging
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

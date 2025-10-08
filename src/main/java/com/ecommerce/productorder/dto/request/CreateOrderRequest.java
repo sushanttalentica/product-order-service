@@ -10,17 +10,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * DTO for creating a new order
- * 
- * Design Principles Applied:
- * - Data Transfer Object Pattern: Transfers data between layers
- * - Validation: Uses Bean Validation annotations for input validation
- * - Immutability: Uses Builder pattern for object creation
- * - Single Responsibility: Only handles order creation data
- * - Encapsulation: All order creation data encapsulated
- * - Composition: Contains list of order items
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -54,14 +44,7 @@ public class CreateOrderRequest {
         return BigDecimal.ZERO;
     }
     
-    /**
-     * DTO for individual order item
-     * 
-     * Design Principles Applied:
-     * - Inner Class: Encapsulates order item data within order context
-     * - Validation: Uses Bean Validation for input validation
-     * - Immutability: Uses Builder pattern for object creation
-     */
+    
     @Data
     @Builder
     @NoArgsConstructor

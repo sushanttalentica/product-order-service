@@ -17,20 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REST Controller for Order operations
- * 
- * Design Principles Applied:
- * - RESTful Design: Follows REST conventions for HTTP methods and status codes
- * - Single Responsibility: Only handles Order HTTP operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Security: Uses Spring Security annotations for authorization
- * - Validation: Uses Bean Validation for input validation
- * - Error Handling: Delegates to global exception handler
- * - Logging: Uses SLF4J for logging
- * - Pagination: Supports pagination for list operations
- * - Command Query Separation: Separates read and write operations
- */
+
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -39,16 +26,7 @@ public class OrderController {
     
     private final OrderService orderService;
     
-    /**
-     * Creates a new order
-     * 
-     * Design Principles Applied:
-     * - POST for creation: Follows REST conventions
-     * - Security: Requires CUSTOMER role
-     * - Validation: Validates request body
-     * - Response: Returns created order with 201 status
-     * - Workflow Trigger: Triggers downstream workflows
-     */
+    
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
@@ -57,15 +35,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
-    /**
-     * Retrieves an order by ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER role
-     * - Path Variable: Uses path variable for resource identification
-     * - Optional Response: Handles case when order not found
-     */
+    
     @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
@@ -75,15 +45,7 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Retrieves orders by customer ID
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires CUSTOMER role
-     * - Path Variable: Uses path variable for customer identification
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Page<OrderResponse>> getOrdersByCustomerId(@PathVariable Long customerId,
@@ -93,15 +55,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves orders by status
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Query Parameter: Uses query parameter for status filtering
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/status/{status}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<OrderResponse>> getOrdersByStatus(@PathVariable String status,
@@ -111,16 +65,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Updates order status
-     * 
-     * Design Principles Applied:
-     * - PATCH for partial updates: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Query Parameter: Uses query parameter for new status
-     * - Workflow Trigger: Triggers downstream workflows
-     */
+    
     @PatchMapping("/{orderId}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long orderId,
@@ -130,15 +75,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Cancels an order
-     * 
-     * Design Principles Applied:
-     * - DELETE for cancellation: Follows REST conventions
-     * - Security: Requires CUSTOMER or ADMIN role
-     * - Path Variable: Uses path variable for resource identification
-     * - Workflow Trigger: Triggers downstream workflows
-     */
+    
     @DeleteMapping("/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
@@ -147,15 +84,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves all orders with pagination
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Pagination: Supports pagination parameters
-     * - Pageable: Uses Spring's Pageable for pagination
-     */
+    
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<OrderResponse>> getAllOrders(@PageableDefault(size = 20) Pageable pageable) {
@@ -164,15 +93,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves orders by date range
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Query Parameters: Uses query parameters for date range
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/date-range")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<OrderResponse>> getOrdersByDateRange(@RequestParam String startDate,
@@ -183,15 +104,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Retrieves orders by amount range
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Query Parameters: Uses query parameters for amount range
-     * - Pagination: Supports pagination for results
-     */
+    
     @GetMapping("/amount-range")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<OrderResponse>> getOrdersByAmountRange(@RequestParam String minAmount,
@@ -202,15 +115,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Gets order statistics
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Query Parameter: Uses query parameter for date range
-     * - Statistics: Returns order statistics
-     */
+    
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> getOrderStatistics(@RequestParam(required = false) String startDate,
@@ -220,15 +125,7 @@ public class OrderController {
         return ResponseEntity.ok(statistics);
     }
     
-    /**
-     * Gets orders needing attention
-     * 
-     * Design Principles Applied:
-     * - GET for retrieval: Follows REST conventions
-     * - Security: Requires ADMIN role
-     * - Business Logic: Returns orders that need attention
-     * - List Response: Returns list of orders
-     */
+    
     @GetMapping("/needing-attention")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderResponse>> getOrdersNeedingAttention() {

@@ -10,16 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service interface for Product business operations
- * 
- * Design Principles Applied:
- * - Service Pattern: Encapsulates business logic
- * - Interface Segregation: Only exposes necessary business operations
- * - Dependency Inversion: Depends on abstraction, not concrete implementation
- * - Single Responsibility: Only handles Product business operations
- * - Facade Pattern: Provides simplified interface to complex operations
- */
+
 public interface ProductService {
     
     /**

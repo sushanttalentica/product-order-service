@@ -8,24 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-/**
- * Stock Update Broadcaster
- * Listens to Kafka stock update events and broadcasts to WebSocket clients
- * 
- * Design Principles Applied:
- * - Event-Driven Architecture: Consumes Kafka events
- * - Publish-Subscribe Pattern: Broadcasts to WebSocket subscribers
- * - Single Responsibility: Only handles stock update broadcasting
- * - Loose Coupling: Decoupled from business logic
- * - Real-Time Communication: Sub-second latency for stock updates
- * 
- * Flow:
- * 1. Product stock changes (order placed/cancelled)
- * 2. Kafka event "product.stock.updated" published
- * 3. This service consumes the event
- * 4. Broadcasts to all WebSocket clients subscribed to that product
- * 5. Frontend updates UI in real-time
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

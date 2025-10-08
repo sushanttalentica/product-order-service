@@ -17,15 +17,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Manual Kafka configuration for Spring Boot 3.1.5 compatibility
- * 
- * Design Principles Applied:
- * - Configuration by Convention: Uses Spring Boot conventions
- * - Single Responsibility: Only handles Kafka configuration
- * - Dependency Injection: Provides Kafka beans manually
- * - Local Development: Configured for local Kafka instance
- */
+
 @Configuration
 @EnableKafka
 public class KafkaConfig {

@@ -25,20 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Customer Controller
- * 
- * REST Controller for Customer operations.
- * 
- * Design Principles Applied:
- * - RESTful Design: Follows REST conventions for HTTP methods and status codes
- * - Security: Uses @PreAuthorize for role-based access control
- * - Validation: Uses Bean Validation for input validation
- * - Error Handling: Delegates to global exception handler
- * - Logging: Uses SLF4J for logging
- * - Pagination: Supports pagination for list operations
- * - Swagger Documentation: Provides comprehensive API documentation
- */
+
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor

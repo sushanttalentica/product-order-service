@@ -1,15 +1,6 @@
 package com.ecommerce.productorder.util;
 
-/**
- * Utility class for common validation operations
- * 
- * Design Principles Applied:
- * - Single Responsibility: Only handles validation logic
- * - Static Methods: Utility methods that don't require state
- * - Immutability: No mutable state
- * - Naming: Clear, descriptive method names
- * - Error Messages: Meaningful error messages
- */
+
 public final class ValidationUtils {
     
     // Private constructor to prevent instantiation

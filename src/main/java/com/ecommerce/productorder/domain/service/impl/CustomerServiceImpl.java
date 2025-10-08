@@ -21,18 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Customer Service Implementation
- * 
- * Implementation of Customer business operations.
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Implements business logic
- * - Transaction Management: Uses @Transactional for data consistency
- * - Error Handling: Throws appropriate business exceptions
- * - Logging: Uses SLF4J for operation logging
- * - Password Security: Encrypts passwords before storage
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

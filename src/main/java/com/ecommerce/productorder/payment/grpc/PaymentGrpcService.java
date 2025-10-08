@@ -10,17 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-/**
- * gRPC service implementation for payment operations
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates gRPC payment operations
- * - Single Responsibility: Only handles gRPC payment requests
- * - Dependency Injection: Uses constructor injection for PaymentService
- * - Logging: Uses SLF4J for comprehensive logging
- * - Exception Handling: Proper exception handling with gRPC status codes
- * - Data Conversion: Converts between gRPC and internal DTOs
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

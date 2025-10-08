@@ -11,16 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * OrderItem entity representing individual items in an order
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Part of Order aggregate
- * - Single Responsibility: Manages order item data and calculations
- * - Encapsulation: All order item data and behavior encapsulated
- * - Value Object Pattern: Immutable calculations for subtotal
- * - Composition: Belongs to Order aggregate
- */
+
 @Entity
 @Table(name = "order_items")
 @Data

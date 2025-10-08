@@ -11,19 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Payment entity representing payment transactions
- * 
- * Design Principles Applied:
- * - Domain-Driven Design: Core business entity for payment domain
- * - Single Responsibility: Manages only payment-related data and behavior
- * - Encapsulation: All payment data and business rules encapsulated
- * - Value Objects: Uses BigDecimal for monetary precision
- * - State Pattern: Payment status represents different transaction states
- * - Aggregate Root: Payment is the aggregate root for payment operations
- * - Immutability: Uses Builder pattern for object creation
- * - JPA Best Practices: Proper entity mapping with constraints
- */
+
 @Entity
 @Table(name = "payments")
 @Data

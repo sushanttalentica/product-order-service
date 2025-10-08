@@ -23,21 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 
-/**
- * Implementation of S3Service
- * Handles AWS S3 operations for file storage
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates S3 operations logic
- * - Single Responsibility: Only handles S3 operations
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Configuration: Uses @Value for configuration injection
- * - Exception Handling: Proper exception handling with custom exceptions
- * - Logging: Uses SLF4J for comprehensive logging
- * - Optional: Uses Optional for null-safe operations
- * - Factory Pattern: Uses static factory methods for URL creation
- * - Builder Pattern: Uses Builder pattern for object creation
- */
+
 @Service
 @Slf4j
 public class S3ServiceImpl implements S3Service {

@@ -2,15 +2,7 @@ package com.ecommerce.productorder.invoice.service;
 
 import com.ecommerce.productorder.domain.entity.Order;
 
-/**
- * Service interface for PDF generation
- * 
- * Design Principles Applied:
- * - Interface Segregation: Defines only necessary PDF generation operations
- * - Single Responsibility: Only handles PDF generation logic
- * - Dependency Inversion: Depends on abstractions, not implementations
- * - Business Logic Encapsulation: Encapsulates PDF generation logic
- */
+
 public interface PdfGeneratorService {
     
     /**

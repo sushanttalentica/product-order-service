@@ -8,17 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Customer Response DTO
- * 
- * DTO for returning customer information in API responses.
- * 
- * Design Principles Applied:
- * - Data Transfer Object: Separates API contract from entity
- * - Security: Excludes sensitive information like password
- * - Builder Pattern: Uses Lombok builder for object creation
- * - Read-only: Immutable response object
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -11,21 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Implementation of PaymentEventPublisher
- * Publishes payment events to Kafka topics
- * 
- * Design Principles Applied:
- * - Service Layer Pattern: Encapsulates event publishing logic
- * - Single Responsibility: Only handles payment event publishing
- * - Dependency Injection: Uses constructor injection for dependencies
- * - Observer Pattern: Publishes events for other services to observe
- * - Event-Driven Architecture: Enables loose coupling between services
- * - Logging: Uses SLF4J for comprehensive logging
- * - Exception Handling: Proper exception handling with graceful degradation
- * - Factory Pattern: Uses static factory methods for event creation
- * - Builder Pattern: Uses Builder pattern for event data creation
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

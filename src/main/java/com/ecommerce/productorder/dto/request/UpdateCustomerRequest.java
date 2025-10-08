@@ -7,17 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Update Customer Request DTO
- * 
- * DTO for updating an existing customer.
- * 
- * Design Principles Applied:
- * - Data Transfer Object: Separates API contract from entity
- * - Partial Updates: All fields are optional for flexible updates
- * - Validation: Uses Bean Validation for input validation
- * - Builder Pattern: Uses Lombok builder for object creation
- */
+
 @Data
 @Builder
 @NoArgsConstructor
