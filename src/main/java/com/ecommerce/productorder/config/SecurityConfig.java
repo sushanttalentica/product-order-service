@@ -50,9 +50,6 @@ public class SecurityConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // PasswordEncoder bean moved to PasswordEncoderConfig to avoid circular dependencies
-
-
     /**
      * Authentication Provider Bean
      */
