@@ -398,6 +398,7 @@ public class PaymentServiceImpl implements PaymentService {
     
     /**
      * Updates order status after payment processing
+     * Handles different order states appropriately
      * 
      * @param orderId the order ID
      * @param paymentSuccessful whether payment was successful
@@ -406,18 +407,30 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             orderRepository.findById(orderId).ifPresent(order -> {
                 if (paymentSuccessful) {
-                    // Update to PROCESSING after successful payment
-                    order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.PROCESSING);
-                    log.info("Order {} status updated to PROCESSING after successful payment", orderId);
+                    com.ecommerce.productorder.domain.entity.Order.OrderStatus currentStatus = order.getStatus();
+                    log.info("Processing payment success for order {} with current status: {}", orderId, currentStatus);
+                    
+                    // Handle status transition based on current state
+                    if (currentStatus == com.ecommerce.productorder.domain.entity.Order.OrderStatus.PENDING) {
+                        // PENDING → CONFIRMED (payment received)
+                        order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.CONFIRMED);
+                        log.info("Order {} status updated: PENDING → CONFIRMED after successful payment", orderId);
+                    } else if (currentStatus == com.ecommerce.productorder.domain.entity.Order.OrderStatus.CONFIRMED) {
+                        // CONFIRMED → PROCESSING (payment confirmed, start processing)
+                        order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.PROCESSING);
+                        log.info("Order {} status updated: CONFIRMED → PROCESSING after successful payment", orderId);
+                    } else {
+                        log.warn("Order {} is in {} status, no automatic update after payment", orderId, currentStatus);
+                    }
+                    
+                    orderRepository.save(order);
                 } else {
-                    // Keep as CONFIRMED but log payment failure
-                    // Order can remain CONFIRMED for retry or alternative payment
-                    log.warn("Payment failed for order {}, order remains in CONFIRMED status", orderId);
+                    // Payment failed - log but don't change order status
+                    log.warn("Payment failed for order {}, order remains in {} status", orderId, order.getStatus());
                 }
-                orderRepository.save(order);
             });
         } catch (Exception e) {
-            log.error("Error updating order status for order ID: {}", orderId, e);
+            log.error("Error updating order status for order ID: {} - {}", orderId, e.getMessage(), e);
             // Don't throw exception - payment is already processed
         }
     }
