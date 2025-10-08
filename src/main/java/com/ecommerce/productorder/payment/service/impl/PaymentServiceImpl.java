@@ -383,11 +383,43 @@ public class PaymentServiceImpl implements PaymentService {
     private void updatePaymentStatus(Payment payment, PaymentResponse gatewayResponse) {
         if ("COMPLETED".equals(gatewayResponse.getStatus())) {
             payment.processPayment(gatewayResponse.getTransactionId(), gatewayResponse.getGatewayResponse());
+            
+            // Update order status to PAYMENT_COMPLETED when payment succeeds
+            updateOrderStatusAfterPayment(payment.getOrderId(), true);
         } else if ("FAILED".equals(gatewayResponse.getStatus())) {
             payment.failPayment(gatewayResponse.getFailureReason());
+            
+            // Update order status to PAYMENT_FAILED when payment fails
+            updateOrderStatusAfterPayment(payment.getOrderId(), false);
         }
         
         paymentRepository.save(payment);
+    }
+    
+    /**
+     * Updates order status after payment processing
+     * 
+     * @param orderId the order ID
+     * @param paymentSuccessful whether payment was successful
+     */
+    private void updateOrderStatusAfterPayment(Long orderId, boolean paymentSuccessful) {
+        try {
+            orderRepository.findById(orderId).ifPresent(order -> {
+                if (paymentSuccessful) {
+                    // Update to PROCESSING after successful payment
+                    order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.PROCESSING);
+                    log.info("Order {} status updated to PROCESSING after successful payment", orderId);
+                } else {
+                    // Keep as CONFIRMED but log payment failure
+                    // Order can remain CONFIRMED for retry or alternative payment
+                    log.warn("Payment failed for order {}, order remains in CONFIRMED status", orderId);
+                }
+                orderRepository.save(order);
+            });
+        } catch (Exception e) {
+            log.error("Error updating order status for order ID: {}", orderId, e);
+            // Don't throw exception - payment is already processed
+        }
     }
     
     @Override
