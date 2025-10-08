@@ -50,9 +50,6 @@ public class S3ServiceImpl implements S3Service {
     @Value("${aws.s3.region:ap-south-1}")
     private String region;
     
-    @Value("${aws.s3.base-url:https://s3.amazonaws.com}")
-    private String baseUrl;
-    
     private S3Client s3Client;
     
     @PostConstruct
@@ -320,12 +317,16 @@ public class S3ServiceImpl implements S3Service {
     
     /**
      * Generates S3 URL
-     * Factory method for URL creation
+     * Creates permanent public URL using regional endpoint
+     * Format: https://{bucket}.s3.{region}.amazonaws.com/{key}
+     * This format ensures the URL is permanent and uses the correct regional endpoint
      * 
      * @param key the S3 key
-     * @return S3 URL
+     * @return S3 URL with regional endpoint (permanent, no expiration)
      */
     private String generateS3Url(String key) {
-        return String.format("%s/%s/%s", baseUrl, bucketName, key);
+        // Use regional endpoint format: https://bucket-name.s3.region.amazonaws.com/path/to/file
+        // This URL is permanent and publicly accessible if bucket policy allows
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
 }
