@@ -62,7 +62,6 @@ public class Order {
     
     /**
      * Business method to calculate total amount from order items
-     * Encapsulates order calculation logic
      */
     public BigDecimal calculateTotalAmount() {
         return orderItems.stream()
@@ -80,7 +79,6 @@ public class Order {
     
     /**
      * Business method to update order status
-     * Encapsulates state transition logic
      */
     public void updateStatus(OrderStatus newStatus) {
         if (isValidStatusTransition(this.status, newStatus)) {
@@ -92,7 +90,6 @@ public class Order {
     
     /**
      * Business method to validate status transitions
-     * Encapsulates order state machine logic
      */
     private boolean isValidStatusTransition(OrderStatus current, OrderStatus newStatus) {
         return switch (current) {

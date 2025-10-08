@@ -49,7 +49,6 @@ public class Category {
     
     /**
      * Business method to check if category is available for products
-     * Encapsulates business logic within the domain entity
      */
     public boolean isAvailableForProducts() {
         return isActive != null && isActive;

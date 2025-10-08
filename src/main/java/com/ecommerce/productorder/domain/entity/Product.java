@@ -66,7 +66,6 @@ public class Product {
     
     /**
      * Business method to check if product is available for purchase
-     * Encapsulates business logic within the domain entity
      */
     public boolean isAvailableForPurchase() {
         return isActive != null && isActive && stockQuantity > 0;
@@ -82,7 +81,6 @@ public class Product {
     
     /**
      * Business method to reduce stock after order
-     * Encapsulates inventory management logic
      */
     public void reduceStock(int quantity) {
         if (!hasSufficientStock(quantity)) {
@@ -93,7 +91,6 @@ public class Product {
     
     /**
      * Business method to restore stock (for order cancellation)
-     * Encapsulates inventory restoration logic
      */
     public void restoreStock(int quantity) {
         this.stockQuantity += quantity;

@@ -1,11 +1,5 @@
 # Terraform outputs for AWS EC2 deployment
 # 
-# Design Principles Applied:
-# - Output Management: Exposes important resource information
-# - Documentation: Documents each output
-# - Security: Excludes sensitive information
-# - Usability: Provides useful information for users
-
 output "vpc_id" {
   description = "ID of the VPC"
   value       = module.vpc.vpc_id

@@ -300,7 +300,6 @@ public class PaymentServiceImpl implements PaymentService {
     
     /**
      * Validates payment request
-     * Encapsulates validation logic
      * 
      * @param request the payment request to validate
      * @throws BusinessException if validation fails
@@ -360,7 +359,6 @@ public class PaymentServiceImpl implements PaymentService {
     
     /**
      * Updates payment status based on gateway response
-     * Encapsulates status update logic
      * 
      * @param payment the payment entity
      * @param gatewayResponse the gateway response
@@ -449,7 +447,6 @@ public class PaymentServiceImpl implements PaymentService {
     
     /**
      * Maps Payment entity to PaymentResponse
-     * Encapsulates mapping logic
      * 
      * @param payment the payment entity
      * @return PaymentResponse

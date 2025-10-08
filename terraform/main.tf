@@ -1,14 +1,5 @@
 # Terraform configuration for AWS EC2 deployment
 # 
-# Design Principles Applied:
-# - Infrastructure as Code: Defines infrastructure using code
-# - Modularity: Uses modules for reusable components
-# - Security: Implements security best practices
-# - Scalability: Configures for horizontal scaling
-# - Monitoring: Includes monitoring and logging
-# - Backup: Implements backup strategies
-# - Cost Optimization: Uses cost-effective resources
-
 terraform {
   required_version = ">= 1.0"
   required_providers {

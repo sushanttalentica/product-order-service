@@ -1,11 +1,5 @@
 # Multi-stage Docker build for Product Order Service
 # 
-# Design Principles Applied:
-# - Multi-stage Build: Reduces final image size
-# - Security: Uses non-root user
-# - Performance: Optimized for Java applications
-# - Maintainability: Clear and documented Dockerfile
-
 # Build stage
 FROM maven:3.9.5-openjdk-17-slim AS build
 

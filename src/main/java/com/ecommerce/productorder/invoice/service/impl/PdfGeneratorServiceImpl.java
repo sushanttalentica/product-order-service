@@ -189,7 +189,6 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
     
     /**
      * Validates order for PDF generation
-     * Encapsulates validation logic
      * 
      * @param order the order to validate
      * @throws IllegalArgumentException if order is invalid

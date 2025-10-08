@@ -32,7 +32,6 @@ public class PaymentResponse {
     
     /**
      * Factory method to create PaymentResponse from Payment entity
-     * Uses Factory Pattern for object creation
      * 
      * @param payment the Payment entity to convert
      * @return PaymentResponse created from Payment entity
@@ -57,7 +56,6 @@ public class PaymentResponse {
     
     /**
      * Factory method to create PaymentResponse with minimal data
-     * Uses Factory Pattern for object creation
      * 
      * @param paymentId the payment ID
      * @param status the payment status

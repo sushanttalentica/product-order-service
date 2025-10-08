@@ -80,7 +80,6 @@ public class Invoice {
     
     /**
      * Business method to mark invoice as sent
-     * Encapsulates invoice status update logic
      */
     public void markAsSent() {
         if (status != InvoiceStatus.GENERATED) {
@@ -91,7 +90,6 @@ public class Invoice {
     
     /**
      * Business method to mark invoice as failed
-     * Encapsulates invoice failure logic
      * 
      * @param failureReason the reason for failure
      */

@@ -37,7 +37,6 @@ public interface OrderMapper {
     
     /**
      * Custom mapping method for OrderStatus enum to String
-     * Encapsulates enum-to-string conversion logic
      */
     @Named("statusToString")
     default String statusToString(Order.OrderStatus status) {

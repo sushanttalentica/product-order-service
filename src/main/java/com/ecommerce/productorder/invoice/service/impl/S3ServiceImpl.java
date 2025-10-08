@@ -248,7 +248,6 @@ public class S3ServiceImpl implements S3Service {
     
     /**
      * Validates upload parameters
-     * Encapsulates validation logic
      * 
      * @param key the S3 key
      * @param content the file content

@@ -51,7 +51,6 @@ public class OrderItem {
     
     /**
      * Business method to calculate subtotal
-     * Encapsulates calculation logic within the domain entity
      */
     public BigDecimal calculateSubtotal() {
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
@@ -67,7 +66,6 @@ public class OrderItem {
     
     /**
      * Factory method to create OrderItem with automatic subtotal calculation
-     * Encapsulates object creation logic
      */
     public static OrderItem create(Order order, Product product, Integer quantity) {
         BigDecimal unitPrice = product.getPrice();

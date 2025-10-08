@@ -138,7 +138,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     
     /**
      * Validates order for invoice generation
-     * Encapsulates validation logic
      * 
      * @param order the order to validate
      * @throws IllegalArgumentException if order is invalid

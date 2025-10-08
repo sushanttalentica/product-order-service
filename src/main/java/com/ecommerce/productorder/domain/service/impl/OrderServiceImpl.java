@@ -526,7 +526,6 @@ public class OrderServiceImpl implements OrderService {
     
     /**
      * Restores product stock
-     * Encapsulates stock restoration logic
      * 
      * @param order the order to restore stock for
      */

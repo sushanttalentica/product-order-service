@@ -91,7 +91,6 @@ public class Payment {
     
     /**
      * Business method to process payment
-     * Encapsulates payment processing logic and state transition
      * 
      * @param transactionId the transaction ID from payment gateway
      * @param gatewayResponse the response from payment gateway
@@ -110,7 +109,6 @@ public class Payment {
     
     /**
      * Business method to fail payment
-     * Encapsulates payment failure logic and state transition
      * 
      * @param failureReason the reason for payment failure
      */
@@ -126,7 +124,6 @@ public class Payment {
     
     /**
      * Business method to refund payment
-     * Encapsulates refund logic and state transition
      * 
      * @param refundAmount the amount to refund
      */

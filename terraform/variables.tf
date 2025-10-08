@@ -1,12 +1,5 @@
 # Terraform variables for AWS EC2 deployment
 # 
-# Design Principles Applied:
-# - Configuration Management: Centralizes configuration variables
-# - Default Values: Provides sensible defaults
-# - Validation: Validates input values
-# - Documentation: Documents each variable
-# - Security: Uses sensitive variables for secrets
-
 variable "aws_region" {
   description = "AWS region for resources"
   type        = string
