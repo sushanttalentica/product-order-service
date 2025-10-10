@@ -1,7 +1,6 @@
-# Terraform configuration for AWS EC2 deployment
-# 
 terraform {
   required_version = ">= 1.0"
+  
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -10,63 +9,148 @@ terraform {
   }
 }
 
-# Configure AWS Provider
 provider "aws" {
   region = var.aws_region
 }
 
-# Data sources
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-
-# VPC Module
-module "vpc" {
-  source = "./modules/vpc"
-  
-  name                 = "${var.project_name}-vpc"
-  cidr                 = var.vpc_cidr
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = var.private_subnets
-  public_subnets       = var.public_subnets
-  enable_nat_gateway   = true
-  enable_vpn_gateway   = false
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = {
+    Name        = "${var.project_name}-vpc"
     Environment = var.environment
-    Project     = var.project_name
   }
 }
 
-# Security Groups
-resource "aws_security_group" "product_order_service" {
-  name_prefix = "${var.project_name}-product-order-service"
-  vpc_id      = module.vpc.vpc_id
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
 
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
+  tags = {
+    Name        = "${var.project_name}-igw"
+    Environment = var.environment
   }
+}
+
+resource "aws_subnet" "public_1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "${var.aws_region}a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name        = "${var.project_name}-public-subnet-1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.aws_region}b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name        = "${var.project_name}-public-subnet-2"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name        = "${var.project_name}-public-rt"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "public_1" {
+  subnet_id      = aws_subnet.public_1.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_2" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_security_group" "app" {
+  name        = "${var.project_name}-app-sg"
+  description = "Security group for application server"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "SSH"
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Application HTTP"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS"
+  }
+
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "gRPC"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound"
+  }
+
+  tags = {
+    Name        = "${var.project_name}-app-sg"
+    Environment = var.environment
+  }
+}
+
+resource "aws_security_group" "redis" {
+  name        = "${var.project_name}-redis-sg"
+  description = "Security group for Redis"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+    description     = "Redis from app"
   }
 
   egress {
@@ -77,180 +161,131 @@ resource "aws_security_group" "product_order_service" {
   }
 
   tags = {
-    Name        = "${var.project_name}-product-order-service-sg"
+    Name        = "${var.project_name}-redis-sg"
     Environment = var.environment
   }
 }
 
-# RDS MySQL Database
-module "rds" {
-  source = "./modules/rds"
-  
-  identifier = "${var.project_name}-mysql"
-  
-  engine            = "mysql"
-  engine_version    = "8.0"
-  instance_class    = var.db_instance_class
-  allocated_storage = var.db_allocated_storage
-  
-  db_name  = var.db_name
-  username = var.db_username
-  password = var.db_password
-  
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  subnet_ids             = module.vpc.private_subnets
-  
-  backup_retention_period = 7
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "sun:04:00-sun:05:00"
-  
+resource "aws_elasticache_subnet_group" "redis" {
+  name       = "${var.project_name}-redis-subnet-group"
+  subnet_ids = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+
   tags = {
+    Name        = "${var.project_name}-redis-subnet-group"
     Environment = var.environment
-    Project    = var.project_name
   }
 }
 
-# ElastiCache Redis
-module "redis" {
-  source = "./modules/redis"
-  
+resource "aws_elasticache_cluster" "redis" {
   cluster_id           = "${var.project_name}-redis"
+  engine               = "redis"
   node_type            = var.redis_node_type
-  num_cache_nodes      = var.redis_num_cache_nodes
-  parameter_group_name  = "default.redis7"
-  
-  subnet_ids = module.vpc.private_subnets
-  security_group_ids = [aws_security_group.redis.id]
-  
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis7"
+  engine_version       = "7.0"
+  port                 = 6379
+  security_group_ids   = [aws_security_group.redis.id]
+  subnet_group_name    = aws_elasticache_subnet_group.redis.name
+
   tags = {
+    Name        = "${var.project_name}-redis"
     Environment = var.environment
-    Project     = var.project_name
   }
 }
 
-# MSK Kafka Cluster
-module "kafka" {
-  source = "./modules/kafka"
-  
-  cluster_name = "${var.project_name}-kafka"
-  kafka_version = "2.8.1"
-  
-  number_of_broker_nodes = var.kafka_broker_count
-  broker_instance_type   = var.kafka_instance_type
-  
-  subnet_ids = module.vpc.private_subnets
-  security_group_ids = [aws_security_group.kafka.id]
-  
+resource "aws_iam_role" "ec2_role" {
+  name = "${var.project_name}-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
   tags = {
+    Name        = "${var.project_name}-ec2-role"
     Environment = var.environment
-    Project     = var.project_name
   }
 }
 
-# Application Load Balancer
-module "alb" {
-  source = "./modules/alb"
-  
-  name               = "${var.project_name}-alb"
-  load_balancer_type = "application"
-  
-  vpc_id          = module.vpc.vpc_id
-  subnets         = module.vpc.public_subnets
-  security_groups = [aws_security_group.alb.id]
-  
+resource "aws_iam_role_policy" "s3_access" {
+  name = "${var.project_name}-s3-access"
+  role = aws_iam_role.ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.s3_bucket_name}",
+          "arn:aws:s3:::${var.s3_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "${var.project_name}-ec2-profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = "${var.project_name}-key"
+  public_key = var.ssh_public_key
+
   tags = {
+    Name        = "${var.project_name}-key"
     Environment = var.environment
-    Project     = var.project_name
   }
 }
 
-# Auto Scaling Group
-module "asg" {
-  source = "./modules/asg"
-  
-  name = "${var.project_name}-asg"
-  
-  vpc_id           = module.vpc.vpc_id
-  subnet_ids       = module.vpc.private_subnets
-  security_groups  = [aws_security_group.product_order_service.id]
-  
-  min_size         = var.asg_min_size
-  max_size         = var.asg_max_size
-  desired_capacity = var.asg_desired_capacity
-  
-  image_id      = data.aws_ami.amazon_linux.id
-  instance_type = var.instance_type
-  
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    db_host     = module.rds.endpoint
-    db_name     = var.db_name
-    db_username = var.db_username
-    db_password = var.db_password
-    redis_host  = module.redis.endpoint
-    kafka_hosts = module.kafka.bootstrap_brokers
-  }))
-  
+resource "aws_instance" "app" {
+  ami                    = var.ec2_ami
+  instance_type          = var.ec2_instance_type
+  key_name               = aws_key_pair.deployer.key_name
+  vpc_security_group_ids = [aws_security_group.app.id]
+  subnet_id              = aws_subnet.public_1.id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
+
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+  }
+
+  user_data = templatefile("${path.module}/user-data.sh", {
+    redis_host     = aws_elasticache_cluster.redis.cache_nodes[0].address
+    s3_bucket_name = var.s3_bucket_name
+    aws_region     = var.aws_region
+    jwt_secret     = var.jwt_secret
+  })
+
   tags = {
+    Name        = "${var.project_name}-app"
     Environment = var.environment
-    Project     = var.project_name
   }
 }
 
-# S3 Bucket for Invoices
-resource "aws_s3_bucket" "invoices" {
-  bucket = "${var.project_name}-invoices-${random_id.bucket_suffix.hex}"
-  
+resource "aws_eip" "app" {
+  instance = aws_instance.app.id
+  domain   = "vpc"
+
   tags = {
+    Name        = "${var.project_name}-eip"
     Environment = var.environment
-    Project     = var.project_name
   }
-}
-
-resource "aws_s3_bucket_versioning" "invoices" {
-  bucket = aws_s3_bucket.invoices.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "invoices" {
-  bucket = aws_s3_bucket.invoices.id
-  
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets  = true
-}
-
-# CloudWatch Log Groups
-resource "aws_cloudwatch_log_group" "product_order_service" {
-  name              = "/aws/ec2/${var.project_name}-product-order-service"
-  retention_in_days = 30
-  
-  tags = {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-}
-
-# CloudWatch Alarms
-resource "aws_cloudwatch_metric_alarm" "high_cpu" {
-  alarm_name          = "${var.project_name}-high-cpu"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "This metric monitors ec2 cpu utilization"
-  
-  dimensions = {
-    AutoScalingGroupName = module.asg.name
-  }
-}
-
-# Random ID for S3 bucket suffix
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
 }
