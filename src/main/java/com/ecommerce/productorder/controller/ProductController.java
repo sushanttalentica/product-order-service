@@ -3,6 +3,7 @@ package com.ecommerce.productorder.controller;
 import com.ecommerce.productorder.domain.service.ProductService;
 import com.ecommerce.productorder.dto.request.CreateProductRequest;
 import com.ecommerce.productorder.dto.request.UpdateProductRequest;
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import com.ecommerce.productorder.dto.response.ProductResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -64,20 +64,22 @@ public class ProductController {
     
     
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
+    public ResponseEntity<?> getProductById(@PathVariable Long productId) {
         log.debug("Retrieving product with id: {}", productId);
         return productService.getProductById(productId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(product -> ResponseEntity.ok((Object) product))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Product not found with ID: " + productId)));
     }
     
     
     @GetMapping("/sku/{sku}")
-    public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
+    public ResponseEntity<?> getProductBySku(@PathVariable String sku) {
         log.debug("Retrieving product with SKU: {}", sku);
         return productService.getProductBySku(sku)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(product -> ResponseEntity.ok((Object) product))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Product not found with SKU: " + sku)));
     }
     
     
@@ -145,10 +147,10 @@ public class ProductController {
     
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+    public ResponseEntity<MessageResponse> deleteProduct(@PathVariable Long productId) {
         log.info("Deleting product with id: {}", productId);
         productService.deleteProduct(productId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(MessageResponse.success("Product deleted successfully with ID: " + productId));
     }
     
     

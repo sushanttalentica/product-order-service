@@ -1,6 +1,5 @@
 package com.ecommerce.productorder.util;
 
-
 public final class Constants {
     
     // Private constructor to prevent instantiation

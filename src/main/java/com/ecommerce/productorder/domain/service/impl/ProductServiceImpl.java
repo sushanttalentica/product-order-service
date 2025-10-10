@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -251,12 +250,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product stock reduced successfully for id: {}", productId);
     }
     
-    /**
-     * Publishes stock update event to Kafka
-     * Enables real-time stock updates via WebSocket
-     * 
-     * @param product the updated product
-     */
+
     private void publishStockUpdateEvent(Product product) {
         try {
             Map<String, Object> event = new HashMap<>();

@@ -2,6 +2,7 @@ package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.domain.entity.Order;
 import com.ecommerce.productorder.domain.repository.OrderRepository;
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import com.ecommerce.productorder.invoice.service.InvoiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/api/v1/invoices")
@@ -71,16 +71,17 @@ public class InvoiceController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Customer or Admin role required")
     })
-    public ResponseEntity<Map<String, String>> getInvoiceUrl(
+    public ResponseEntity<?> getInvoiceUrl(
             @Parameter(description = "ID of the order to get invoice for") @PathVariable Long orderId) {
         log.debug("Retrieving invoice URL for order ID: {}", orderId);
         
         Optional<String> invoiceUrl = invoiceService.getInvoiceUrl(orderId);
         
         if (invoiceUrl.isPresent()) {
-            return ResponseEntity.ok(Map.of("invoiceUrl", invoiceUrl.get()));
+            return ResponseEntity.ok(Map.of("invoiceUrl", invoiceUrl.get(), "message", "Invoice retrieved successfully"));
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MessageResponse.error("Invoice not found for order ID: " + orderId));
         }
     }
     
@@ -108,21 +109,22 @@ public class InvoiceController {
     @Operation(summary = "Delete invoice for order", description = "Delete invoice from S3 and database (Admin only)")
     @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Invoice deleted successfully"),
+        @ApiResponse(responseCode = "200", description = "Invoice deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Invoice not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Admin role required")
     })
-    public ResponseEntity<Void> deleteInvoice(
+    public ResponseEntity<MessageResponse> deleteInvoice(
             @Parameter(description = "ID of the order to delete invoice for") @PathVariable Long orderId) {
         log.info("Deleting invoice for order ID: {}", orderId);
         
         boolean deleted = invoiceService.deleteInvoice(orderId);
         
         if (deleted) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(MessageResponse.success("Invoice deleted successfully for order ID: " + orderId));
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MessageResponse.error("Invoice not found for order ID: " + orderId));
         }
     }
 }

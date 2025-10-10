@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -16,12 +15,7 @@ public class StockUpdateBroadcaster {
     
     private final SimpMessagingTemplate messagingTemplate;
     
-    /**
-     * Handles stock update events from Kafka
-     * Broadcasts updates to all connected WebSocket clients
-     * 
-     * @param event the stock update event containing productId and new stock quantity
-     */
+
     @KafkaListener(
         topics = "product.stock.updated",
         groupId = "websocket-broadcaster",
@@ -58,12 +52,7 @@ public class StockUpdateBroadcaster {
         }
     }
     
-    /**
-     * Handles order created events
-     * Can broadcast order confirmations to customers
-     * 
-     * @param event the order created event
-     */
+
     @KafkaListener(
         topics = "order.created",
         groupId = "websocket-broadcaster",

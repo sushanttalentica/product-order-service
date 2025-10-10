@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "payments")
 @Data
@@ -69,32 +68,17 @@ public class Payment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to check if payment can be processed
-     * Encapsulates payment state business rules
-     * 
-     * @return true if payment can be processed, false otherwise
-     */
+
     public boolean canBeProcessed() {
         return status == PaymentStatus.PENDING;
     }
     
-    /**
-     * Business method to check if payment can be refunded
-     * Encapsulates refund eligibility business rules
-     * 
-     * @return true if payment can be refunded, false otherwise
-     */
+
     public boolean canBeRefunded() {
         return status == PaymentStatus.COMPLETED || status == PaymentStatus.PARTIALLY_REFUNDED;
     }
     
-    /**
-     * Business method to process payment
-     * 
-     * @param transactionId the transaction ID from payment gateway
-     * @param gatewayResponse the response from payment gateway
-     */
+
     public void processPayment(String transactionId, String gatewayResponse) {
         if (!canBeProcessed()) {
             throw new IllegalStateException("Payment cannot be processed in current state: " + status);
@@ -107,11 +91,7 @@ public class Payment {
         this.processedAt = LocalDateTime.now();
     }
     
-    /**
-     * Business method to fail payment
-     * 
-     * @param failureReason the reason for payment failure
-     */
+
     public void failPayment(String failureReason) {
         if (!canBeProcessed()) {
             throw new IllegalStateException("Payment cannot be failed in current state: " + status);
@@ -122,11 +102,7 @@ public class Payment {
         this.processedAt = LocalDateTime.now();
     }
     
-    /**
-     * Business method to refund payment
-     * 
-     * @param refundAmount the amount to refund
-     */
+
     public void refundPayment(BigDecimal refundAmount) {
         if (!canBeRefunded()) {
             throw new IllegalStateException("Payment cannot be refunded in current state: " + status);

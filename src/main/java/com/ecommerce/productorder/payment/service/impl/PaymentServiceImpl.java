@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -37,14 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentGatewayService paymentGatewayService;
     private final PaymentEventPublisher paymentEventPublisher;
     
-    /**
-     * Processes a payment request
-     * Handles payment authorization and processing with comprehensive error handling
-     * 
-     * @param request the payment processing request
-     * @return PaymentResponse containing payment details
-     * @throws BusinessException if payment processing fails
-     */
+
     @Override
     @Transactional
     public PaymentResponse processPayment(ProcessPaymentRequest request) {
@@ -85,13 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     
-    /**
-     * Retrieves payment by payment ID
-     * Uses Optional for null-safe operations
-     * 
-     * @param paymentId the payment ID to search for
-     * @return Optional containing payment if found, empty otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Optional<PaymentResponse> getPaymentById(String paymentId) {
@@ -101,13 +87,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentResponse::fromEntity);
     }
     
-    /**
-     * Retrieves payment by order ID
-     * Uses Optional for null-safe operations
-     * 
-     * @param orderId the order ID to search for
-     * @return Optional containing payment if found, empty otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Optional<PaymentResponse> getPaymentByOrderId(Long orderId) {
@@ -117,13 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentResponse::fromEntity);
     }
     
-    /**
-     * Retrieves payments by customer ID
-     * Uses Java Streams for data processing
-     * 
-     * @param customerId the customer ID to search for
-     * @return List of payments for the customer
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentsByCustomerId(Long customerId) {
@@ -135,13 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Retrieves payments by status
-     * Uses Java Streams for data processing
-     * 
-     * @param status the payment status to search for
-     * @return List of payments with the specified status
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentsByStatus(String status) {
@@ -159,15 +127,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     
-    /**
-     * Refunds a payment
-     * Handles payment refund processing with validation
-     * 
-     * @param paymentId the payment ID to refund
-     * @param refundAmount the amount to refund
-     * @return PaymentResponse containing updated payment details
-     * @throws BusinessException if refund fails
-     */
+
     @Override
     @Transactional
     public PaymentResponse refundPayment(String paymentId, String refundAmount) {
@@ -204,14 +164,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     
-    /**
-     * Cancels a payment
-     * Handles payment cancellation with validation
-     * 
-     * @param paymentId the payment ID to cancel
-     * @return PaymentResponse containing updated payment details
-     * @throws BusinessException if cancellation fails
-     */
+
     @Override
     @Transactional
     public PaymentResponse cancelPayment(String paymentId) {
@@ -242,12 +195,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     
-    /**
-     * Retrieves payments that need processing
-     * Uses Java Streams for data processing
-     * 
-     * @return List of payments that need processing
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentsNeedingProcessing() {
@@ -259,14 +207,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Retries failed payments
-     * Handles retry logic for failed payments
-     * 
-     * @param paymentId the payment ID to retry
-     * @return PaymentResponse containing updated payment details
-     * @throws BusinessException if retry fails
-     */
+
     @Override
     @Transactional
     public PaymentResponse retryPayment(String paymentId) {
@@ -298,12 +239,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     
-    /**
-     * Validates payment request
-     * 
-     * @param request the payment request to validate
-     * @throws BusinessException if validation fails
-     */
+
     private void validatePaymentRequest(ProcessPaymentRequest request) {
         // Validate order exists
         Order order = orderRepository.findById(request.getOrderId())
@@ -319,18 +255,12 @@ public class PaymentServiceImpl implements PaymentService {
         if (orderTotal.compareTo(java.math.BigDecimal.ZERO) <= 0) {
             throw new BusinessException("Order total must be greater than zero");
         }
-        if (orderTotal.compareTo(new java.math.BigDecimal("10000")) > 0) {
+        if (orderTotal.compareTo(new java.math.BigDecimal("100000000")) > 0) {
             throw new BusinessException("Order total exceeds maximum limit");
         }
     }
     
-    /**
-     * Creates payment entity from request
-     * Uses Builder pattern for object creation
-     * 
-     * @param request the payment request
-     * @return Payment entity
-     */
+
     private Payment createPaymentEntity(ProcessPaymentRequest request) {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + request.getOrderId()));
@@ -345,32 +275,20 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
     
-    /**
-     * Processes payment through gateway
-     * Delegates to payment gateway service
-     * 
-     * @param payment the payment entity
-     * @param request the payment request
-     * @return PaymentResponse from gateway
-     */
+
     private PaymentResponse processPaymentThroughGateway(Payment payment, ProcessPaymentRequest request) {
         return paymentGatewayService.processPayment(payment, request);
     }
     
-    /**
-     * Updates payment status based on gateway response
-     * 
-     * @param payment the payment entity
-     * @param gatewayResponse the gateway response
-     */
+
     private void updatePaymentStatus(Payment payment, PaymentResponse gatewayResponse) {
-        if ("COMPLETED".equals(gatewayResponse.getStatus())) {
-            payment.processPayment(gatewayResponse.getTransactionId(), gatewayResponse.getGatewayResponse());
+        if ("COMPLETED".equals(gatewayResponse.status())) {
+            payment.processPayment(gatewayResponse.transactionId(), gatewayResponse.gatewayResponse());
             
             // Update order status to PAYMENT_COMPLETED when payment succeeds
             updateOrderStatusAfterPayment(payment.getOrderId(), true);
-        } else if ("FAILED".equals(gatewayResponse.getStatus())) {
-            payment.failPayment(gatewayResponse.getFailureReason());
+        } else if ("FAILED".equals(gatewayResponse.status())) {
+            payment.failPayment(gatewayResponse.failureReason());
             
             // Update order status to PAYMENT_FAILED when payment fails
             updateOrderStatusAfterPayment(payment.getOrderId(), false);
@@ -379,13 +297,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
     }
     
-    /**
-     * Updates order status after payment processing
-     * Handles different order states appropriately
-     * 
-     * @param orderId the order ID
-     * @param paymentSuccessful whether payment was successful
-     */
+
     private void updateOrderStatusAfterPayment(Long orderId, boolean paymentSuccessful) {
         try {
             orderRepository.findById(orderId).ifPresent(order -> {
@@ -445,25 +357,22 @@ public class PaymentServiceImpl implements PaymentService {
         );
     }
     
-    /**
-     * Maps Payment entity to PaymentResponse
-     * 
-     * @param payment the payment entity
-     * @return PaymentResponse
-     */
+
     private PaymentResponse mapToResponse(Payment payment) {
-        return PaymentResponse.builder()
-                .paymentId(payment.getPaymentId())
-                .orderId(payment.getOrderId())
-                .customerId(payment.getCustomerId())
-                .amount(payment.getAmount())
-                .status(payment.getStatus().name())
-                .paymentMethod(payment.getPaymentMethod().name())
-                .transactionId(payment.getTransactionId())
-                .gatewayResponse(payment.getGatewayResponse())
-                .failureReason(payment.getFailureReason())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(payment.getUpdatedAt())
-                .build();
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getPaymentId(),
+                payment.getOrderId(),
+                payment.getCustomerId(),
+                payment.getAmount(),
+                payment.getStatus().name(),
+                payment.getPaymentMethod().name(),
+                payment.getTransactionId(),
+                payment.getGatewayResponse(),
+                payment.getFailureReason(),
+                payment.getProcessedAt(),
+                payment.getCreatedAt(),
+                payment.getUpdatedAt()
+        );
     }
 }

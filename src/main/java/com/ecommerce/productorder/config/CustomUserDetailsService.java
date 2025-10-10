@@ -54,7 +54,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
     }
 
-
     private List<SimpleGrantedAuthority> getAuthority(String role) {
         return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role));
     }

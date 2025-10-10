@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.kafka.annotation.EnableKafka;
 
-
 @SpringBootApplication
 @EnableCaching // Enables Spring's caching abstraction for in-memory caching
 @EnableKafka // Enables Kafka message processing capabilities

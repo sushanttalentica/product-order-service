@@ -6,7 +6,6 @@ import com.ecommerce.productorder.dto.request.UpdateCustomerRequest;
 import com.ecommerce.productorder.dto.response.CustomerResponse;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class CustomerMapper {
 
@@ -53,36 +52,33 @@ public class CustomerMapper {
 
         CustomerResponse.AddressResponse addressResponse = null;
         if (customer.getAddress() != null) {
-            addressResponse = CustomerResponse.AddressResponse.builder()
-                    .streetAddress(customer.getAddress().getStreetAddress())
-                    .city(customer.getAddress().getCity())
-                    .state(customer.getAddress().getState())
-                    .postalCode(customer.getAddress().getPostalCode())
-                    .country(customer.getAddress().getCountry())
-                    .build();
+            addressResponse = new CustomerResponse.AddressResponse(
+                    customer.getAddress().getStreetAddress(),
+                    customer.getAddress().getCity(),
+                    customer.getAddress().getState(),
+                    customer.getAddress().getPostalCode(),
+                    customer.getAddress().getCountry()
+            );
         }
 
-        return CustomerResponse.builder()
-                .id(customer.getId())
-                .username(customer.getUsername())
-                .email(customer.getEmail())
-                .firstName(customer.getFirstName())
-                .lastName(customer.getLastName())
-                .fullName(customer.getFullName())
-                .phoneNumber(customer.getPhoneNumber())
-                .address(addressResponse)
-                .role(customer.getRole())
-                .isActive(customer.getIsActive())
-                .emailVerified(customer.getEmailVerified())
-                .createdAt(customer.getCreatedAt())
-                .updatedAt(customer.getUpdatedAt())
-                .orderCount(customer.getOrders() != null ? (long) customer.getOrders().size() : 0L)
-                .build();
+        return new CustomerResponse(
+                customer.getId(),
+                customer.getUsername(),
+                customer.getEmail(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getFullName(),
+                customer.getPhoneNumber(),
+                addressResponse,
+                customer.getRole(),
+                customer.getIsActive(),
+                customer.getEmailVerified(),
+                customer.getCreatedAt(),
+                customer.getUpdatedAt(),
+                customer.getOrders() != null ? (long) customer.getOrders().size() : 0L
+        );
     }
 
-    /**
-     * Update existing Customer entity with UpdateCustomerRequest
-     */
     public void updateEntity(Customer customer, UpdateCustomerRequest request) {
         if (customer == null || request == null) {
             return;
@@ -191,12 +187,12 @@ public class CustomerMapper {
             return null;
         }
 
-        return CustomerResponse.AddressResponse.builder()
-                .streetAddress(address.getStreetAddress())
-                .city(address.getCity())
-                .state(address.getState())
-                .postalCode(address.getPostalCode())
-                .country(address.getCountry())
-                .build();
+        return new CustomerResponse.AddressResponse(
+                address.getStreetAddress(),
+                address.getCity(),
+                address.getState(),
+                address.getPostalCode(),
+                address.getCountry()
+        );
     }
 }

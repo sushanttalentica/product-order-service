@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,13 +34,7 @@ public class InventoryServiceImpl implements InventoryService {
     private static final String INVENTORY_UPDATED_TOPIC = "inventory.updated";
     private static final String INVENTORY_LOW_STOCK_TOPIC = "inventory.low-stock";
     
-    /**
-     * Reserves inventory for order
-     * Reserves product stock for order items
-     * 
-     * @param order the order entity
-     * @return true if inventory reserved successfully, false otherwise
-     */
+
     @Override
     @Transactional
     public boolean reserveInventory(Order order) {
@@ -84,13 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Releases inventory for order
-     * Releases reserved stock for order cancellation
-     * 
-     * @param order the order entity
-     * @return true if inventory released successfully, false otherwise
-     */
+
     @Override
     @Transactional
     public boolean releaseInventory(Order order) {
@@ -127,13 +114,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Updates inventory after order completion
-     * Updates stock levels after successful order processing
-     * 
-     * @param order the order entity
-     * @return true if inventory updated successfully, false otherwise
-     */
+
     @Override
     @Transactional
     public boolean updateInventoryAfterOrder(Order order) {
@@ -170,14 +151,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Checks product availability
-     * Verifies if product has sufficient stock
-     * 
-     * @param productId the product ID
-     * @param quantity the required quantity
-     * @return true if product is available, false otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public boolean checkProductAvailability(Long productId, Integer quantity) {
@@ -203,13 +177,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Gets product stock level
-     * Retrieves current stock level for product
-     * 
-     * @param productId the product ID
-     * @return Optional containing stock level if found, empty otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Optional<Integer> getProductStockLevel(Long productId) {
@@ -225,14 +193,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Updates product stock level
-     * Updates stock level for product
-     * 
-     * @param productId the product ID
-     * @param newStockLevel the new stock level
-     * @return true if stock updated successfully, false otherwise
-     */
+
     @Override
     @Transactional
     public boolean updateProductStockLevel(Long productId, Integer newStockLevel) {
@@ -259,13 +220,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Gets low stock products
-     * Retrieves products with stock below threshold
-     * 
-     * @param threshold the stock threshold
-     * @return List of products with low stock
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> getLowStockProducts(Integer threshold) {
@@ -286,12 +241,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Gets out of stock products
-     * Retrieves products with zero stock
-     * 
-     * @return List of out of stock products
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> getOutOfStockProducts() {
@@ -312,12 +262,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Gets inventory statistics
-     * Retrieves inventory statistics and metrics
-     * 
-     * @return Object containing inventory statistics
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Object getInventoryStatistics() {
@@ -348,12 +293,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Kafka listener for order events
-     * Listens to order events and triggers inventory updates
-     * 
-     * @param eventData the event data
-     */
+
     @KafkaListener(topics = "order.created", groupId = "inventory-service")
     public void handleOrderCreatedEvent(Map<String, Object> eventData) {
         log.info("Received order created event: {}", eventData);
@@ -373,12 +313,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Kafka listener for order cancellation events
-     * Listens to order cancellation events and triggers inventory release
-     * 
-     * @param eventData the event data
-     */
+
     @KafkaListener(topics = "order.cancelled", groupId = "inventory-service")
     public void handleOrderCancelledEvent(Map<String, Object> eventData) {
         log.info("Received order cancelled event: {}", eventData);
@@ -398,12 +333,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Publishes inventory reserved event
-     * Publishes event when inventory is reserved
-     * 
-     * @param order the order entity
-     */
+
     private void publishInventoryReservedEvent(Order order) {
         try {
             Map<String, Object> eventData = createInventoryEventData(order, "INVENTORY_RESERVED");
@@ -415,12 +345,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Publishes inventory released event
-     * Publishes event when inventory is released
-     * 
-     * @param order the order entity
-     */
+
     private void publishInventoryReleasedEvent(Order order) {
         try {
             Map<String, Object> eventData = createInventoryEventData(order, "INVENTORY_RELEASED");
@@ -432,12 +357,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Publishes inventory updated event
-     * Publishes event when inventory is updated
-     * 
-     * @param order the order entity
-     */
+
     private void publishInventoryUpdatedEvent(Order order) {
         try {
             Map<String, Object> eventData = createInventoryEventData(order, "INVENTORY_UPDATED");
@@ -449,14 +369,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
     
-    /**
-     * Creates inventory event data
-     * Factory method for event data creation
-     * 
-     * @param order the order entity
-     * @param eventType the type of event
-     * @return Map containing event data
-     */
+
     private Map<String, Object> createInventoryEventData(Order order, String eventType) {
         Map<String, Object> eventData = new HashMap<>();
         
@@ -475,13 +388,7 @@ public class InventoryServiceImpl implements InventoryService {
         return eventData;
     }
     
-    /**
-     * Creates mock order for inventory processing
-     * Factory method for order creation
-     * 
-     * @param orderId the order ID
-     * @return Order entity
-     */
+
     private Order createMockOrder(Long orderId) {
         // This would typically fetch the order from the database
         // For now, create a mock order

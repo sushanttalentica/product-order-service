@@ -33,17 +33,11 @@ public class JwtUtil {
     @Value("${security.jwt.expiration:86400000}") // 24 hours
     private Long expiration;
 
-    /**
-     * Generate JWT token for user
-     */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
     }
 
-    /**
-     * Create JWT token with claims
-     */
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -95,17 +89,11 @@ public class JwtUtil {
                 .getBody();
     }
 
-    /**
-     * Check if token is expired
-     */
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    /**
-     * Validate token
-     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

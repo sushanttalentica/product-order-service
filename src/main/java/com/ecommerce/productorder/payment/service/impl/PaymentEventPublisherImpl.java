@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,12 +25,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
     private static final String PAYMENT_CANCELLED_TOPIC = "payment.cancelled";
     private static final String PAYMENT_RETRY_TOPIC = "payment.retry";
     
-    /**
-     * Publishes payment processed event
-     * Notifies other services about successful payment processing
-     * 
-     * @param payment the payment entity
-     */
+
     @Override
     public void publishPaymentProcessedEvent(Payment payment) {
         log.info("Publishing payment processed event for payment ID: {}", payment.getPaymentId());
@@ -47,12 +41,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         }
     }
     
-    /**
-     * Publishes payment failed event
-     * Notifies other services about failed payment processing
-     * 
-     * @param payment the payment entity
-     */
+
     @Override
     public void publishPaymentFailedEvent(Payment payment) {
         log.info("Publishing payment failed event for payment ID: {}", payment.getPaymentId());
@@ -69,12 +58,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         }
     }
     
-    /**
-     * Publishes payment refunded event
-     * Notifies other services about payment refund
-     * 
-     * @param payment the payment entity
-     */
+
     @Override
     public void publishPaymentRefundedEvent(Payment payment) {
         log.info("Publishing payment refunded event for payment ID: {}", payment.getPaymentId());
@@ -90,12 +74,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         }
     }
     
-    /**
-     * Publishes payment cancelled event
-     * Notifies other services about payment cancellation
-     * 
-     * @param payment the payment entity
-     */
+
     @Override
     public void publishPaymentCancelledEvent(Payment payment) {
         log.info("Publishing payment cancelled event for payment ID: {}", payment.getPaymentId());
@@ -111,12 +90,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         }
     }
     
-    /**
-     * Publishes payment retry event
-     * Notifies other services about payment retry
-     * 
-     * @param payment the payment entity
-     */
+
     @Override
     public void publishPaymentRetryEvent(Payment payment) {
         log.info("Publishing payment retry event for payment ID: {}", payment.getPaymentId());
@@ -132,14 +106,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         }
     }
     
-    /**
-     * Creates payment event data
-     * Factory method for creating event data
-     * 
-     * @param payment the payment entity
-     * @param eventType the type of event
-     * @return Map containing event data
-     */
+
     private Map<String, Object> createPaymentEventData(Payment payment, String eventType) {
         Map<String, Object> eventData = new HashMap<>();
         

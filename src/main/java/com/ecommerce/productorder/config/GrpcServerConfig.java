@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 
-
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
@@ -25,12 +24,7 @@ public class GrpcServerConfig {
     
     private Server grpcServer;
     
-    /**
-     * Creates and starts the gRPC server
-     * 
-     * @return gRPC server instance
-     * @throws IOException if server fails to start
-     */
+
     @Bean
     public Server grpcServer() throws IOException {
         log.info("Starting gRPC server on port: {}", grpcPort);

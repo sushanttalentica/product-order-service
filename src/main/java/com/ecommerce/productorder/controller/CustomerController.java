@@ -5,6 +5,7 @@ import com.ecommerce.productorder.domain.service.CustomerService;
 import com.ecommerce.productorder.dto.request.CreateCustomerRequest;
 import com.ecommerce.productorder.dto.request.UpdateCustomerRequest;
 import com.ecommerce.productorder.dto.response.CustomerResponse;
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
@@ -35,9 +35,6 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    /**
-     * Create a new customer
-     */
     @PostMapping
     @Operation(summary = "Create a new customer", description = "Create a new customer account")
     @ApiResponses(value = {
@@ -65,12 +62,13 @@ public class CustomerController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<CustomerResponse> getCustomerById(
+    public ResponseEntity<?> getCustomerById(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
         log.debug("Retrieving customer with ID: {}", id);
         Optional<CustomerResponse> customer = customerService.getCustomerById(id);
-        return customer.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
+        return customer.map(c -> ResponseEntity.ok((Object) c))
+                      .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                              .body(MessageResponse.error("Customer not found with ID: " + id)));
     }
 
     /**
@@ -86,12 +84,13 @@ public class CustomerController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Admin role required")
     })
-    public ResponseEntity<CustomerResponse> getCustomerByUsername(
+    public ResponseEntity<?> getCustomerByUsername(
             @Parameter(description = "Customer username") @PathVariable String username) {
         log.debug("Retrieving customer with username: {}", username);
         Optional<CustomerResponse> customer = customerService.getCustomerByUsername(username);
-        return customer.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
+        return customer.map(c -> ResponseEntity.ok((Object) c))
+                      .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                              .body(MessageResponse.error("Customer not found with username: " + username)));
     }
 
     /**
@@ -113,9 +112,6 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Update customer
-     */
     @PutMapping("/{id}")
     @Operation(summary = "Update customer", description = "Update customer information")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and @customerSecurityService.isOwner(#id, authentication.name))")
@@ -135,24 +131,21 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Delete customer
-     */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete customer", description = "Delete customer account (Admin only)")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
+        @ApiResponse(responseCode = "200", description = "Customer deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Customer not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Admin role required")
     })
-    public ResponseEntity<Void> deleteCustomer(
+    public ResponseEntity<MessageResponse> deleteCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
         log.info("Deleting customer with ID: {}", id);
         customerService.deleteCustomer(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(MessageResponse.success("Customer deleted successfully with ID: " + id));
     }
 
     /**

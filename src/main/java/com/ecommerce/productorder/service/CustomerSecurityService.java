@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -14,14 +13,11 @@ public class CustomerSecurityService {
 
     private final CustomerService customerService;
 
-    /**
-     * Check if the authenticated user owns the customer resource
-     */
     public boolean isOwner(Long customerId, String username) {
         log.debug("Checking ownership for customer ID: {} and username: {}", customerId, username);
         
         return customerService.getCustomerByUsername(username)
-                .map(customer -> customer.getId().equals(customerId))
+                .map(customer -> customer.id().equals(customerId))
                 .orElse(false);
     }
 
@@ -34,7 +30,7 @@ public class CustomerSecurityService {
         }
 
         return customerService.getCustomerByUsername(authentication.getName())
-                .map(customer -> customer.getId())
+                .map(customer -> customer.id())
                 .orElse(null);
     }
 }

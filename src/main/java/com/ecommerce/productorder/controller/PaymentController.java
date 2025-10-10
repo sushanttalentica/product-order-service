@@ -1,5 +1,6 @@
 package com.ecommerce.productorder.controller;
 
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest;
 import com.ecommerce.productorder.payment.dto.response.PaymentResponse;
 import com.ecommerce.productorder.payment.service.PaymentService;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -62,11 +62,12 @@ public class PaymentController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable String paymentId) {
+    public ResponseEntity<?> getPaymentById(@PathVariable String paymentId) {
         log.debug("Retrieving payment with ID: {}", paymentId);
         return paymentService.getPaymentById(paymentId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(payment -> ResponseEntity.ok((Object) payment))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Payment not found with ID: " + paymentId)));
     }
     
     
@@ -80,11 +81,12 @@ public class PaymentController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<PaymentResponse> getPaymentByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<?> getPaymentByOrderId(@PathVariable Long orderId) {
         log.debug("Retrieving payment for order ID: {}", orderId);
         return paymentService.getPaymentByOrderId(orderId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(payment -> ResponseEntity.ok((Object) payment))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Payment not found for order ID: " + orderId)));
     }
     
     

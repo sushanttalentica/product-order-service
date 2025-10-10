@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
 @Table(name = "products")
 @Data
@@ -64,9 +63,7 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to check if product is available for purchase
-     */
+
     public boolean isAvailableForPurchase() {
         return isActive != null && isActive && stockQuantity > 0;
     }
@@ -79,9 +76,7 @@ public class Product {
         return stockQuantity >= requestedQuantity;
     }
     
-    /**
-     * Business method to reduce stock after order
-     */
+
     public void reduceStock(int quantity) {
         if (!hasSufficientStock(quantity)) {
             throw new IllegalArgumentException("Insufficient stock available");
@@ -89,9 +84,7 @@ public class Product {
         this.stockQuantity -= quantity;
     }
     
-    /**
-     * Business method to restore stock (for order cancellation)
-     */
+
     public void restoreStock(int quantity) {
         this.stockQuantity += quantity;
     }

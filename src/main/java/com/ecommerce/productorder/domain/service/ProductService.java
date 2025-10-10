@@ -10,32 +10,21 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-
 public interface ProductService {
     
-    /**
-     * Creates a new product
-     */
+
     ProductResponse createProduct(CreateProductRequest request);
     
-    /**
-     * Updates an existing product
-     */
+
     ProductResponse updateProduct(Long productId, UpdateProductRequest request);
     
-    /**
-     * Retrieves a product by ID
-     */
+
     Optional<ProductResponse> getProductById(Long productId);
     
-    /**
-     * Retrieves a product by SKU
-     */
+
     Optional<ProductResponse> getProductBySku(String sku);
     
-    /**
-     * Retrieves all products with pagination
-     */
+
     Page<ProductResponse> getAllProducts(Pageable pageable);
     
     /**
@@ -64,9 +53,7 @@ public interface ProductService {
                                        java.math.BigDecimal maxPrice, 
                                        Pageable pageable);
     
-    /**
-     * Deletes a product (soft delete)
-     */
+
     void deleteProduct(Long productId);
     
     /**
@@ -74,9 +61,7 @@ public interface ProductService {
      */
     List<ProductResponse> getProductsWithLowStock(Integer threshold);
     
-    /**
-     * Updates product stock
-     */
+
     ProductResponse updateProductStock(Long productId, Integer newStock);
     
     /**

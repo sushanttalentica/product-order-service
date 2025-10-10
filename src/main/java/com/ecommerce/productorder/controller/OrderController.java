@@ -2,6 +2,7 @@ package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.domain.service.OrderService;
 import com.ecommerce.productorder.dto.request.CreateOrderRequest;
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import com.ecommerce.productorder.dto.response.OrderResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -38,11 +38,12 @@ public class OrderController {
     
     @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
         log.debug("Retrieving order with id: {}", orderId);
         return orderService.getOrderById(orderId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(order -> ResponseEntity.ok((Object) order))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Order not found with ID: " + orderId)));
     }
     
     

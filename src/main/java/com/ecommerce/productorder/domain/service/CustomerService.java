@@ -10,12 +10,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-
 public interface CustomerService {
 
-    /**
-     * Create a new customer
-     */
     CustomerResponse createCustomer(CreateCustomerRequest request);
 
     /**
@@ -38,14 +34,8 @@ public interface CustomerService {
      */
     Page<CustomerResponse> getAllCustomers(Pageable pageable);
 
-    /**
-     * Update customer
-     */
     CustomerResponse updateCustomer(Long id, UpdateCustomerRequest request);
 
-    /**
-     * Delete customer
-     */
     void deleteCustomer(Long id);
 
     /**
@@ -99,14 +89,8 @@ public interface CustomerService {
      */
     List<CustomerResponse> getCustomersWithNoOrders();
 
-    /**
-     * Check if username exists
-     */
     boolean usernameExists(String username);
 
-    /**
-     * Check if email exists
-     */
     boolean emailExists(String email);
 
     /**

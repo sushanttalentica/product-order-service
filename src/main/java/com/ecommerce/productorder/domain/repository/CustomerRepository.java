@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
@@ -30,14 +29,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      */
     Optional<Customer> findByUsernameOrEmail(String username, String email);
 
-    /**
-     * Check if username exists
-     */
     boolean existsByUsername(String username);
 
-    /**
-     * Check if email exists
-     */
     boolean existsByEmail(String email);
 
     /**

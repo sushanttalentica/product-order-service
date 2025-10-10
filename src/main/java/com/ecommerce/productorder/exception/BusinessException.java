@@ -1,6 +1,5 @@
 package com.ecommerce.productorder.exception;
 
-
 public class BusinessException extends RuntimeException {
     
     public BusinessException(String message) {

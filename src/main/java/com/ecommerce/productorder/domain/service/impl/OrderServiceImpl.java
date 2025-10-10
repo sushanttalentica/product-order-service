@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -48,15 +47,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final OrderEventPublisher orderEventPublisher;
     
-    /**
-     * Creates a new order
-     * Handles order creation and triggers downstream workflows
-     * Includes retry logic for optimistic lock conflicts
-     * 
-     * @param request the order creation request
-     * @return OrderResponse containing order details
-     * @throws BusinessException if order creation fails
-     */
+
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderResponse createOrder(CreateOrderRequest request) {
@@ -84,13 +75,7 @@ public class OrderServiceImpl implements OrderService {
         throw new BusinessException("Failed to create order after retries");
     }
     
-    /**
-     * Internal order creation logic
-     * Separated for retry mechanism
-     * 
-     * @param request the order creation request
-     * @return OrderResponse containing order details
-     */
+
     private OrderResponse createOrderInternal(CreateOrderRequest request) {
         // Validate request
         validateOrderRequest(request);
@@ -112,13 +97,7 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toResponse(savedOrder);
     }
     
-    /**
-     * Retrieves order by ID
-     * Uses Optional for null-safe operations
-     * 
-     * @param orderId the order ID to search for
-     * @return Optional containing order if found, empty otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Optional<OrderResponse> getOrderById(Long orderId) {
@@ -128,14 +107,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toResponse);
     }
     
-    /**
-     * Retrieves orders by customer ID
-     * Uses Java Streams for data processing
-     * 
-     * @param customerId the customer ID to search for
-     * @param pageable the pagination parameters
-     * @return Page of orders for the customer
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByCustomerId(Long customerId, Pageable pageable) {
@@ -145,14 +117,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toResponse);
     }
     
-    /**
-     * Retrieves orders by status
-     * Uses Java Streams for data processing
-     * 
-     * @param status the order status to search for
-     * @param pageable the pagination parameters
-     * @return Page of orders with the specified status
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByStatus(String status, Pageable pageable) {
@@ -168,15 +133,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Updates order status
-     * Handles order status updates and triggers downstream workflows
-     * 
-     * @param orderId the order ID to update
-     * @param status the new status
-     * @return OrderResponse containing updated order details
-     * @throws BusinessException if status update fails
-     */
+
     @Override
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, String status) {
@@ -205,14 +162,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Cancels an order
-     * Handles order cancellation and triggers downstream workflows
-     * 
-     * @param orderId the order ID to cancel
-     * @return OrderResponse containing updated order details
-     * @throws BusinessException if cancellation fails
-     */
+
     @Override
     @Transactional
     public OrderResponse cancelOrder(Long orderId) {
@@ -246,13 +196,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Retrieves all orders with pagination
-     * Uses Java Streams for data processing
-     * 
-     * @param pageable the pagination parameters
-     * @return Page of all orders
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
@@ -262,15 +206,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toResponse);
     }
     
-    /**
-     * Retrieves orders by date range
-     * Uses Java Streams for data processing
-     * 
-     * @param startDate the start date for the range
-     * @param endDate the end date for the range
-     * @param pageable the pagination parameters
-     * @return Page of orders within the date range
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByDateRange(String startDate, String endDate, Pageable pageable) {
@@ -288,15 +224,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Retrieves orders by amount range
-     * Uses Java Streams for data processing
-     * 
-     * @param minAmount the minimum amount
-     * @param maxAmount the maximum amount
-     * @param pageable the pagination parameters
-     * @return Page of orders within the amount range
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByAmountRange(String minAmount, String maxAmount, Pageable pageable) {
@@ -314,14 +242,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Gets order statistics
-     * Returns order statistics for analysis
-     * 
-     * @param startDate the start date for statistics (optional)
-     * @param endDate the end date for statistics (optional)
-     * @return Object containing order statistics
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Object getOrderStatistics(String startDate, String endDate) {
@@ -346,12 +267,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Gets orders needing attention
-     * Returns list of orders that need attention
-     * 
-     * @return List of orders needing attention
-     */
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersNeedingAttention() {
@@ -367,12 +283,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Validates order request for business rules
-     * 
-     * @param request the order request to validate
-     * @throws BusinessException if validation fails
-     */
+
     private void validateOrderRequest(CreateOrderRequest request) {
         if (request.getOrderItems() == null || request.getOrderItems().isEmpty()) {
             throw new BusinessException("Order must contain at least one item");
@@ -385,13 +296,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Validates and reserves products using atomic SQL operations
-     * Prevents race conditions with database-level atomicity
-     * 
-     * @param request the order request
-     * @throws BusinessException if validation fails or insufficient stock
-     */
+
     private void validateAndReserveProductsAtomic(CreateOrderRequest request) {
         for (var orderItem : request.getOrderItems()) {
             // First, check if product exists and is available
@@ -427,14 +332,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Validates and reserves products (legacy method kept for backward compatibility)
-     * Now uses pessimistic locking to prevent race conditions
-     * 
-     * @param request the order request
-     * @throws BusinessException if validation fails
-     * @deprecated Use validateAndReserveProductsAtomic for better performance
-     */
+
     @Deprecated
     private void validateAndReserveProducts(CreateOrderRequest request) {
         for (var orderItem : request.getOrderItems()) {
@@ -457,13 +355,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    /**
-     * Creates order entity from request
-     * Uses Builder pattern for object creation
-     * 
-     * @param request the order request
-     * @return Order entity
-     */
+
     private Order createOrderEntity(CreateOrderRequest request) {
         Order order = Order.builder()
                 .orderNumber(UUID.randomUUID().toString())
@@ -488,47 +380,26 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
     
-    /**
-     * Calculates the total amount for an order
-     * Fetches product prices and calculates based on quantities
-     * 
-     * @param request the order request
-     * @return calculated total amount
-     */
+
     private BigDecimal calculateOrderTotal(CreateOrderRequest request) {
         return request.getOrderItems().stream()
                 .map(this::calculateItemTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     
-    /**
-     * Calculates total for a single order item
-     * 
-     * @param orderItem the order item
-     * @return calculated item total
-     */
+
     private BigDecimal calculateItemTotal(CreateOrderRequest.OrderItemRequest orderItem) {
         Product product = findProductById(orderItem.getProductId());
         return product.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
     }
     
-    /**
-     * Finds product by ID with proper error handling
-     * 
-     * @param productId the product ID
-     * @return Product entity
-     * @throws ResourceNotFoundException if product not found
-     */
+
     private Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
     }
     
-    /**
-     * Restores product stock
-     * 
-     * @param order the order to restore stock for
-     */
+
     private void restoreProductStock(Order order) {
         log.info("Restoring product stock for order ID: {}", order.getId());
         

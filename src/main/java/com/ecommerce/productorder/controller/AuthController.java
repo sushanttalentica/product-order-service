@@ -25,11 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-/**
- * Authentication Controller
- * 
- * This controller handles user authentication and registration.
- */
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -42,9 +37,6 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final CustomerService customerService;
 
-    /**
-     * User Login
-     */
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticate user and return JWT token")
     @ApiResponses(value = {
@@ -73,30 +65,24 @@ public class AuthController {
             
             log.info("Login successful for user: {}", request.getUsername());
             
-            return ResponseEntity.ok(AuthResponse.builder()
-                .token(token)
-                .username(request.getUsername())
-                .message("Login successful")
-                .build());
+            return ResponseEntity.ok(new AuthResponse(
+                token,
+                request.getUsername(),
+                "Login successful",
+                null
+            ));
                 
         } catch (org.springframework.security.core.AuthenticationException e) {
             log.error("Authentication failed for user: {} - Error: {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.badRequest()
-                .body(AuthResponse.builder()
-                    .message("Invalid credentials")
-                    .build());
+                .body(new AuthResponse(null, null, "Invalid credentials", null));
         } catch (Exception e) {
             log.error("Unexpected error during login for user: {} - Error: {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.badRequest()
-                .body(AuthResponse.builder()
-                    .message("Login failed: " + e.getMessage())
-                    .build());
+                .body(new AuthResponse(null, null, "Login failed: " + e.getMessage(), null));
         }
     }
 
-    /**
-     * User Registration
-     */
     @PostMapping("/register")
     @Operation(summary = "User registration", description = "Register a new customer account")
     @ApiResponses(value = {
@@ -128,17 +114,17 @@ public class AuthController {
             CustomerResponse customerResponse = customerService.createCustomer(createRequest);
             log.info("Customer registered successfully: {}", request.getUsername());
             
-            return ResponseEntity.status(201).body(AuthResponse.builder()
-                .username(customerResponse.getUsername())
-                .message("Registration successful. Please login.")
-                .build());
+            return ResponseEntity.status(201).body(new AuthResponse(
+                null,
+                customerResponse.username(),
+                "Registration successful. Please login.",
+                null
+            ));
                 
         } catch (Exception e) {
             log.error("Registration failed for user: {} - Error: {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.badRequest()
-                .body(AuthResponse.builder()
-                    .message("Registration failed: " + e.getMessage())
-                    .build());
+                .body(new AuthResponse(null, null, "Registration failed: " + e.getMessage(), null));
         }
     }
 

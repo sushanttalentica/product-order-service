@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "order_items")
 @Data
@@ -49,9 +48,7 @@ public class OrderItem {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to calculate subtotal
-     */
+
     public BigDecimal calculateSubtotal() {
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
@@ -64,9 +61,7 @@ public class OrderItem {
         this.subtotal = calculateSubtotal();
     }
     
-    /**
-     * Factory method to create OrderItem with automatic subtotal calculation
-     */
+
     public static OrderItem create(Order order, Product product, Integer quantity) {
         BigDecimal unitPrice = product.getPrice();
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));

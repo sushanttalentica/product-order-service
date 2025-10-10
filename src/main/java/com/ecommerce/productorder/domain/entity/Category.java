@@ -12,7 +12,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
 @Table(name = "categories")
 @Data
@@ -47,9 +46,7 @@ public class Category {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to check if category is available for products
-     */
+
     public boolean isAvailableForProducts() {
         return isActive != null && isActive;
     }

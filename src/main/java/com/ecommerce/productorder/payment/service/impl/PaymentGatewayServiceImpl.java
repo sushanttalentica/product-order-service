@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,14 +22,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     
     private final Random random = new Random();
     
-    /**
-     * Processes payment through external gateway
-     * Simulates payment authorization and processing
-     * 
-     * @param payment the payment entity
-     * @param request the payment processing request
-     * @return PaymentResponse containing gateway response
-     */
+
     @Override
     public PaymentResponse processPayment(Payment payment, ProcessPaymentRequest request) {
         log.info("Processing payment through gateway for payment ID: {}", payment.getPaymentId());
@@ -59,14 +51,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         }
     }
     
-    /**
-     * Processes refund through external gateway
-     * Simulates refund processing
-     * 
-     * @param payment the payment entity
-     * @param refundAmount the amount to refund
-     * @return PaymentResponse containing gateway response
-     */
+
     @Override
     public PaymentResponse processRefund(Payment payment, BigDecimal refundAmount) {
         log.info("Processing refund through gateway for payment ID: {}", payment.getPaymentId());
@@ -95,13 +80,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         }
     }
     
-    /**
-     * Validates payment method
-     * Validates payment method and card details
-     * 
-     * @param request the payment processing request
-     * @return true if payment method is valid, false otherwise
-     */
+
     @Override
     public boolean validatePaymentMethod(ProcessPaymentRequest request) {
         log.debug("Validating payment method for request: {}", request.getPaymentMethod());
@@ -127,12 +106,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         return true;
     }
     
-    /**
-     * Gets supported payment methods
-     * Returns list of supported payment methods
-     * 
-     * @return List of supported payment methods
-     */
+
     @Override
     public List<String> getSupportedPaymentMethods() {
         return Arrays.asList(
@@ -143,12 +117,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         );
     }
     
-    /**
-     * Checks gateway health
-     * Verifies gateway communication
-     * 
-     * @return true if gateway is healthy, false otherwise
-     */
+
     @Override
     public boolean isGatewayHealthy() {
         // Simulate gateway health check
@@ -168,13 +137,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         }
     }
     
-    /**
-     * Simulates payment processing result
-     * Simulates payment authorization success/failure
-     * 
-     * @param request the payment request
-     * @return true if payment is successful, false otherwise
-     */
+
     private boolean simulatePaymentResult(ProcessPaymentRequest request) {
         // Use effective amount from payment entity via request hint if provided
         // Fallback to request.getAmount() for backward compatibility
@@ -185,23 +148,12 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         return random.nextDouble() < successRate;
     }
     
-    /**
-     * Simulates refund processing result
-     * Simulates refund processing success/failure
-     * 
-     * @return true if refund is successful, false otherwise
-     */
+
     private boolean simulateRefundResult() {
         return random.nextDouble() < 0.95; // 95% success rate for refunds
     }
     
-    /**
-     * Validates card number using Luhn algorithm
-     * Implements Luhn algorithm for card number validation
-     * 
-     * @param cardNumber the card number to validate
-     * @return true if card number is valid, false otherwise
-     */
+
     private boolean isValidCardNumber(String cardNumber) {
         if (cardNumber == null || cardNumber.length() < 13 || cardNumber.length() > 19) {
             return false;
@@ -236,13 +188,7 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         return sum % 10 == 0;
     }
     
-    /**
-     * Validates expiry date
-     * Validates MM/YY format and future date
-     * 
-     * @param expiryDate the expiry date to validate
-     * @return true if expiry date is valid, false otherwise
-     */
+
     private boolean isValidExpiryDate(String expiryDate) {
         if (expiryDate == null || !expiryDate.matches("^(0[1-9]|1[0-2])/([0-9]{2})$")) {
             return false;
@@ -262,94 +208,71 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         }
     }
     
-    /**
-     * Validates CVV
-     * Validates CVV format and length
-     * 
-     * @param cvv the CVV to validate
-     * @return true if CVV is valid, false otherwise
-     */
+
     private boolean isValidCVV(String cvv) {
         return cvv != null && cvv.matches("^[0-9]{3,4}$");
     }
     
-    /**
-     * Creates successful payment response
-     * Factory method for successful responses
-     * 
-     * @param payment the payment entity
-     * @param request the payment request
-     * @return PaymentResponse for successful payment
-     */
+
     private PaymentResponse createSuccessfulResponse(Payment payment, ProcessPaymentRequest request) {
         String transactionId = "TXN_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String gatewayResponse = "Payment authorized successfully";
         
-        return PaymentResponse.builder()
-                .id(payment.getId())
-                .paymentId(payment.getPaymentId())
-                .orderId(payment.getOrderId())
-                .customerId(payment.getCustomerId())
-                .amount(payment.getAmount())
-                .status("COMPLETED")
-                .paymentMethod(payment.getPaymentMethod().name())
-                .transactionId(transactionId)
-                .gatewayResponse(gatewayResponse)
-                .processedAt(LocalDateTime.now())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getPaymentId(),
+                payment.getOrderId(),
+                payment.getCustomerId(),
+                payment.getAmount(),
+                "COMPLETED",
+                payment.getPaymentMethod().name(),
+                transactionId,
+                gatewayResponse,
+                null,
+                LocalDateTime.now(),
+                payment.getCreatedAt(),
+                LocalDateTime.now()
+        );
     }
     
-    /**
-     * Creates successful refund response
-     * Factory method for successful refund responses
-     * 
-     * @param payment the payment entity
-     * @param refundAmount the refund amount
-     * @return PaymentResponse for successful refund
-     */
+
     private PaymentResponse createSuccessfulRefundResponse(Payment payment, BigDecimal refundAmount) {
         String transactionId = "REF_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String gatewayResponse = "Refund processed successfully";
         
-        return PaymentResponse.builder()
-                .id(payment.getId())
-                .paymentId(payment.getPaymentId())
-                .orderId(payment.getOrderId())
-                .customerId(payment.getCustomerId())
-                .amount(payment.getAmount())
-                .status("REFUNDED")
-                .paymentMethod(payment.getPaymentMethod().name())
-                .transactionId(transactionId)
-                .gatewayResponse(gatewayResponse)
-                .processedAt(LocalDateTime.now())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getPaymentId(),
+                payment.getOrderId(),
+                payment.getCustomerId(),
+                payment.getAmount(),
+                "REFUNDED",
+                payment.getPaymentMethod().name(),
+                transactionId,
+                gatewayResponse,
+                null,
+                LocalDateTime.now(),
+                payment.getCreatedAt(),
+                LocalDateTime.now()
+        );
     }
     
-    /**
-     * Creates failed payment response
-     * Factory method for failed responses
-     * 
-     * @param payment the payment entity
-     * @param failureReason the reason for failure
-     * @return PaymentResponse for failed payment
-     */
+
     private PaymentResponse createFailedResponse(Payment payment, String failureReason) {
-        return PaymentResponse.builder()
-                .id(payment.getId())
-                .paymentId(payment.getPaymentId())
-                .orderId(payment.getOrderId())
-                .customerId(payment.getCustomerId())
-                .amount(payment.getAmount())
-                .status("FAILED")
-                .paymentMethod(payment.getPaymentMethod().name())
-                .failureReason(failureReason)
-                .processedAt(LocalDateTime.now())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getPaymentId(),
+                payment.getOrderId(),
+                payment.getCustomerId(),
+                payment.getAmount(),
+                "FAILED",
+                payment.getPaymentMethod().name(),
+                null,
+                null,
+                failureReason,
+                LocalDateTime.now(),
+                payment.getCreatedAt(),
+                LocalDateTime.now()
+        );
     }
 }

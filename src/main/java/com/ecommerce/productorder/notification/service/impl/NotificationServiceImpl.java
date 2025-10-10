@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,13 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String NOTIFICATION_SMS_TOPIC = "notification.sms";
     private static final String NOTIFICATION_PUSH_TOPIC = "notification.push";
     
-    /**
-     * Sends order confirmation email
-     * Sends email notification for order confirmation
-     * 
-     * @param order the order entity
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendOrderConfirmationEmail(Order order) {
         log.info("Sending order confirmation email for order ID: {}", order.getId());
@@ -54,14 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Sends order status update email
-     * Sends email notification for order status updates
-     * 
-     * @param order the order entity
-     * @param previousStatus the previous order status
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendOrderStatusUpdateEmail(Order order, String previousStatus) {
         log.info("Sending order status update email for order ID: {}", order.getId());
@@ -82,13 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Sends order cancellation email
-     * Sends email notification for order cancellation
-     * 
-     * @param order the order entity
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendOrderCancellationEmail(Order order) {
         log.info("Sending order cancellation email for order ID: {}", order.getId());
@@ -109,14 +89,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Sends payment confirmation email
-     * Sends email notification for payment confirmation
-     * 
-     * @param order the order entity
-     * @param paymentId the payment ID
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendPaymentConfirmationEmail(Order order, String paymentId) {
         log.info("Sending payment confirmation email for order ID: {}", order.getId());
@@ -137,14 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Sends invoice email
-     * Sends email notification with invoice attachment
-     * 
-     * @param order the order entity
-     * @param invoiceUrl the invoice URL
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendInvoiceEmail(Order order, String invoiceUrl) {
         log.info("Sending invoice email for order ID: {}", order.getId());
@@ -165,15 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Sends low stock alert email
-     * Sends email notification for low stock alerts
-     * 
-     * @param productName the product name
-     * @param currentStock the current stock level
-     * @param threshold the stock threshold
-     * @return true if email sent successfully, false otherwise
-     */
+
     @Override
     public boolean sendLowStockAlertEmail(String productName, Integer currentStock, Integer threshold) {
         log.info("Sending low stock alert email for product: {}", productName);
@@ -194,13 +152,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Gets notification status
-     * Retrieves notification delivery status
-     * 
-     * @param notificationId the notification ID
-     * @return Optional containing notification status if found, empty otherwise
-     */
+
     @Override
     public Optional<String> getNotificationStatus(String notificationId) {
         log.debug("Getting notification status for ID: {}", notificationId);
@@ -216,12 +168,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Kafka listener for order events
-     * Listens to order events and triggers notifications
-     * 
-     * @param eventData the event data
-     */
+
     @KafkaListener(topics = "order.created", groupId = "notification-service")
     public void handleOrderCreatedEvent(Map<String, Object> eventData) {
         log.info("Received order created event: {}", eventData);
@@ -242,12 +189,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Kafka listener for payment events
-     * Listens to payment events and triggers notifications
-     * 
-     * @param eventData the event data
-     */
+
     @KafkaListener(topics = "payment.processed", groupId = "notification-service")
     public void handlePaymentProcessedEvent(Map<String, Object> eventData) {
         log.info("Received payment processed event: {}", eventData);
@@ -269,13 +211,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
     
-    /**
-     * Creates order confirmation email data
-     * Factory method for email data creation
-     * 
-     * @param order the order entity
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createOrderConfirmationEmailData(Order order) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -296,14 +232,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates order status update email data
-     * Factory method for email data creation
-     * 
-     * @param order the order entity
-     * @param previousStatus the previous status
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createOrderStatusUpdateEmailData(Order order, String previousStatus) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -325,13 +254,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates order cancellation email data
-     * Factory method for email data creation
-     * 
-     * @param order the order entity
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createOrderCancellationEmailData(Order order) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -351,14 +274,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates payment confirmation email data
-     * Factory method for email data creation
-     * 
-     * @param order the order entity
-     * @param paymentId the payment ID
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createPaymentConfirmationEmailData(Order order, String paymentId) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -379,14 +295,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates invoice email data
-     * Factory method for email data creation
-     * 
-     * @param order the order entity
-     * @param invoiceUrl the invoice URL
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createInvoiceEmailData(Order order, String invoiceUrl) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -407,15 +316,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates low stock alert email data
-     * Factory method for email data creation
-     * 
-     * @param productName the product name
-     * @param currentStock the current stock
-     * @param threshold the threshold
-     * @return Map containing email data
-     */
+
     private Map<String, Object> createLowStockAlertEmailData(String productName, Integer currentStock, Integer threshold) {
         Map<String, Object> emailData = new HashMap<>();
         
@@ -434,14 +335,7 @@ public class NotificationServiceImpl implements NotificationService {
         return emailData;
     }
     
-    /**
-     * Creates mock order for notifications
-     * Factory method for order creation
-     * 
-     * @param orderId the order ID
-     * @param customerEmail the customer email
-     * @return Order entity
-     */
+
     private Order createMockOrder(Long orderId, String customerEmail) {
         return Order.builder()
                 .id(orderId)

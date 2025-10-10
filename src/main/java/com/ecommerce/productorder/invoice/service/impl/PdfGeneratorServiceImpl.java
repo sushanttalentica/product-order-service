@@ -20,21 +20,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PdfGeneratorServiceImpl implements PdfGeneratorService {
     
-    /**
-     * Generates PDF invoice for order
-     * Creates PDF content for invoice
-     * 
-     * @param order the order entity
-     * @return byte array containing PDF content
-     * @throws IllegalArgumentException if order is invalid
-     * @throws RuntimeException if PDF generation fails
-     */
+
     @Override
     public byte[] generateInvoicePdf(Order order) {
         log.info("Generating PDF invoice for order ID: {}", order.getId());
@@ -109,15 +100,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         }
     }
     
-    /**
-     * Generates PDF receipt for order
-     * Creates PDF content for receipt
-     * 
-     * @param order the order entity
-     * @return byte array containing PDF content
-     * @throws IllegalArgumentException if order is invalid
-     * @throws RuntimeException if PDF generation fails
-     */
+
     @Override
     public byte[] generateReceiptPdf(Order order) {
         log.info("Generating PDF receipt for order ID: {}", order.getId());
@@ -148,15 +131,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         }
     }
     
-    /**
-     * Generates PDF shipping label for order
-     * Creates PDF content for shipping label
-     * 
-     * @param order the order entity
-     * @return byte array containing PDF content
-     * @throws IllegalArgumentException if order is invalid
-     * @throws RuntimeException if PDF generation fails
-     */
+
     @Override
     public byte[] generateShippingLabelPdf(Order order) {
         log.info("Generating PDF shipping label for order ID: {}", order.getId());
@@ -187,12 +162,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         }
     }
     
-    /**
-     * Validates order for PDF generation
-     * 
-     * @param order the order to validate
-     * @throws IllegalArgumentException if order is invalid
-     */
+
     private void validateOrderForPdf(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Order cannot be null");
@@ -211,13 +181,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         }
     }
     
-    /**
-     * Creates invoice content
-     * Factory method for invoice content creation
-     * 
-     * @param order the order entity
-     * @return String containing invoice content
-     */
+
     private String createInvoiceContent(Order order) {
         StringBuilder content = new StringBuilder();
         
@@ -243,13 +207,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         return content.toString();
     }
     
-    /**
-     * Creates receipt content
-     * Factory method for receipt content creation
-     * 
-     * @param order the order entity
-     * @return String containing receipt content
-     */
+
     private String createReceiptContent(Order order) {
         StringBuilder content = new StringBuilder();
         
@@ -271,13 +229,7 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         return content.toString();
     }
     
-    /**
-     * Creates shipping label content
-     * Factory method for shipping label content creation
-     * 
-     * @param order the order entity
-     * @return String containing shipping label content
-     */
+
     private String createShippingLabelContent(Order order) {
         StringBuilder content = new StringBuilder();
         

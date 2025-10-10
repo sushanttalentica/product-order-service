@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     
@@ -61,12 +60,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * Find products by multiple criteria with custom query
      * Uses JPQL for complex search scenarios
      */
-    @Query("SELECT p FROM Product p WHERE " +
-           "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
-           "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
-           "(:maxPrice IS NULL OR p.price <= :maxPrice) AND " +
-           "p.isActive = true")
+    @Query("""
+        SELECT p FROM Product p 
+        WHERE (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) 
+        AND (:categoryId IS NULL OR p.category.id = :categoryId) 
+        AND (:minPrice IS NULL OR p.price >= :minPrice) 
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice) 
+        AND p.isActive = true
+        """)
     Page<Product> findProductsByCriteria(@Param("name") String name,
                                        @Param("categoryId") Long categoryId,
                                        @Param("minPrice") java.math.BigDecimal minPrice,
@@ -85,44 +86,29 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      */
     Page<Product> findByCategoryNameContainingIgnoreCaseAndIsActiveTrue(String categoryName, Pageable pageable);
     
-    /**
-     * Find product by ID with pessimistic write lock
-     * Prevents concurrent modifications to the same product
-     * Used for stock updates to avoid race conditions
-     * 
-     * @param productId the product ID
-     * @return Optional containing locked product if found
-     */
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Optional<Product> findByIdWithLock(@Param("productId") Long productId);
     
-    /**
-     * Atomically reduce product stock
-     * Uses database-level atomic operation to prevent race conditions
-     * Only updates if sufficient stock is available
-     * 
-     * @param productId the product ID
-     * @param quantity the quantity to reduce
-     * @return number of rows updated (1 if successful, 0 if insufficient stock)
-     */
+
     @Modifying
-    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity - :quantity " +
-           "WHERE p.id = :productId AND p.stockQuantity >= :quantity")
+    @Query("""
+        UPDATE Product p 
+        SET p.stockQuantity = p.stockQuantity - :quantity 
+        WHERE p.id = :productId 
+        AND p.stockQuantity >= :quantity
+        """)
     int reduceStockAtomic(@Param("productId") Long productId, 
                           @Param("quantity") Integer quantity);
     
-    /**
-     * Atomically restore product stock
-     * Used for order cancellations and refunds
-     * 
-     * @param productId the product ID
-     * @param quantity the quantity to restore
-     * @return number of rows updated
-     */
+
     @Modifying
-    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity + :quantity " +
-           "WHERE p.id = :productId")
+    @Query("""
+        UPDATE Product p 
+        SET p.stockQuantity = p.stockQuantity + :quantity 
+        WHERE p.id = :productId
+        """)
     int restoreStockAtomic(@Param("productId") Long productId, 
                            @Param("quantity") Integer quantity);
 }

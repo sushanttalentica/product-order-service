@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,15 +25,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PdfGeneratorService pdfGeneratorService;
     private final S3Service s3Service;
     
-    /**
-     * Generates PDF invoice for order
-     * Creates PDF invoice and uploads to AWS S3
-     * 
-     * @param order the order entity
-     * @return Optional containing invoice URL if successful, empty otherwise
-     * @throws IllegalArgumentException if order is invalid
-     * @throws RuntimeException if invoice generation fails
-     */
+
     @Override
     @Transactional
     public Optional<String> generateInvoice(Order order) {
@@ -70,13 +61,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
     
-    /**
-     * Gets invoice URL for order
-     * Retrieves public access URL for invoice
-     * 
-     * @param orderId the order ID
-     * @return Optional containing invoice URL if found, empty otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public Optional<String> getInvoiceUrl(Long orderId) {
@@ -86,13 +71,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .map(Invoice::getS3Url);
     }
     
-    /**
-     * Deletes invoice for order
-     * Removes invoice from S3 and database
-     * 
-     * @param orderId the order ID
-     * @return true if deletion successful, false otherwise
-     */
+
     @Override
     @Transactional
     public boolean deleteInvoice(Long orderId) {
@@ -123,25 +102,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
     
-    /**
-     * Checks if invoice exists for order
-     * Verifies invoice existence
-     * 
-     * @param orderId the order ID
-     * @return true if invoice exists, false otherwise
-     */
+
     @Override
     @Transactional(readOnly = true)
     public boolean invoiceExists(Long orderId) {
         return invoiceRepository.findByOrderId(orderId).isPresent();
     }
     
-    /**
-     * Validates order for invoice generation
-     * 
-     * @param order the order to validate
-     * @throws IllegalArgumentException if order is invalid
-     */
+
     private void validateOrderForInvoice(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Order cannot be null");
@@ -156,26 +124,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
     
-    /**
-     * Generates S3 key for invoice
-     * Creates unique S3 key for invoice storage
-     * 
-     * @param order the order entity
-     * @return S3 key for invoice
-     */
+
     private String generateS3Key(Order order) {
         return String.format("invoices/%d/%s.pdf", order.getId(), UUID.randomUUID().toString());
     }
     
-    /**
-     * Creates invoice entity
-     * Uses Builder pattern for object creation
-     * 
-     * @param order the order entity
-     * @param s3Key the S3 key
-     * @param s3Url the S3 URL
-     * @return Invoice entity
-     */
+
     private Invoice createInvoiceEntity(Order order, String s3Key, String s3Url) {
         return Invoice.builder()
                 .orderId(order.getId())

@@ -1,7 +1,7 @@
 # Multi-stage Docker build for Product Order Service
 # 
 # Build stage
-FROM maven:3.9.5-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 # Set working directory
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:21-jre-jammy
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y \

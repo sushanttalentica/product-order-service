@@ -5,7 +5,6 @@ import com.ecommerce.productorder.dto.request.CreateOrderRequest;
 import com.ecommerce.productorder.dto.response.OrderResponse;
 import org.mapstruct.*;
 
-
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrderMapper {
     

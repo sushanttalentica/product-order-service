@@ -31,12 +31,6 @@ import java.time.Duration;
 @EnableCaching
 public class RedisConfig {
 
-    /**
-     * Redis Cache Configuration
-     * 
-     * @param connectionFactory Redis connection factory
-     * @return Cache manager with Redis backend
-     */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -58,12 +52,6 @@ public class RedisConfig {
                 .build();
     }
 
-    /**
-     * Redis Template Configuration
-     * 
-     * @param connectionFactory Redis connection factory
-     * @return Redis template for operations
-     */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -87,11 +75,6 @@ public class RedisConfig {
         return template;
     }
 
-    /**
-     * Redis Connection Factory
-     * 
-     * @return Lettuce connection factory
-     */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory();

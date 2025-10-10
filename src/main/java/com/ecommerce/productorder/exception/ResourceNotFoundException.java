@@ -1,6 +1,5 @@
 package com.ecommerce.productorder.exception;
 
-
 public class ResourceNotFoundException extends RuntimeException {
     
     public ResourceNotFoundException(String message) {

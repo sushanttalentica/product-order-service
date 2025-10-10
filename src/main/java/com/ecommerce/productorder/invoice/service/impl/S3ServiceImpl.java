@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 
-
 @Service
 @Slf4j
 public class S3ServiceImpl implements S3Service {
@@ -46,17 +45,7 @@ public class S3ServiceImpl implements S3Service {
                 .build();
     }
     
-    /**
-     * Uploads file to S3
-     * Uploads file content to S3 bucket
-     * 
-     * @param key the S3 key for the file
-     * @param content the file content
-     * @param contentType the content type of the file
-     * @return S3 URL for the uploaded file
-     * @throws IllegalArgumentException if parameters are invalid
-     * @throws RuntimeException if upload fails
-     */
+
     @Override
     public String uploadFile(String key, byte[] content, String contentType) {
         log.info("Uploading file to S3 with key: {}", key);
@@ -95,13 +84,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Downloads file from S3
-     * Downloads file content from S3 bucket
-     * 
-     * @param key the S3 key for the file
-     * @return Optional containing file content if found, empty otherwise
-     */
+
     @Override
     public Optional<byte[]> downloadFile(String key) {
         log.debug("Downloading file from S3 with key: {}", key);
@@ -124,13 +107,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Deletes file from S3
-     * Removes file from S3 bucket
-     * 
-     * @param key the S3 key for the file
-     * @return true if deletion successful, false otherwise
-     */
+
     @Override
     public boolean deleteFile(String key) {
         log.info("Deleting file from S3 with key: {}", key);
@@ -152,13 +129,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Checks if file exists in S3
-     * Verifies file existence in S3 bucket
-     * 
-     * @param key the S3 key for the file
-     * @return true if file exists, false otherwise
-     */
+
     @Override
     public boolean fileExists(String key) {
         log.debug("Checking if file exists in S3 with key: {}", key);
@@ -181,13 +152,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Gets file URL from S3
-     * Retrieves public URL for file
-     * 
-     * @param key the S3 key for the file
-     * @return Optional containing file URL if found, empty otherwise
-     */
+
     @Override
     public Optional<String> getFileUrl(String key) {
         log.debug("Getting file URL from S3 with key: {}", key);
@@ -210,14 +175,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Generates presigned URL for file
-     * Creates presigned URL for secure file access
-     * 
-     * @param key the S3 key for the file
-     * @param expirationMinutes the expiration time in minutes
-     * @return Optional containing presigned URL if successful, empty otherwise
-     */
+
     @Override
     public Optional<String> generatePresignedUrl(String key, int expirationMinutes) {
         log.info("Generating presigned URL for S3 key: {} with expiration: {} minutes", key, expirationMinutes);
@@ -246,38 +204,21 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Validates upload parameters
-     * 
-     * @param key the S3 key
-     * @param content the file content
-     * @param contentType the content type
-     * @throws IllegalArgumentException if parameters are invalid
-     */
+
     private void validateUploadParameters(String key, byte[] content, String contentType) {
         validateS3Key(key);
         validateFileContent(content);
         validateContentType(contentType);
     }
     
-    /**
-     * Validates S3 key parameter
-     * 
-     * @param key the S3 key to validate
-     * @throws IllegalArgumentException if key is invalid
-     */
+
     private void validateS3Key(String key) {
         if (key == null || key.trim().length() < Constants.MIN_KEY_LENGTH) {
             throw new IllegalArgumentException("S3 key cannot be null or empty");
         }
     }
     
-    /**
-     * Validates file content parameter
-     * 
-     * @param content the file content to validate
-     * @throws IllegalArgumentException if content is invalid
-     */
+
     private void validateFileContent(byte[] content) {
         if (content == null || content.length < Constants.MIN_CONTENT_LENGTH) {
             throw new IllegalArgumentException("File content cannot be null or empty");
@@ -288,27 +229,14 @@ public class S3ServiceImpl implements S3Service {
         }
     }
     
-    /**
-     * Validates content type parameter
-     * 
-     * @param contentType the content type to validate
-     * @throws IllegalArgumentException if content type is invalid
-     */
+
     private void validateContentType(String contentType) {
         if (contentType == null || contentType.trim().isEmpty()) {
             throw new IllegalArgumentException("Content type cannot be null or empty");
         }
     }
     
-    /**
-     * Generates S3 URL
-     * Creates permanent public URL using regional endpoint
-     * Format: https://{bucket}.s3.{region}.amazonaws.com/{key}
-     * This format ensures the URL is permanent and uses the correct regional endpoint
-     * 
-     * @param key the S3 key
-     * @return S3 URL with regional endpoint (permanent, no expiration)
-     */
+
     private String generateS3Url(String key) {
         // Use regional endpoint format: https://bucket-name.s3.region.amazonaws.com/path/to/file
         // This URL is permanent and publicly accessible if bucket policy allows

@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
 @Table(name = "orders")
 @Data
@@ -60,26 +59,16 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to calculate total amount from order items
-     */
     public BigDecimal calculateTotalAmount() {
         return orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     
-    /**
-     * Business method to check if order can be cancelled
-     * Encapsulates order state business rules
-     */
     public boolean canBeCancelled() {
         return status == OrderStatus.PENDING || status == OrderStatus.CONFIRMED;
     }
     
-    /**
-     * Business method to update order status
-     */
     public void updateStatus(OrderStatus newStatus) {
         if (isValidStatusTransition(this.status, newStatus)) {
             this.status = newStatus;
@@ -88,9 +77,6 @@ public class Order {
         }
     }
     
-    /**
-     * Business method to validate status transitions
-     */
     private boolean isValidStatusTransition(OrderStatus current, OrderStatus newStatus) {
         return switch (current) {
             case PENDING -> newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELLED;
@@ -102,17 +88,13 @@ public class Order {
         };
     }
     
-    /**
-     * Enum representing order status states
-     * Uses State Pattern for order lifecycle management
-     */
     public enum OrderStatus {
-        PENDING,    // Order created, waiting for payment
-        CONFIRMED,  // Payment confirmed
-        PROCESSING, // Order being prepared
-        SHIPPED,    // Order shipped
-        DELIVERED,  // Order delivered
-        COMPLETED,  // Order completed
-        CANCELLED   // Order cancelled
+        PENDING,
+        CONFIRMED,
+        PROCESSING,
+        SHIPPED,
+        DELIVERED,
+        COMPLETED,
+        CANCELLED
     }
 }

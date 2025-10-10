@@ -80,8 +80,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/auth/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/customers")).permitAll() // Allow customer registration
-                .requestMatchers(new AntPathRequestMatcher("/actuator/health")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/customers")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui.html")).permitAll()
@@ -89,13 +89,9 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/swagger-resources/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products")).permitAll() // Allow public access to product listing
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/search")).permitAll() // Allow public access to product search
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/*/sku")).permitAll() // Allow public access to product by SKU
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/*/category")).permitAll() // Allow public access to products by category
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/*/price-range")).permitAll() // Allow public access to products by price range
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/*")).permitAll() // Allow public access to individual products
-                // Orders and payments require authentication
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/products")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/test/**")).permitAll()
                 // Protected endpoints
                 .anyRequest().authenticated()

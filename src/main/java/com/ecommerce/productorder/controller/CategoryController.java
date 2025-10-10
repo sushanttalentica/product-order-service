@@ -2,13 +2,14 @@ package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.domain.entity.Category;
 import com.ecommerce.productorder.domain.repository.CategoryRepository;
+import com.ecommerce.productorder.dto.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -28,10 +29,11 @@ public class CategoryController {
     
     
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
+    public ResponseEntity<?> getCategoryById(@PathVariable Long categoryId) {
         log.debug("Retrieving category with id: {}", categoryId);
         return categoryRepository.findById(categoryId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(category -> ResponseEntity.ok((Object) category))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MessageResponse.error("Category not found with ID: " + categoryId)));
     }
 }

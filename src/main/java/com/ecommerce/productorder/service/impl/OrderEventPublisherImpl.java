@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,12 +24,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
     private static final String ORDER_CANCELLED_TOPIC = "order.cancelled";
     private static final String ORDER_COMPLETED_TOPIC = "order.completed";
     
-    /**
-     * Publishes order created event
-     * Notifies other services about new order creation
-     * 
-     * @param order the order entity
-     */
+
     @Override
     public void publishOrderCreatedEvent(Order order) {
         log.info("Publishing order created event for order ID: {}", order.getId());
@@ -46,12 +40,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
         }
     }
     
-    /**
-     * Publishes order status updated event
-     * Notifies other services about order status changes
-     * 
-     * @param order the order entity
-     */
+
     @Override
     public void publishOrderStatusUpdatedEvent(Order order) {
         log.info("Publishing order status updated event for order ID: {}", order.getId());
@@ -68,12 +57,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
         }
     }
     
-    /**
-     * Publishes order cancelled event
-     * Notifies other services about order cancellation
-     * 
-     * @param order the order entity
-     */
+
     @Override
     public void publishOrderCancelledEvent(Order order) {
         log.info("Publishing order cancelled event for order ID: {}", order.getId());
@@ -89,12 +73,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
         }
     }
     
-    /**
-     * Publishes order completed event
-     * Notifies other services about order completion
-     * 
-     * @param order the order entity
-     */
+
     @Override
     public void publishOrderCompletedEvent(Order order) {
         log.info("Publishing order completed event for order ID: {}", order.getId());
@@ -110,14 +89,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
         }
     }
     
-    /**
-     * Creates order event data
-     * Factory method for creating event data
-     * 
-     * @param order the order entity
-     * @param eventType the type of event
-     * @return Map containing event data
-     */
+
     private Map<String, Object> createOrderEventData(Order order, String eventType) {
         Map<String, Object> eventData = new HashMap<>();
         

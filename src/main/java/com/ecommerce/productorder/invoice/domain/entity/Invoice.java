@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "invoices")
 @Data
@@ -58,29 +57,17 @@ public class Invoice {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    /**
-     * Business method to check if invoice can be downloaded
-     * Encapsulates invoice access business rules
-     * 
-     * @return true if invoice can be downloaded, false otherwise
-     */
+
     public boolean canBeDownloaded() {
         return status == InvoiceStatus.GENERATED || status == InvoiceStatus.SENT;
     }
     
-    /**
-     * Business method to check if invoice can be regenerated
-     * Encapsulates invoice regeneration business rules
-     * 
-     * @return true if invoice can be regenerated, false otherwise
-     */
+
     public boolean canBeRegenerated() {
         return status == InvoiceStatus.GENERATED || status == InvoiceStatus.SENT;
     }
     
-    /**
-     * Business method to mark invoice as sent
-     */
+
     public void markAsSent() {
         if (status != InvoiceStatus.GENERATED) {
             throw new IllegalStateException("Invoice cannot be marked as sent in current state: " + status);
@@ -88,11 +75,7 @@ public class Invoice {
         this.status = InvoiceStatus.SENT;
     }
     
-    /**
-     * Business method to mark invoice as failed
-     * 
-     * @param failureReason the reason for failure
-     */
+
     public void markAsFailed(String failureReason) {
         this.status = InvoiceStatus.FAILED;
     }

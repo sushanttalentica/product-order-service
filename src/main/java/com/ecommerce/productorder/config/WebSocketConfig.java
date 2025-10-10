@@ -6,16 +6,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     
-    /**
-     * Configures message broker for pub-sub messaging
-     * 
-     * @param config the message broker registry
-     */
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Enable simple broker for topics
@@ -28,11 +23,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setUserDestinationPrefix("/user");
     }
     
-    /**
-     * Registers STOMP endpoints for WebSocket connections
-     * 
-     * @param registry the STOMP endpoint registry
-     */
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Register WebSocket endpoint

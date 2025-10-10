@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,12 +17,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
     
     private final PaymentService paymentService;
     
-    /**
-     * Process payment via gRPC
-     * 
-     * @param request gRPC payment request
-     * @param responseObserver gRPC response observer
-     */
+
     @Override
     public void processPayment(PaymentProto.ProcessPaymentRequest request, 
                               StreamObserver<PaymentProto.ProcessPaymentResponse> responseObserver) {
@@ -53,12 +47,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         }
     }
     
-    /**
-     * Get payment by ID via gRPC
-     * 
-     * @param request gRPC get payment request
-     * @param responseObserver gRPC response observer
-     */
+
     @Override
     public void getPayment(PaymentProto.GetPaymentRequest request, 
                           StreamObserver<PaymentProto.GetPaymentResponse> responseObserver) {
@@ -79,12 +68,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         }
     }
     
-    /**
-     * Get payment by order ID via gRPC
-     * 
-     * @param request gRPC get payment by order ID request
-     * @param responseObserver gRPC response observer
-     */
+
     @Override
     public void getPaymentByOrderId(PaymentProto.GetPaymentByOrderIdRequest request, 
                                    StreamObserver<PaymentProto.GetPaymentByOrderIdResponse> responseObserver) {
@@ -105,12 +89,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         }
     }
     
-    /**
-     * Refund payment via gRPC
-     * 
-     * @param request gRPC refund payment request
-     * @param responseObserver gRPC response observer
-     */
+
     @Override
     public void refundPayment(PaymentProto.RefundPaymentRequest request, 
                              StreamObserver<PaymentProto.RefundPaymentResponse> responseObserver) {
@@ -131,12 +110,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         }
     }
     
-    /**
-     * Convert gRPC request to internal DTO
-     * 
-     * @param request gRPC payment request
-     * @return internal payment request DTO
-     */
+
     private ProcessPaymentRequest convertToInternalRequest(PaymentProto.ProcessPaymentRequest request) {
         return ProcessPaymentRequest.builder()
             .orderId(request.getOrderId())
@@ -156,32 +130,27 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
             .build();
     }
     
-    /**
-     * Convert internal response to gRPC response
-     * 
-     * @param response internal payment response
-     * @return gRPC payment response
-     */
+
     private PaymentProto.ProcessPaymentResponse convertToGrpcResponse(PaymentResponse response) {
         PaymentProto.PaymentData paymentData = PaymentProto.PaymentData.newBuilder()
-            .setId(response.getId())
-            .setPaymentId(response.getPaymentId())
-            .setOrderId(response.getOrderId())
-            .setCustomerId(response.getCustomerId())
-            .setAmount(response.getAmount().toString())
-            .setStatus(response.getStatus())
-            .setPaymentMethod(response.getPaymentMethod())
-            .setTransactionId(response.getTransactionId())
-            .setGatewayResponse(response.getGatewayResponse())
-            .setFailureReason(response.getFailureReason())
-            .setProcessedAt(response.getProcessedAt() != null ? response.getProcessedAt().toString() : "")
-            .setCreatedAt(response.getCreatedAt() != null ? response.getCreatedAt().toString() : "")
-            .setUpdatedAt(response.getUpdatedAt() != null ? response.getUpdatedAt().toString() : "")
+            .setId(response.id())
+            .setPaymentId(response.paymentId())
+            .setOrderId(response.orderId())
+            .setCustomerId(response.customerId())
+            .setAmount(response.amount().toString())
+            .setStatus(response.status())
+            .setPaymentMethod(response.paymentMethod())
+            .setTransactionId(response.transactionId())
+            .setGatewayResponse(response.gatewayResponse())
+            .setFailureReason(response.failureReason())
+            .setProcessedAt(response.processedAt() != null ? response.processedAt().toString() : "")
+            .setCreatedAt(response.createdAt() != null ? response.createdAt().toString() : "")
+            .setUpdatedAt(response.updatedAt() != null ? response.updatedAt().toString() : "")
             .build();
             
         return PaymentProto.ProcessPaymentResponse.newBuilder()
-            .setSuccess("COMPLETED".equals(response.getStatus()))
-            .setMessage(response.getFailureReason() != null ? response.getFailureReason() : "Payment processed successfully")
+            .setSuccess("COMPLETED".equals(response.status()))
+            .setMessage(response.failureReason() != null ? response.failureReason() : "Payment processed successfully")
             .setPayment(paymentData)
             .build();
     }
