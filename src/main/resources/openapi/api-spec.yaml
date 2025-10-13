@@ -1,0 +1,1701 @@
+openapi: 3.0.3
+info:
+  title: Product Order Service API
+  version: 1.0.0
+  description: E-commerce platform API for product and order management
+
+servers:
+  - url: http://localhost:8080/product-order-service
+    description: Local development
+  - url: http://13.202.157.59:8080/product-order-service
+    description: AWS EC2
+
+tags:
+  - name: Authentication
+  - name: Products
+  - name: Orders
+  - name: Payments
+  - name: Customers
+  - name: Invoices
+  - name: Categories
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Common
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+    # Auth
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - password
+        - email
+        - firstName
+        - lastName
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        streetAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        username:
+          type: string
+        message:
+          type: string
+        role:
+          type: string
+
+    # Customer
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fullName:
+          type: string
+        phoneNumber:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressResponse'
+        role:
+          type: string
+        isActive:
+          type: boolean
+        emailVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        orderCount:
+          type: integer
+          format: int64
+
+    AddressResponse:
+      type: object
+      properties:
+        streetAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    UpdateCustomerRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        streetAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    CustomerStatistics:
+      type: object
+      properties:
+        totalCustomers:
+          type: integer
+          format: int64
+        activeCustomers:
+          type: integer
+          format: int64
+        verifiedEmails:
+          type: integer
+          format: int64
+
+    # Product
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stockQuantity:
+          type: integer
+        sku:
+          type: string
+        isActive:
+          type: boolean
+        category:
+          $ref: '#/components/schemas/CategoryResponse'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - stockQuantity
+        - sku
+        - categoryId
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stockQuantity:
+          type: integer
+        sku:
+          type: string
+        categoryId:
+          type: integer
+          format: int64
+        isActive:
+          type: boolean
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stockQuantity:
+          type: integer
+        isActive:
+          type: boolean
+        categoryId:
+          type: integer
+          format: int64
+
+    UpdateStockRequest:
+      type: object
+      required:
+        - stockQuantity
+      properties:
+        stockQuantity:
+          type: integer
+
+    # Category
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+
+    # Order
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        orderNumber:
+          type: string
+        customerId:
+          type: integer
+          format: int64
+        customerEmail:
+          type: string
+        status:
+          type: string
+        totalAmount:
+          type: number
+        shippingAddress:
+          type: string
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - customerId
+        - customerEmail
+        - orderItems
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        customerEmail:
+          type: string
+          format: email
+        shippingAddress:
+          type: string
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+
+    OrderItemRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          minimum: 1
+
+    OrderItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        product:
+          $ref: '#/components/schemas/ProductInfo'
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+        subtotal:
+          type: number
+
+    ProductInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        sku:
+          type: string
+
+    OrderStatistics:
+      type: object
+      properties:
+        totalOrders:
+          type: integer
+          format: int64
+        totalRevenue:
+          type: number
+        averageOrderValue:
+          type: number
+
+    # Payment
+    PaymentRequest:
+      type: object
+      required:
+        - orderId
+        - customerId
+        - paymentMethod
+        - cardNumber
+        - cardHolderName
+        - expiryDate
+        - cvv
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        paymentMethod:
+          type: string
+          enum: [CREDIT_CARD, DEBIT_CARD, UPI, NET_BANKING]
+        cardNumber:
+          type: string
+          pattern: '^[0-9]{13,19}$'
+          description: Card number (13-19 digits)
+        cardHolderName:
+          type: string
+          maxLength: 100
+        expiryDate:
+          type: string
+          pattern: '^(0[1-9]|1[0-2])/([0-9]{2})$'
+          description: Expiry date in MM/YY format
+        cvv:
+          type: string
+          pattern: '^[0-9]{3,4}$'
+          description: CVV (3-4 digits)
+        description:
+          type: string
+          maxLength: 500
+        customerEmail:
+          type: string
+          format: email
+          maxLength: 100
+        billingAddress:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 50
+        state:
+          type: string
+          maxLength: 50
+        postalCode:
+          type: string
+          pattern: '^[0-9]{5,10}$'
+        country:
+          type: string
+          maxLength: 50
+
+    PaymentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        paymentId:
+          type: string
+        orderId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+        status:
+          type: string
+        paymentMethod:
+          type: string
+        transactionId:
+          type: string
+        gatewayResponse:
+          type: string
+        failureReason:
+          type: string
+        processedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentStatistics:
+      type: object
+      properties:
+        totalPayments:
+          type: integer
+          format: int64
+        successfulPayments:
+          type: integer
+          format: int64
+        failedPayments:
+          type: integer
+          format: int64
+        totalAmount:
+          type: number
+
+    # Invoice
+    InvoiceUrlResponse:
+      type: object
+      properties:
+        url:
+          type: string
+
+paths:
+  # Authentication
+  /api/v1/auth/login:
+    post:
+      tags: [Authentication]
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /api/v1/auth/register:
+    post:
+      tags: [Authentication]
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /api/v1/auth/health:
+    get:
+      tags: [Authentication]
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  # Products
+  /api/v1/products:
+    post:
+      tags: [Products]
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+
+    get:
+      tags: [Products]
+      operationId: getAllProducts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/products/{productId}:
+    get:
+      tags: [Products]
+      operationId: getProductById
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+
+    put:
+      tags: [Products]
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+
+    delete:
+      tags: [Products]
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/products/sku/{sku}:
+    get:
+      tags: [Products]
+      operationId: getProductBySku
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/search:
+    get:
+      tags: [Products]
+      operationId: searchProducts
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/category/{categoryId}:
+    get:
+      tags: [Products]
+      operationId: getProductsByCategory
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/price-range:
+    get:
+      tags: [Products]
+      operationId: getProductsByPriceRange
+      parameters:
+        - name: minPrice
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/search/advanced:
+    get:
+      tags: [Products]
+      operationId: advancedSearchProducts
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/low-stock:
+    get:
+      tags: [Products]
+      operationId: getLowStockProducts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: threshold
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+
+  /api/v1/products/{productId}/stock:
+    patch:
+      tags: [Products]
+      operationId: updateProductStock
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+
+  # Orders
+  /api/v1/orders:
+    post:
+      tags: [Orders]
+      operationId: createOrder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+    get:
+      tags: [Orders]
+      operationId: getAllOrders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/orders/{orderId}:
+    get:
+      tags: [Orders]
+      operationId: getOrderById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+    delete:
+      tags: [Orders]
+      operationId: cancelOrder
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/orders/customer/{customerId}:
+    get:
+      tags: [Orders]
+      operationId: getOrdersByCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+
+  /api/v1/orders/status/{status}:
+    get:
+      tags: [Orders]
+      operationId: getOrdersByStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+
+  /api/v1/orders/{orderId}/status:
+    patch:
+      tags: [Orders]
+      operationId: updateOrderStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+  /api/v1/orders/date-range:
+    get:
+      tags: [Orders]
+      operationId: getOrdersByDateRange
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+
+  /api/v1/orders/amount-range:
+    get:
+      tags: [Orders]
+      operationId: getOrdersByAmountRange
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: minAmount
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+
+  /api/v1/orders/statistics:
+    get:
+      tags: [Orders]
+      operationId: getOrderStatistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatistics'
+
+  /api/v1/orders/needing-attention:
+    get:
+      tags: [Orders]
+      operationId: getOrdersNeedingAttention
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+
+  # Customers
+  /api/v1/customers:
+    post:
+      tags: [Customers]
+      operationId: createCustomer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+    get:
+      tags: [Customers]
+      operationId: getAllCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customers/{id}:
+    get:
+      tags: [Customers]
+      operationId: getCustomerById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+    put:
+      tags: [Customers]
+      operationId: updateCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+    delete:
+      tags: [Customers]
+      operationId: deleteCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/customers/username/{username}:
+    get:
+      tags: [Customers]
+      operationId: getCustomerByUsername
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /api/v1/customers/{id}/activate:
+    patch:
+      tags: [Customers]
+      operationId: activateCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /api/v1/customers/{id}/deactivate:
+    patch:
+      tags: [Customers]
+      operationId: deactivateCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /api/v1/customers/{id}/verify-email:
+    patch:
+      tags: [Customers]
+      operationId: verifyCustomerEmail
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /api/v1/customers/search:
+    get:
+      tags: [Customers]
+      operationId: searchCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customers/role/{role}:
+    get:
+      tags: [Customers]
+      operationId: getCustomersByRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customers/active:
+    get:
+      tags: [Customers]
+      operationId: getActiveCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customers/city/{city}:
+    get:
+      tags: [Customers]
+      operationId: getCustomersByCity
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customers/top:
+    get:
+      tags: [Customers]
+      operationId: getTopCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerResponse'
+
+  /api/v1/customers/statistics:
+    get:
+      tags: [Customers]
+      operationId: getCustomerStatistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerStatistics'
+
+  # Payments
+  /api/v1/payments:
+    post:
+      tags: [Payments]
+      operationId: processPayment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+    get:
+      tags: [Payments]
+      operationId: getAllPayments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/payments/{paymentId}:
+    get:
+      tags: [Payments]
+      operationId: getPaymentById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+    delete:
+      tags: [Payments]
+      operationId: deletePayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/payments/order/{orderId}:
+    get:
+      tags: [Payments]
+      operationId: getPaymentByOrderId
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+  /api/v1/payments/customer/{customerId}:
+    get:
+      tags: [Payments]
+      operationId: getPaymentsByCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentResponse'
+
+  /api/v1/payments/{paymentId}/refund:
+    post:
+      tags: [Payments]
+      operationId: refundPayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+  /api/v1/payments/statistics:
+    get:
+      tags: [Payments]
+      operationId: getPaymentStatistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatistics'
+
+  # Invoices
+  /api/v1/invoices/order/{orderId}:
+    post:
+      tags: [Invoices]
+      operationId: generateInvoice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceUrlResponse'
+
+    get:
+      tags: [Invoices]
+      operationId: getInvoiceUrl
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceUrlResponse'
+
+    delete:
+      tags: [Invoices]
+      operationId: deleteInvoice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/invoices/order/{orderId}/exists:
+    get:
+      tags: [Invoices]
+      operationId: checkInvoiceExists
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+
+  # Categories
+  /api/v1/categories:
+    get:
+      tags: [Categories]
+      operationId: getAllCategories
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryResponse'
+
+  /api/v1/categories/{categoryId}:
+    get:
+      tags: [Categories]
+      operationId: getCategoryById
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'

@@ -1,0 +1,47 @@
+package com.ecommerce.productorder.controller;
+
+import com.ecommerce.productorder.api.CategoriesApi;
+import com.ecommerce.productorder.api.model.CategoryResponse;
+import com.ecommerce.productorder.domain.entity.Category;
+import com.ecommerce.productorder.domain.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class CategoriesApiImpl implements CategoriesApi {
+
+    private final CategoryRepository categoryRepository;
+
+    @Override
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        log.info("Getting all categories");
+        List<Category> categories = categoryRepository.findAll();
+        return ResponseEntity.ok(categories.stream()
+                .map(this::convertToApiModel)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ResponseEntity<CategoryResponse> getCategoryById(Long categoryId) {
+        log.info("Getting category by ID: {}", categoryId);
+        return categoryRepository.findById(categoryId)
+                .map(category -> ResponseEntity.ok(convertToApiModel(category)))
+                .orElse(ResponseEntity.status(404).body(null));
+    }
+
+    private CategoryResponse convertToApiModel(Category entity) {
+        var apiModel = new CategoryResponse();
+        apiModel.setId(entity.getId());
+        apiModel.setName(entity.getName());
+        apiModel.setDescription(entity.getDescription());
+        apiModel.setIsActive(entity.getIsActive());
+        return apiModel;
+    }
+}

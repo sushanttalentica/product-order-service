@@ -1,0 +1,13 @@
+aws_region        = "ap-south-1"
+environment       = "production"
+project_name      = "product-order-service"
+ec2_instance_type = "t2.micro"
+ec2_ami           = "ami-0f58b397bc5c1f2e8"
+redis_node_type   = "cache.t2.micro"
+s3_bucket_name    = "my-pos-bucket-125"
+jwt_secret        = "your-secure-jwt-secret-key-minimum-256-bits"
+
+ssh_public_key = <<-EOT
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here
+EOT
+
