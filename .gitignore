@@ -1,6 +1,7 @@
 .idea/
 *.iml
-/target/
+target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 *.log
 .DS_Store
@@ -8,3 +9,5 @@
 /out/
 /build/
 .env
+logs/
+*.sh
