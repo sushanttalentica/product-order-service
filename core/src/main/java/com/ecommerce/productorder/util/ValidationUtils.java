@@ -1,5 +1,7 @@
 package com.ecommerce.productorder.util;
 
+import java.util.Collection;
+
 public final class ValidationUtils {
     
     // Private constructor to prevent instantiation
@@ -41,7 +43,7 @@ public final class ValidationUtils {
     }
     
 
-    public static void validateNotNullOrEmpty(java.util.Collection<?> collection, String fieldName) {
+    public static void validateNotNullOrEmpty(Collection<?> collection, String fieldName) {
         if (collection == null || collection.isEmpty()) {
             throw new IllegalArgumentException(fieldName + " cannot be null or empty");
         }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -113,7 +114,7 @@ public class PaymentEventPublisherImpl implements PaymentEventPublisher {
         
         // Basic payment information
         eventData.put("eventType", eventType);
-        eventData.put("eventId", java.util.UUID.randomUUID().toString());
+        eventData.put("eventId", UUID.randomUUID().toString());
         eventData.put("timestamp", LocalDateTime.now().toString());
         eventData.put("paymentId", payment.getPaymentId());
         eventData.put("orderId", payment.getOrderId());

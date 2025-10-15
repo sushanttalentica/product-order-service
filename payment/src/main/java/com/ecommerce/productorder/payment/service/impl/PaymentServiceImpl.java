@@ -2,6 +2,7 @@ package com.ecommerce.productorder.payment.service.impl;
 
 import com.ecommerce.productorder.payment.domain.entity.Payment;
 import com.ecommerce.productorder.domain.entity.Order;
+import com.ecommerce.productorder.domain.entity.Order.OrderStatus;
 import com.ecommerce.productorder.domain.repository.OrderRepository;
 import com.ecommerce.productorder.payment.domain.repository.PaymentRepository;
 import com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest;
@@ -308,17 +309,14 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             orderRepository.findById(orderId).ifPresent(order -> {
                 if (paymentSuccessful) {
-                    com.ecommerce.productorder.domain.entity.Order.OrderStatus currentStatus = order.getStatus();
+                    OrderStatus currentStatus = order.getStatus();
                     log.info("Processing payment success for order {} with current status: {}", orderId, currentStatus);
                     
-                    // Handle status transition based on current state
-                    if (currentStatus == com.ecommerce.productorder.domain.entity.Order.OrderStatus.PENDING) {
-                        // PENDING → CONFIRMED (payment received)
-                        order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.CONFIRMED);
+                    if (currentStatus == OrderStatus.PENDING) {
+                        order.updateStatus(OrderStatus.CONFIRMED);
                         log.info("Order {} status updated: PENDING → CONFIRMED after successful payment", orderId);
-                    } else if (currentStatus == com.ecommerce.productorder.domain.entity.Order.OrderStatus.CONFIRMED) {
-                        // CONFIRMED → PROCESSING (payment confirmed, start processing)
-                        order.updateStatus(com.ecommerce.productorder.domain.entity.Order.OrderStatus.PROCESSING);
+                    } else if (currentStatus == OrderStatus.CONFIRMED) {
+                        order.updateStatus(OrderStatus.PROCESSING);
                         log.info("Order {} status updated: CONFIRMED → PROCESSING after successful payment", orderId);
                     } else {
                         log.warn("Order {} is in {} status, no automatic update after payment", orderId, currentStatus);

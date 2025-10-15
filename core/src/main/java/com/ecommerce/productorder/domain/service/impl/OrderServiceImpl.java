@@ -23,9 +23,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -256,15 +258,15 @@ public class OrderServiceImpl implements OrderService {
         try {
             // This would typically involve complex queries and aggregations
             // For now, returning a simple statistics object
-            return java.util.Map.of(
+            return Map.of(
                 "totalOrders", orderRepository.count(),
                 "totalRevenue", orderRepository.findAll().stream()
                     .map(Order::getTotalAmount)
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add),
+                    .reduce(BigDecimal.ZERO, BigDecimal::add),
                 "averageOrderValue", orderRepository.findAll().stream()
                     .map(Order::getTotalAmount)
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add)
-                    .divide(new java.math.BigDecimal(orderRepository.count()), 2, java.math.RoundingMode.HALF_UP)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .divide(new BigDecimal(orderRepository.count()), 2, RoundingMode.HALF_UP)
             );
         } catch (Exception e) {
             log.error("Error calculating order statistics", e);

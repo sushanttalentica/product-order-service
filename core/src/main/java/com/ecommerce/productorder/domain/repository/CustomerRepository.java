@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,17 +100,17 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     /**
      * Find customers created after date
      */
-    List<Customer> findByCreatedAtAfter(java.time.LocalDateTime date);
+    List<Customer> findByCreatedAtAfter(LocalDateTime date);
 
     /**
      * Find customers created before date
      */
-    List<Customer> findByCreatedAtBefore(java.time.LocalDateTime date);
+    List<Customer> findByCreatedAtBefore(LocalDateTime date);
 
     /**
      * Find customers by date range
      */
-    List<Customer> findByCreatedAtBetween(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+    List<Customer> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * Search customers by multiple criteria

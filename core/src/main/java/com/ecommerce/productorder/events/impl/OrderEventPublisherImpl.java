@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -92,7 +93,7 @@ public class OrderEventPublisherImpl implements OrderEventPublisher {
         
         // Order information
         eventData.put("eventType", eventType);
-        eventData.put("eventId", java.util.UUID.randomUUID().toString());
+        eventData.put("eventId", UUID.randomUUID().toString());
         eventData.put("timestamp", LocalDateTime.now().toString());
         eventData.put("orderId", order.getId());
         eventData.put("orderNumber", order.getOrderNumber());

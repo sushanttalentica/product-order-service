@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,7 +55,7 @@ public class AuthenticationApiImpl implements AuthenticationApi {
                     .message("Login successful")
                     .role(null));
                     
-        } catch (org.springframework.security.core.AuthenticationException e) {
+        } catch (AuthenticationException e) {
             log.error("Authentication failed for user: {}", loginRequest.getUsername(), e);
             return ResponseEntity.badRequest()
                     .body(new AuthResponse()

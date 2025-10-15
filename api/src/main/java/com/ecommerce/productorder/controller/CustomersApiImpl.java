@@ -5,6 +5,7 @@ import com.ecommerce.productorder.api.model.*;
 import com.ecommerce.productorder.domain.entity.Customer;
 import com.ecommerce.productorder.domain.service.CustomerService;
 import com.ecommerce.productorder.dto.request.CreateCustomerRequest;
+import com.ecommerce.productorder.dto.request.UpdateCustomerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,7 @@ public class CustomersApiImpl implements CustomersApi {
     public ResponseEntity<Object> getAllCustomers(Integer page, Integer size) {
         Page<com.ecommerce.productorder.dto.response.CustomerResponse> customersPage = 
                 customerService.getAllCustomers(PageRequest.of(page, size));
-        return ResponseEntity.ok(customersPage);
+        return ResponseEntity.ok(customersPage.map(this::convertToApiModel));
     }
 
     @Override
