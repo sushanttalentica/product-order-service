@@ -3,16 +3,12 @@ package com.ecommerce.productorder.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,7 +19,6 @@ import java.time.LocalDateTime;
 @Table(name = "order_items")
 @Getter
 @Setter
-@Builder
 public class OrderItem {
     
     @Id
@@ -85,13 +80,13 @@ public class OrderItem {
         BigDecimal unitPrice = product.getPrice();
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
         
-        return OrderItem.builder()
-                .order(order)
-                .product(product)
-                .quantity(quantity)
-                .unitPrice(unitPrice)
-                .subtotal(subtotal)
-                .build();
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setProduct(product);
+        orderItem.setQuantity(quantity);
+        orderItem.setUnitPrice(unitPrice);
+        orderItem.setSubtotal(subtotal);
+        return orderItem;
     }
     
 }

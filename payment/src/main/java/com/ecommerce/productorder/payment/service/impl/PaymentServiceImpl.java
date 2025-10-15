@@ -270,15 +270,15 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + request.getOrderId()));
 
-        return Payment.builder()
-                .paymentId(UUID.randomUUID().toString())
-                .orderId(order.getId())
-                .customerId(order.getCustomerId())
-                .amount(order.getTotalAmount())
-                .refundedAmount(BigDecimal.ZERO)
-                .status(Payment.PaymentStatus.PENDING)
-                .paymentMethod(Payment.PaymentMethod.valueOf(request.getPaymentMethod().toUpperCase()))
-                .build();
+        Payment payment = new Payment();
+        payment.setPaymentId(UUID.randomUUID().toString());
+        payment.setOrderId(order.getId());
+        payment.setCustomerId(order.getCustomerId());
+        payment.setAmount(order.getTotalAmount());
+        payment.setRefundedAmount(BigDecimal.ZERO);
+        payment.setStatus(Payment.PaymentStatus.PENDING);
+        payment.setPaymentMethod(Payment.PaymentMethod.valueOf(request.getPaymentMethod().toUpperCase()));
+        return payment;
     }
     
 

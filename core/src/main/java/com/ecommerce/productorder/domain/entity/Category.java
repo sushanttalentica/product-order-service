@@ -2,7 +2,6 @@ package com.ecommerce.productorder.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +14,6 @@ import java.util.List;
 @Table(name = "categories")
 @Getter
 @Setter
-@Builder
 public class Category {
     
     @Id

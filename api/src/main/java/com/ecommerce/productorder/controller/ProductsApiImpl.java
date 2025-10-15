@@ -31,14 +31,14 @@ public class ProductsApiImpl implements ProductsApi {
     @Override
     public ResponseEntity<ProductResponse> createProduct(CreateProductRequest createProductRequest) {
         log.info("Creating product: {}", createProductRequest.getName());
-        var dtoRequest = com.ecommerce.productorder.dto.request.CreateProductRequest.builder()
-                .name(createProductRequest.getName())
-                .description(createProductRequest.getDescription())
-                .price(createProductRequest.getPrice())
-                .stockQuantity(createProductRequest.getStockQuantity())
-                .sku(createProductRequest.getSku())
-                .categoryId(createProductRequest.getCategoryId())
-                .build();
+        com.ecommerce.productorder.dto.request.CreateProductRequest dtoRequest = 
+                new com.ecommerce.productorder.dto.request.CreateProductRequest();
+        dtoRequest.setName(createProductRequest.getName());
+        dtoRequest.setDescription(createProductRequest.getDescription());
+        dtoRequest.setPrice(createProductRequest.getPrice());
+        dtoRequest.setStockQuantity(createProductRequest.getStockQuantity());
+        dtoRequest.setSku(createProductRequest.getSku());
+        dtoRequest.setCategoryId(createProductRequest.getCategoryId());
         
         var response = productService.createProduct(dtoRequest);
         return ResponseEntity.status(201).body(convertToApiModel(response));
@@ -62,14 +62,14 @@ public class ProductsApiImpl implements ProductsApi {
     @Override
     public ResponseEntity<ProductResponse> updateProduct(Long productId, UpdateProductRequest updateProductRequest) {
         log.info("Updating product: {}", productId);
-        var dtoRequest = com.ecommerce.productorder.dto.request.UpdateProductRequest.builder()
-                .name(updateProductRequest.getName())
-                .description(updateProductRequest.getDescription())
-                .price(updateProductRequest.getPrice())
-                .stockQuantity(updateProductRequest.getStockQuantity())
-                .isActive(updateProductRequest.getIsActive())
-                .categoryId(updateProductRequest.getCategoryId())
-                .build();
+        com.ecommerce.productorder.dto.request.UpdateProductRequest dtoRequest = 
+                new com.ecommerce.productorder.dto.request.UpdateProductRequest();
+        dtoRequest.setName(updateProductRequest.getName());
+        dtoRequest.setDescription(updateProductRequest.getDescription());
+        dtoRequest.setPrice(updateProductRequest.getPrice());
+        dtoRequest.setStockQuantity(updateProductRequest.getStockQuantity());
+        dtoRequest.setIsActive(updateProductRequest.getIsActive());
+        dtoRequest.setCategoryId(updateProductRequest.getCategoryId());
         
         var response = productService.updateProduct(productId, dtoRequest);
         return ResponseEntity.ok(convertToApiModel(response));

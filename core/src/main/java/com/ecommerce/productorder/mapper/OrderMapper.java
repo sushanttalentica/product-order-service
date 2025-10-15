@@ -16,12 +16,12 @@ public class OrderMapper {
             return null;
         }
 
-        return Order.builder()
-                .customerId(request.getCustomerId())
-                .customerEmail(request.getCustomerEmail())
-                .shippingAddress(request.getShippingAddress())
-                .status(Order.OrderStatus.PENDING)
-                .build();
+        Order order = new Order();
+        order.setCustomerId(request.getCustomerId());
+        order.setCustomerEmail(request.getCustomerEmail());
+        order.setShippingAddress(request.getShippingAddress());
+        order.setStatus(Order.OrderStatus.PENDING);
+        return order;
     }
 
     public OrderResponse toResponse(Order order) {

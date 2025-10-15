@@ -362,14 +362,13 @@ public class OrderServiceImpl implements OrderService {
     
 
     private Order createOrderEntity(CreateOrderRequest request) {
-        Order order = Order.builder()
-                .orderNumber(UUID.randomUUID().toString())
-                .customerId(request.getCustomerId())
-                .customerEmail(request.getCustomerEmail())
-                .status(Order.OrderStatus.PENDING)
-                .totalAmount(calculateOrderTotal(request))
-                .shippingAddress(request.getShippingAddress())
-                .build();
+        Order order = new Order();
+        order.setOrderNumber(UUID.randomUUID().toString());
+        order.setCustomerId(request.getCustomerId());
+        order.setCustomerEmail(request.getCustomerEmail());
+        order.setStatus(Order.OrderStatus.PENDING);
+        order.setTotalAmount(calculateOrderTotal(request));
+        order.setShippingAddress(request.getShippingAddress());
         
         // Create and associate order items
         List<OrderItem> orderItems = request.getOrderItems().stream()

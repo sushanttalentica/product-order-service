@@ -28,17 +28,20 @@ public class OrdersApiImpl implements OrdersApi {
     public ResponseEntity<OrderResponse> createOrder(CreateOrderRequest createOrderRequest) {
         log.info("Creating order for customer: {}", createOrderRequest.getCustomerId());
         
-        var dtoRequest = com.ecommerce.productorder.dto.request.CreateOrderRequest.builder()
-                .customerId(createOrderRequest.getCustomerId())
-                .customerEmail(createOrderRequest.getCustomerEmail())
-                .shippingAddress(createOrderRequest.getShippingAddress())
-                .orderItems(createOrderRequest.getOrderItems().stream()
-                        .map(item -> com.ecommerce.productorder.dto.request.CreateOrderRequest.OrderItemRequest.builder()
-                                .productId(item.getProductId())
-                                .quantity(item.getQuantity())
-                                .build())
-                        .collect(Collectors.toList()))
-                .build();
+        com.ecommerce.productorder.dto.request.CreateOrderRequest dtoRequest = 
+                new com.ecommerce.productorder.dto.request.CreateOrderRequest();
+        dtoRequest.setCustomerId(createOrderRequest.getCustomerId());
+        dtoRequest.setCustomerEmail(createOrderRequest.getCustomerEmail());
+        dtoRequest.setShippingAddress(createOrderRequest.getShippingAddress());
+        dtoRequest.setOrderItems(createOrderRequest.getOrderItems().stream()
+                .map(item -> {
+                    com.ecommerce.productorder.dto.request.CreateOrderRequest.OrderItemRequest orderItem = 
+                            new com.ecommerce.productorder.dto.request.CreateOrderRequest.OrderItemRequest();
+                    orderItem.setProductId(item.getProductId());
+                    orderItem.setQuantity(item.getQuantity());
+                    return orderItem;
+                })
+                .collect(Collectors.toList()));
         
         var response = orderService.createOrder(dtoRequest);
         return ResponseEntity.status(201).body(convertToApiModel(response));

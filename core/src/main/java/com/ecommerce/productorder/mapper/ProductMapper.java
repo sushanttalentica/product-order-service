@@ -17,14 +17,14 @@ public class ProductMapper {
             return null;
         }
         
-        return Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .stockQuantity(request.getStockQuantity())
-                .sku(request.getSku())
-                .isActive(true)
-                .build();
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setSku(request.getSku());
+        product.setIsActive(true);
+        return product;
     }
 
     public ProductResponse toResponse(Product product) {
@@ -61,18 +61,18 @@ public class ProductMapper {
             return existingProduct;
         }
 
-        return Product.builder()
-                .id(existingProduct.getId())
-                .name(request.getName() != null ? request.getName() : existingProduct.getName())
-                .description(request.getDescription() != null ? request.getDescription() : existingProduct.getDescription())
-                .price(request.getPrice() != null ? request.getPrice() : existingProduct.getPrice())
-                .stockQuantity(request.getStockQuantity() != null ? request.getStockQuantity() : existingProduct.getStockQuantity())
-                .sku(existingProduct.getSku())
-                .isActive(request.getIsActive() != null ? request.getIsActive() : existingProduct.getIsActive())
-                .category(existingProduct.getCategory())
-                .version(existingProduct.getVersion())
-                .createdAt(existingProduct.getCreatedAt())
-                .build();
+        Product product = new Product();
+        product.setId(existingProduct.getId());
+        product.setName(request.getName() != null ? request.getName() : existingProduct.getName());
+        product.setDescription(request.getDescription() != null ? request.getDescription() : existingProduct.getDescription());
+        product.setPrice(request.getPrice() != null ? request.getPrice() : existingProduct.getPrice());
+        product.setStockQuantity(request.getStockQuantity() != null ? request.getStockQuantity() : existingProduct.getStockQuantity());
+        product.setSku(existingProduct.getSku());
+        product.setIsActive(request.getIsActive() != null ? request.getIsActive() : existingProduct.getIsActive());
+        product.setCategory(existingProduct.getCategory());
+        product.setVersion(existingProduct.getVersion());
+        product.setCreatedAt(existingProduct.getCreatedAt());
+        return product;
     }
 
     public List<ProductResponse> toResponseList(List<Product> products) {

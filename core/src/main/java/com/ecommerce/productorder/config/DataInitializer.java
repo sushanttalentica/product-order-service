@@ -40,69 +40,63 @@ public class DataInitializer implements CommandLineRunner {
             categoryRepository.save(electronics);
             log.info("Created Electronics category");
 
-            Category clothing = Category.builder()
-                    .name("Clothing")
-                    .description("Fashion and apparel")
-                    .isActive(true)
-                    .build();
+            Category clothing = new Category();
+            clothing.setName("Clothing");
+            clothing.setDescription("Fashion and apparel");
+            clothing.setIsActive(true);
             categoryRepository.save(clothing);
             log.info("Created Clothing category");
 
-            Category books = Category.builder()
-                    .name("Books")
-                    .description("Books and literature")
-                    .isActive(true)
-                    .build();
+            Category books = new Category();
+            books.setName("Books");
+            books.setDescription("Books and literature");
+            books.setIsActive(true);
             categoryRepository.save(books);
             log.info("Created Books category");
 
             // Create products (always create for testing)
             log.info("Creating products...");
-                Product iphone = Product.builder()
-                        .name("iPhone 15")
-                        .description("Latest Apple smartphone")
-                        .price(new BigDecimal("999.99"))
-                        .stockQuantity(50)
-                        .sku("IPHONE15-001")
-                        .isActive(true)
-                        .category(electronics)
-                        .build();
+                Product iphone = new Product();
+                iphone.setName("iPhone 15");
+                iphone.setDescription("Latest Apple smartphone");
+                iphone.setPrice(new BigDecimal("999.99"));
+                iphone.setStockQuantity(50);
+                iphone.setSku("IPHONE15-001");
+                iphone.setIsActive(true);
+                iphone.setCategory(electronics);
                 productRepository.save(iphone);
                 log.info("Created iPhone 15 product");
 
-                Product macbook = Product.builder()
-                        .name("MacBook Pro")
-                        .description("Apple laptop computer")
-                        .price(new BigDecimal("1999.99"))
-                        .stockQuantity(25)
-                        .sku("MBP-001")
-                        .isActive(true)
-                        .category(electronics)
-                        .build();
+                Product macbook = new Product();
+                macbook.setName("MacBook Pro");
+                macbook.setDescription("Apple laptop computer");
+                macbook.setPrice(new BigDecimal("1999.99"));
+                macbook.setStockQuantity(25);
+                macbook.setSku("MBP-001");
+                macbook.setIsActive(true);
+                macbook.setCategory(electronics);
                 productRepository.save(macbook);
                 log.info("Created MacBook Pro product");
 
-                Product tshirt = Product.builder()
-                        .name("T-Shirt")
-                        .description("Cotton t-shirt")
-                        .price(new BigDecimal("29.99"))
-                        .stockQuantity(100)
-                        .sku("TSHIRT-001")
-                        .isActive(true)
-                        .category(clothing)
-                        .build();
+                Product tshirt = new Product();
+                tshirt.setName("T-Shirt");
+                tshirt.setDescription("Cotton t-shirt");
+                tshirt.setPrice(new BigDecimal("29.99"));
+                tshirt.setStockQuantity(100);
+                tshirt.setSku("TSHIRT-001");
+                tshirt.setIsActive(true);
+                tshirt.setCategory(clothing);
                 productRepository.save(tshirt);
                 log.info("Created T-Shirt product");
 
-                Product book = Product.builder()
-                        .name("Programming Book")
-                        .description("Learn Java programming")
-                        .price(new BigDecimal("49.99"))
-                        .stockQuantity(75)
-                        .sku("BOOK-001")
-                        .isActive(true)
-                        .category(books)
-                        .build();
+                Product book = new Product();
+                book.setName("Programming Book");
+                book.setDescription("Learn Java programming");
+                book.setPrice(new BigDecimal("49.99"));
+                book.setStockQuantity(75);
+                book.setSku("BOOK-001");
+                book.setIsActive(true);
+                book.setCategory(books);
                 productRepository.save(book);
                 log.info("Created Programming Book product");
         

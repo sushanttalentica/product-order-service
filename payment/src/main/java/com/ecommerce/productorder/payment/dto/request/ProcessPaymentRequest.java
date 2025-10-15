@@ -1,17 +1,13 @@
 package com.ecommerce.productorder.payment.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
  
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class ProcessPaymentRequest {
     
     @NotNull(message = "Order ID is required")
@@ -64,4 +60,26 @@ public class ProcessPaymentRequest {
     
     @Size(max = 50, message = "Country must not exceed 50 characters")
     private String country;
+    
+    public ProcessPaymentRequest() {}
+    
+    public ProcessPaymentRequest(Long orderId, Long customerId, String paymentMethod, String cardNumber,
+                                String cardHolderName, String expiryDate, String cvv, String description,
+                                String customerEmail, String billingAddress, String city, String state,
+                                String postalCode, String country) {
+        this.orderId = orderId;
+        this.customerId = customerId;
+        this.paymentMethod = paymentMethod;
+        this.cardNumber = cardNumber;
+        this.cardHolderName = cardHolderName;
+        this.expiryDate = expiryDate;
+        this.cvv = cvv;
+        this.description = description;
+        this.customerEmail = customerEmail;
+        this.billingAddress = billingAddress;
+        this.city = city;
+        this.state = state;
+        this.postalCode = postalCode;
+        this.country = country;
+    }
 }

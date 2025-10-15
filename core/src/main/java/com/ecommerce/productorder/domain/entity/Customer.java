@@ -6,16 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -26,7 +22,6 @@ import java.util.List;
 @Table(name = "customers")
 @Getter
 @Setter
-@Builder
 public class Customer {
 
     @Id
@@ -114,7 +109,6 @@ public class Customer {
     @Embeddable
     @Getter
     @Setter
-    @Builder
     public static class Address {
         @Column(name = "street_address")
         private String streetAddress;

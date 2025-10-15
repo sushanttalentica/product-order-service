@@ -1,20 +1,16 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import com.ecommerce.productorder.domain.entity.Customer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class CreateCustomerRequest {
 
     @NotBlank(message = "Username is required")
@@ -46,11 +42,8 @@ public class CreateCustomerRequest {
     @NotNull(message = "Role is required")
     private Customer.CustomerRole role;
 
-     // Address DTO for nested validation
-    @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+    @Getter
+    @Setter
     public static class AddressDto {
         
         @Size(max = 200, message = "Street address must not exceed 200 characters")
@@ -67,5 +60,29 @@ public class CreateCustomerRequest {
 
         @Size(max = 50, message = "Country must not exceed 50 characters")
         private String country;
+        
+        public AddressDto() {}
+        
+        public AddressDto(String streetAddress, String city, String state, String postalCode, String country) {
+            this.streetAddress = streetAddress;
+            this.city = city;
+            this.state = state;
+            this.postalCode = postalCode;
+            this.country = country;
+        }
+    }
+    
+    public CreateCustomerRequest() {}
+    
+    public CreateCustomerRequest(String username, String password, String email, String firstName, 
+                                 String lastName, String phoneNumber, AddressDto address, Customer.CustomerRole role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.role = role;
     }
 }

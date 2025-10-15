@@ -113,22 +113,22 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
     
 
     private ProcessPaymentRequest convertToInternalRequest(PaymentProto.ProcessPaymentRequest request) {
-        return ProcessPaymentRequest.builder()
-            .orderId(request.getOrderId())
-            .customerId(request.getCustomerId())
-            .paymentMethod(request.getPaymentMethod())
-            .cardNumber(request.getCardNumber())
-            .cardHolderName(request.getCardHolderName())
-            .expiryDate(request.getExpiryDate())
-            .cvv(request.getCvv())
-            .description(request.getDescription())
-            .customerEmail(request.getCustomerEmail())
-            .billingAddress(request.getBillingAddress())
-            .city(request.getCity())
-            .state(request.getState())
-            .postalCode(request.getPostalCode())
-            .country(request.getCountry())
-            .build();
+        ProcessPaymentRequest paymentRequest = new ProcessPaymentRequest();
+        paymentRequest.setOrderId(request.getOrderId());
+        paymentRequest.setCustomerId(request.getCustomerId());
+        paymentRequest.setPaymentMethod(request.getPaymentMethod());
+        paymentRequest.setCardNumber(request.getCardNumber());
+        paymentRequest.setCardHolderName(request.getCardHolderName());
+        paymentRequest.setExpiryDate(request.getExpiryDate());
+        paymentRequest.setCvv(request.getCvv());
+        paymentRequest.setDescription(request.getDescription());
+        paymentRequest.setCustomerEmail(request.getCustomerEmail());
+        paymentRequest.setBillingAddress(request.getBillingAddress());
+        paymentRequest.setCity(request.getCity());
+        paymentRequest.setState(request.getState());
+        paymentRequest.setPostalCode(request.getPostalCode());
+        paymentRequest.setCountry(request.getCountry());
+        return paymentRequest;
     }
     
 

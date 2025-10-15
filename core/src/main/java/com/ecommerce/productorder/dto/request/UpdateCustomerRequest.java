@@ -1,16 +1,12 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class UpdateCustomerRequest {
 
     @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
@@ -34,11 +30,8 @@ public class UpdateCustomerRequest {
 
     private Boolean emailVerified;
 
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Getter
+    @Setter
     public static class AddressDto {
         
         @Size(max = 200, message = "Street address must not exceed 200 characters")
@@ -55,5 +48,29 @@ public class UpdateCustomerRequest {
 
         @Size(max = 50, message = "Country must not exceed 50 characters")
         private String country;
+        
+        public AddressDto() {}
+        
+        public AddressDto(String streetAddress, String city, String state, String postalCode, String country) {
+            this.streetAddress = streetAddress;
+            this.city = city;
+            this.state = state;
+            this.postalCode = postalCode;
+            this.country = country;
+        }
+    }
+    
+    public UpdateCustomerRequest() {}
+    
+    public UpdateCustomerRequest(String password, String email, String firstName, String lastName,
+                                 String phoneNumber, AddressDto address, Boolean isActive, Boolean emailVerified) {
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.isActive = isActive;
+        this.emailVerified = emailVerified;
     }
 }

@@ -1,17 +1,13 @@
 package com.ecommerce.productorder.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class CreateProductRequest {
     
     @NotBlank(message = "Product name is required")
@@ -38,4 +34,16 @@ public class CreateProductRequest {
     @NotNull(message = "Category ID is required")
     @Positive(message = "Category ID must be positive")
     private Long categoryId;
+    
+    public CreateProductRequest() {}
+    
+    public CreateProductRequest(String name, String description, BigDecimal price, 
+                                Integer stockQuantity, String sku, Long categoryId) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.sku = sku;
+        this.categoryId = categoryId;
+    }
 }

@@ -4,16 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,7 +15,6 @@ import java.util.List;
 @Table(name = "products")
 @Getter
 @Setter
-@Builder
 public class Product {
     
     @Id

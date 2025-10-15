@@ -1,19 +1,15 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class CreateOrderRequest {
     
     @NotNull(message = "Customer ID is required")
@@ -32,10 +28,8 @@ public class CreateOrderRequest {
     @Valid
     private List<OrderItemRequest> orderItems;
     
-    @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+    @Getter
+    @Setter
     public static class OrderItemRequest {
         
         @NotNull(message = "Product ID is required")
@@ -46,5 +40,22 @@ public class CreateOrderRequest {
         @Min(value = 1, message = "Quantity must be at least 1")
         @Max(value = 100, message = "Quantity must not exceed 100")
         private Integer quantity;
+        
+        public OrderItemRequest() {}
+        
+        public OrderItemRequest(Long productId, Integer quantity) {
+            this.productId = productId;
+            this.quantity = quantity;
+        }
+    }
+    
+    public CreateOrderRequest() {}
+    
+    public CreateOrderRequest(Long customerId, String customerEmail, String shippingAddress, 
+                             List<OrderItemRequest> orderItems) {
+        this.customerId = customerId;
+        this.customerEmail = customerEmail;
+        this.shippingAddress = shippingAddress;
+        this.orderItems = orderItems;
     }
 }

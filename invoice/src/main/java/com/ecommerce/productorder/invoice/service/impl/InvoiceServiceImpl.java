@@ -134,15 +134,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     
 
     private Invoice createInvoiceEntity(Order order, String s3Key, String s3Url) {
-        return Invoice.builder()
-                .orderId(order.getId())
-                .customerId(order.getCustomerId())
-                .customerEmail(order.getCustomerEmail())
-                .totalAmount(order.getTotalAmount())
-                .s3Key(s3Key)
-                .s3Url(s3Url)
-                .status(Invoice.InvoiceStatus.GENERATED)
-                .generatedAt(LocalDateTime.now())
-                .build();
+        Invoice invoice = new Invoice();
+        invoice.setOrderId(order.getId());
+        invoice.setCustomerId(order.getCustomerId());
+        invoice.setCustomerEmail(order.getCustomerEmail());
+        invoice.setTotalAmount(order.getTotalAmount());
+        invoice.setS3Key(s3Key);
+        invoice.setS3Url(s3Url);
+        invoice.setStatus(Invoice.InvoiceStatus.GENERATED);
+        invoice.setGeneratedAt(LocalDateTime.now());
+        return invoice;
     }
 }

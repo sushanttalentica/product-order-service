@@ -71,24 +71,22 @@ public class AuthenticationApiImpl implements AuthenticationApi {
     public ResponseEntity<AuthResponse> register(RegisterRequest registerRequest) {
         log.info("Registration request for user: {}", registerRequest.getUsername());
         try {
-            CreateCustomerRequest.AddressDto addressDto = CreateCustomerRequest.AddressDto.builder()
-                    .streetAddress(registerRequest.getStreetAddress())
-                    .city(registerRequest.getCity())
-                    .state(registerRequest.getState())
-                    .postalCode(registerRequest.getPostalCode())
-                    .country(registerRequest.getCountry())
-                    .build();
+            CreateCustomerRequest.AddressDto addressDto = new CreateCustomerRequest.AddressDto();
+            addressDto.setStreetAddress(registerRequest.getStreetAddress());
+            addressDto.setCity(registerRequest.getCity());
+            addressDto.setState(registerRequest.getState());
+            addressDto.setPostalCode(registerRequest.getPostalCode());
+            addressDto.setCountry(registerRequest.getCountry());
             
-            CreateCustomerRequest createRequest = CreateCustomerRequest.builder()
-                    .username(registerRequest.getUsername())
-                    .password(registerRequest.getPassword())
-                    .email(registerRequest.getEmail())
-                    .firstName(registerRequest.getFirstName())
-                    .lastName(registerRequest.getLastName())
-                    .phoneNumber(registerRequest.getPhoneNumber())
-                    .address(addressDto)
-                    .role(Customer.CustomerRole.CUSTOMER)
-                    .build();
+            CreateCustomerRequest createRequest = new CreateCustomerRequest();
+            createRequest.setUsername(registerRequest.getUsername());
+            createRequest.setPassword(registerRequest.getPassword());
+            createRequest.setEmail(registerRequest.getEmail());
+            createRequest.setFirstName(registerRequest.getFirstName());
+            createRequest.setLastName(registerRequest.getLastName());
+            createRequest.setPhoneNumber(registerRequest.getPhoneNumber());
+            createRequest.setAddress(addressDto);
+            createRequest.setRole(Customer.CustomerRole.CUSTOMER);
 
             CustomerResponse customerResponse = customerService.createCustomer(createRequest);
             log.info("Customer registered successfully: {}", registerRequest.getUsername());

@@ -1,17 +1,13 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class UpdateProductRequest {
     
     @Size(max = 200, message = "Product name must not exceed 200 characters")
@@ -35,4 +31,17 @@ public class UpdateProductRequest {
     private Long categoryId;
     
     private Boolean isActive;
+    
+    public UpdateProductRequest() {}
+    
+    public UpdateProductRequest(String name, String description, BigDecimal price, 
+                                Integer stockQuantity, String sku, Long categoryId, Boolean isActive) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.sku = sku;
+        this.categoryId = categoryId;
+        this.isActive = isActive;
+    }
 }

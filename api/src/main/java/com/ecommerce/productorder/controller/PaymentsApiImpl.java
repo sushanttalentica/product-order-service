@@ -30,22 +30,22 @@ public class PaymentsApiImpl implements PaymentsApi {
     @Override
     public ResponseEntity<PaymentResponse> processPayment(PaymentRequest paymentRequest) {
         log.info("Processing payment for order: {}", paymentRequest.getOrderId());
-        var dtoRequest = com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest.builder()
-                .orderId(paymentRequest.getOrderId())
-                .customerId(paymentRequest.getCustomerId())
-                .paymentMethod(paymentRequest.getPaymentMethod() != null ? paymentRequest.getPaymentMethod().name() : null)
-                .cardNumber(paymentRequest.getCardNumber())
-                .cardHolderName(paymentRequest.getCardHolderName())
-                .expiryDate(paymentRequest.getExpiryDate())
-                .cvv(paymentRequest.getCvv())
-                .description(paymentRequest.getDescription())
-                .customerEmail(paymentRequest.getCustomerEmail())
-                .billingAddress(paymentRequest.getBillingAddress())
-                .city(paymentRequest.getCity())
-                .state(paymentRequest.getState())
-                .postalCode(paymentRequest.getPostalCode())
-                .country(paymentRequest.getCountry())
-                .build();
+        com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest dtoRequest = 
+                new com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest();
+        dtoRequest.setOrderId(paymentRequest.getOrderId());
+        dtoRequest.setCustomerId(paymentRequest.getCustomerId());
+        dtoRequest.setPaymentMethod(paymentRequest.getPaymentMethod() != null ? paymentRequest.getPaymentMethod().name() : null);
+        dtoRequest.setCardNumber(paymentRequest.getCardNumber());
+        dtoRequest.setCardHolderName(paymentRequest.getCardHolderName());
+        dtoRequest.setExpiryDate(paymentRequest.getExpiryDate());
+        dtoRequest.setCvv(paymentRequest.getCvv());
+        dtoRequest.setDescription(paymentRequest.getDescription());
+        dtoRequest.setCustomerEmail(paymentRequest.getCustomerEmail());
+        dtoRequest.setBillingAddress(paymentRequest.getBillingAddress());
+        dtoRequest.setCity(paymentRequest.getCity());
+        dtoRequest.setState(paymentRequest.getState());
+        dtoRequest.setPostalCode(paymentRequest.getPostalCode());
+        dtoRequest.setCountry(paymentRequest.getCountry());
         
         var response = paymentService.processPayment(dtoRequest);
         return ResponseEntity.ok(convertToApiModel(response));

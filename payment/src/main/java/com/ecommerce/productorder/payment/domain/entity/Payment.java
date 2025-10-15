@@ -3,16 +3,12 @@ package com.ecommerce.productorder.payment.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,7 +19,6 @@ import java.time.LocalDateTime;
 @Table(name = "payments")
 @Getter
 @Setter
-@Builder
 public class Payment {
     
     @Id

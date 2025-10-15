@@ -45,16 +45,15 @@ public class DefaultUserInitializer implements CommandLineRunner {
             return;
         }
 
-        Customer admin = Customer.builder()
-                .username(adminUsername)
-                .password(passwordEncoder.encode("admin123"))
-                .email("admin@gmail.com")
-                .firstName("Admin")
-                .lastName("User")
-                .role(Customer.CustomerRole.ADMIN)
-                .isActive(true)
-                .emailVerified(true)
-                .build();
+        Customer admin = new Customer();
+        admin.setUsername(adminUsername);
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setEmail("admin@gmail.com");
+        admin.setFirstName("Admin");
+        admin.setLastName("User");
+        admin.setRole(Customer.CustomerRole.ADMIN);
+        admin.setIsActive(true);
+        admin.setEmailVerified(true);
 
         customerRepository.save(admin);
         log.info("Default admin user created: {} / admin123", adminUsername);
@@ -68,16 +67,15 @@ public class DefaultUserInitializer implements CommandLineRunner {
             return;
         }
 
-        Customer customer = Customer.builder()
-                .username(customerUsername)
-                .password(passwordEncoder.encode("customer123"))
-                .email("customer@gmail.com")
-                .firstName("Customer")
-                .lastName("User")
-                .role(Customer.CustomerRole.CUSTOMER)
-                .isActive(true)
-                .emailVerified(true)
-                .build();
+        Customer customer = new Customer();
+        customer.setUsername(customerUsername);
+        customer.setPassword(passwordEncoder.encode("customer123"));
+        customer.setEmail("customer@gmail.com");
+        customer.setFirstName("Customer");
+        customer.setLastName("User");
+        customer.setRole(Customer.CustomerRole.CUSTOMER);
+        customer.setIsActive(true);
+        customer.setEmailVerified(true);
 
         customerRepository.save(customer);
         log.info("Default customer user created: {} / customer123", customerUsername);

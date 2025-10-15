@@ -1,16 +1,12 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class LoginRequest {
     
     @NotBlank(message = "Username is required")
@@ -18,4 +14,11 @@ public class LoginRequest {
     
     @NotBlank(message = "Password is required")
     private String password;
+
+    public LoginRequest() {}
+    
+    public LoginRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

@@ -1,17 +1,13 @@
 package com.ecommerce.productorder.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class RegisterRequest {
     
     @NotBlank(message = "Username is required")
@@ -28,4 +24,13 @@ public class RegisterRequest {
     
     @NotBlank(message = "Full name is required")
     private String fullName;
+    
+    public RegisterRequest() {}
+    
+    public RegisterRequest(String username, String password, String email, String fullName) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+    }
 }

@@ -140,15 +140,15 @@ public class NotificationServiceImpl implements NotificationService {
     // Helper to build notification request with common parameters
     private NotificationRequest buildRequest(NotificationType type, Set<NotificationChannel> channels,
                                             String recipient, String subject, Map<String, Object> data) {
-        return NotificationRequest.builder()
-                .type(type)
-                .channels(channels)
-                .recipient(recipient)
-                .subject(subject)
-                .template(type.name().toLowerCase().replace('_', '-'))
-                .data(data)
-                .priority(1)
-                .build();
+        NotificationRequest request = new NotificationRequest();
+        request.setType(type);
+        request.setChannels(channels);
+        request.setRecipient(recipient);
+        request.setSubject(subject);
+        request.setTemplate(type.name().toLowerCase().replace('_', '-'));
+        request.setData(data);
+        request.setPriority(1);
+        return request;
     }
     
     // Build Kafka message payload for notification
