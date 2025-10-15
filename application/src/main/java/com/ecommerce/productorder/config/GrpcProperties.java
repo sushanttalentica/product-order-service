@@ -10,6 +10,5 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class GrpcProperties {
-    private int port;
+  private int port;
 }
-

@@ -14,19 +14,9 @@ public record OrderResponse(
     String shippingAddress,
     List<OrderItemResponse> orderItems,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {
-    public record OrderItemResponse(
-        Long id,
-        ProductInfo product,
-        Integer quantity,
-        BigDecimal unitPrice,
-        BigDecimal subtotal
-    ) {
-        public record ProductInfo(
-            Long id,
-            String name,
-            String sku
-        ) {}
-    }
+    LocalDateTime updatedAt) {
+  public record OrderItemResponse(
+      Long id, ProductInfo product, Integer quantity, BigDecimal unitPrice, BigDecimal subtotal) {
+    public record ProductInfo(Long id, String name, String sku) {}
+  }
 }

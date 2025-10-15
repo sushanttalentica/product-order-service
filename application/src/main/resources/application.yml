@@ -77,9 +77,9 @@ spring:
   
   # Kafka Configuration
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: product-order-service-group
+      group-id: ${KAFKA_CONSUMER_GROUP:product-order-service-group}
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -87,7 +87,24 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     admin:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+# Kafka Topics Configuration
+kafka:
+  topics:
+    order:
+      created: ${KAFKA_TOPIC_ORDER_CREATED:order.created}
+      status-updated: ${KAFKA_TOPIC_ORDER_STATUS_UPDATED:order.status.updated}
+      cancelled: ${KAFKA_TOPIC_ORDER_CANCELLED:order.cancelled}
+      completed: ${KAFKA_TOPIC_ORDER_COMPLETED:order.completed}
+    payment:
+      processed: ${KAFKA_TOPIC_PAYMENT_PROCESSED:payment.processed}
+      failed: ${KAFKA_TOPIC_PAYMENT_FAILED:payment.failed}
+      refunded: ${KAFKA_TOPIC_PAYMENT_REFUNDED:payment.refunded}
+      cancelled: ${KAFKA_TOPIC_PAYMENT_CANCELLED:payment.cancelled}
+      retry: ${KAFKA_TOPIC_PAYMENT_RETRY:payment.retry}
+    product:
+      stock-updated: ${KAFKA_TOPIC_PRODUCT_STOCK_UPDATED:product.stock.updated}
 
 # Security Configuration
 security:
@@ -128,6 +145,25 @@ aws:
     region: ${S3_REGION:ap-south-1}
     access-key: ${AWS_ACCESS_KEY_ID:}
     secret-key: ${AWS_SECRET_ACCESS_KEY:}
+
+# OpenAPI/Swagger Configuration
+openapi:
+  info:
+    title: Product Order Service API
+    version: 1.0.0
+    description: E-commerce platform API for product and order management
+  servers:
+    - url: /product-order-service
+      description: Current Server
+    - url: ${OPENAPI_LOCAL_SERVER:http://localhost:8080/product-order-service}
+      description: Local Development
+    - url: ${OPENAPI_AWS_SERVER:http://13.202.157.59:8080/product-order-service}
+      description: AWS EC2 Instance
+  security:
+    scheme-name: bearerAuth
+    scheme-type: HTTP
+    scheme: bearer
+    bearer-format: JWT
 
 # Logging Configuration
 logging:

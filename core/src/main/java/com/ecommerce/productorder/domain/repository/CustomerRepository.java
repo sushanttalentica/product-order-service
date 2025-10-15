@@ -1,142 +1,102 @@
 package com.ecommerce.productorder.domain.repository;
 
 import com.ecommerce.productorder.domain.entity.Customer;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    /**
-     * Find customer by username
-     */
-    Optional<Customer> findByUsername(String username);
+  // Find customer by username
+  Optional<Customer> findByUsername(String username);
 
-    /**
-     * Find customer by email
-     */
-    Optional<Customer> findByEmail(String email);
+  // Find customer by email
+  Optional<Customer> findByEmail(String email);
 
-    /**
-     * Find customer by username or email
-     */
-    Optional<Customer> findByUsernameOrEmail(String username, String email);
+  // Find customer by username or email
+  Optional<Customer> findByUsernameOrEmail(String username, String email);
 
-    boolean existsByUsername(String username);
+  boolean existsByUsername(String username);
 
-    boolean existsByEmail(String email);
+  boolean existsByEmail(String email);
 
-    /**
-     * Find active customers
-     */
-    List<Customer> findByActiveTrue();
+  // Find all active customers
+  List<Customer> findByActiveTrue();
 
-    /**
-     * Find customers by role
-     */
-    List<Customer> findByRole(Customer.CustomerRole role);
+  // Find customers by role
+  List<Customer> findByRole(Customer.CustomerRole role);
 
-    /**
-     * Find active customers by role
-     */
-    List<Customer> findByRoleAndActiveTrue(Customer.CustomerRole role);
+  // Find active customers by role
+  List<Customer> findByRoleAndActiveTrue(Customer.CustomerRole role);
 
-    /**
-     * Find customers by first name containing (case insensitive)
-     */
-    @Query("SELECT c FROM Customer c WHERE LOWER(c.firstName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<Customer> findByFirstNameContainingIgnoreCase(@Param("name") String name);
+  // Find customers by first name containing (case insensitive)
+  @Query("SELECT c FROM Customer c WHERE LOWER(c.firstName) LIKE LOWER(CONCAT('%', :name, '%'))")
+  List<Customer> findByFirstNameContainingIgnoreCase(@Param("name") String name);
 
-    /**
-     * Find customers by last name containing (case insensitive)
-     */
-    @Query("SELECT c FROM Customer c WHERE LOWER(c.lastName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<Customer> findByLastNameContainingIgnoreCase(@Param("name") String name);
+  // Find customers by last name containing (case insensitive)
+  @Query("SELECT c FROM Customer c WHERE LOWER(c.lastName) LIKE LOWER(CONCAT('%', :name, '%'))")
+  List<Customer> findByLastNameContainingIgnoreCase(@Param("name") String name);
 
-    /**
-     * Find customers by full name containing (case insensitive)
-     */
-    @Query("SELECT c FROM Customer c WHERE LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<Customer> findByFullNameContainingIgnoreCase(@Param("name") String name);
+  // Find customers by full name containing (case insensitive)
+  @Query(
+      "SELECT c FROM Customer c WHERE LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))")
+  List<Customer> findByFullNameContainingIgnoreCase(@Param("name") String name);
 
-    /**
-     * Find customers by city
-     */
-    @Query("SELECT c FROM Customer c WHERE LOWER(c.address.city) = LOWER(:city)")
-    List<Customer> findByCity(@Param("city") String city);
+  // Find customers by city
+  @Query("SELECT c FROM Customer c WHERE LOWER(c.address.city) = LOWER(:city)")
+  List<Customer> findByCity(@Param("city") String city);
 
-    /**
-     * Find customers by country
-     */
-    @Query("SELECT c FROM Customer c WHERE LOWER(c.address.country) = LOWER(:country)")
-    List<Customer> findByCountry(@Param("country") String country);
+  // Find customers by state
+  @Query("SELECT c FROM Customer c WHERE LOWER(c.address.country) = LOWER(:country)")
+  List<Customer> findByCountry(@Param("country") String country);
 
-    /**
-     * Find customers with verified emails
-     */
-    List<Customer> findByEmailVerifiedTrue();
+  // Find customers with verified emails
+  List<Customer> findByEmailVerifiedTrue();
 
-    /**
-     * Find customers with unverified emails
-     */
-    List<Customer> findByEmailVerifiedFalse();
+  // Find customers with unverified emails
+  List<Customer> findByEmailVerifiedFalse();
 
-    /**
-     * Count customers by role
-     */
-    long countByRole(Customer.CustomerRole role);
+  // Count customers by role
+  long countByRole(Customer.CustomerRole role);
 
-    /**
-     * Count active customers
-     */
-    long countByActiveTrue();
+  // Count active customers
+  long countByActiveTrue();
 
-    /**
-     * Find customers created after date
-     */
-    List<Customer> findByCreatedAtAfter(LocalDateTime date);
+  // Count customers with verified emails
+  List<Customer> findByCreatedAtAfter(LocalDateTime date);
 
-    /**
-     * Find customers created before date
-     */
-    List<Customer> findByCreatedAtBefore(LocalDateTime date);
+  // Find customers created before a specific date
+  List<Customer> findByCreatedAtBefore(LocalDateTime date);
 
-    /**
-     * Find customers by date range
-     */
-    List<Customer> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+  // Find customers created between two dates
+  List<Customer> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    /**
-     * Search customers by multiple criteria
-     */
-    @Query("SELECT c FROM Customer c WHERE " +
-           "(:name IS NULL OR LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
-           "(:role IS NULL OR c.role = :role) AND " +
-           "(:isActive IS NULL OR c.active = :isActive)")
-    Page<Customer> searchCustomers(
-            @Param("name") String name,
-            @Param("email") String email,
-            @Param("role") Customer.CustomerRole role,
-            @Param("isActive") Boolean isActive,
-            Pageable pageable);
+  // Advanced search with pagination
+  @Query(
+      "SELECT c FROM Customer c WHERE "
+          + "(:name IS NULL OR LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))) AND "
+          + "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND "
+          + "(:role IS NULL OR c.role = :role) AND "
+          + "(:isActive IS NULL OR c.active = :isActive)")
+  Page<Customer> searchCustomers(
+      @Param("name") String name,
+      @Param("email") String email,
+      @Param("role") Customer.CustomerRole role,
+      @Param("isActive") Boolean isActive,
+      Pageable pageable);
 
-    /**
-     * Find top customers by order count
-     */
-    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true " +
-           "GROUP BY c.id ORDER BY COUNT(o.id) DESC")
-    Page<Customer> findTopCustomersByOrderCount(Pageable pageable);
+  // Find top customers by number of orders
+  @Query(
+      "SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true "
+          + "GROUP BY c.id ORDER BY COUNT(o.id) DESC")
+  Page<Customer> findTopCustomersByOrderCount(Pageable pageable);
 
-    /**
-     * Find customers with no orders
-     */
-    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true AND o.id IS NULL")
-    List<Customer> findCustomersWithNoOrders();
+  // Find customers with no orders
+  @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true AND o.id IS NULL")
+  List<Customer> findCustomersWithNoOrders();
 }

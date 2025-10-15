@@ -10,14 +10,13 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class KafkaProperties {
-    
-    private String bootstrapServers;
-    private Consumer consumer;
-    
-    @Getter
-    @Setter
-    public static class Consumer {
-        private String groupId;
-    }
-}
 
+  private String bootstrapServers;
+  private Consumer consumer;
+
+  @Getter
+  @Setter
+  public static class Consumer {
+    private String groupId;
+  }
+}

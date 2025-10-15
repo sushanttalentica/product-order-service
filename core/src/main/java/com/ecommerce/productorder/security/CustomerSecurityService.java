@@ -9,27 +9,30 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CustomerSecurityService {
 
-    private final CustomerService customerService;    
-    public CustomerSecurityService(CustomerService customerService) {
-        this.customerService = customerService;
+  private final CustomerService customerService;
+
+  public CustomerSecurityService(CustomerService customerService) {
+    this.customerService = customerService;
+  }
+
+  public boolean isOwner(Long customerId, String username) {
+    log.debug("Checking ownership for customer ID: {} and username: {}", customerId, username);
+
+    return customerService
+        .getCustomerByUsername(username)
+        .map(customer -> customer.id().equals(customerId))
+        .orElse(false);
+  }
+
+  // Get customer ID from authentication
+  public Long getCustomerIdFromAuth(Authentication authentication) {
+    if (authentication == null || authentication.getName() == null) {
+      return null;
     }
 
-    public boolean isOwner(Long customerId, String username) {
-        log.debug("Checking ownership for customer ID: {} and username: {}", customerId, username);
-        
-        return customerService.getCustomerByUsername(username)
-                .map(customer -> customer.id().equals(customerId))
-                .orElse(false);
-    }
-
-     // Get customer ID from authentication
-    public Long getCustomerIdFromAuth(Authentication authentication) {
-        if (authentication == null || authentication.getName() == null) {
-            return null;
-        }
-
-        return customerService.getCustomerByUsername(authentication.getName())
-                .map(customer -> customer.id())
-                .orElse(null);
-    }
+    return customerService
+        .getCustomerByUsername(authentication.getName())
+        .map(customer -> customer.id())
+        .orElse(null);
+  }
 }

@@ -9,31 +9,28 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Enable simple broker for topics
-        config.enableSimpleBroker("/topic", "/queue");
-        
-        // Set application destination prefix
-        config.setApplicationDestinationPrefixes("/app");
-        
-        // Enable user-specific destinations
-        config.setUserDestinationPrefix("/user");
-    }
-    
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry config) {
+    // Enable simple broker for topics
+    config.enableSimpleBroker("/topic", "/queue");
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Register WebSocket endpoint
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins("*")  // Configure properly for production
-                .withSockJS();  // Fallback for browsers without WebSocket support
-        
-        // Additional endpoint without SockJS for native WebSocket clients
-        registry.addEndpoint("/ws-native")
-                .setAllowedOrigins("*");
-    }
+    // Set application destination prefix
+    config.setApplicationDestinationPrefixes("/app");
+
+    // Enable user-specific destinations
+    config.setUserDestinationPrefix("/user");
+  }
+
+  @Override
+  public void registerStompEndpoints(StompEndpointRegistry registry) {
+    // Register WebSocket endpoint
+    registry
+        .addEndpoint("/ws")
+        .setAllowedOrigins("*")
+        .withSockJS(); // Fallback for browsers without WebSocket support
+
+    // Additional endpoint without SockJS for native WebSocket clients
+    registry.addEndpoint("/ws-native").setAllowedOrigins("*");
+  }
 }
-

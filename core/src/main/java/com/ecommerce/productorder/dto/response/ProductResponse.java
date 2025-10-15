@@ -13,12 +13,6 @@ public record ProductResponse(
     Boolean active,
     CategoryResponse category,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {
-    public record CategoryResponse(
-        Long id,
-        String name,
-        String description,
-        Boolean active
-    ) {}
+    LocalDateTime updatedAt) {
+  public record CategoryResponse(Long id, String name, String description, Boolean active) {}
 }

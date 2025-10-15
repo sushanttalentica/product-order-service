@@ -1,7 +1,6 @@
 package com.ecommerce.productorder.dto.response;
 
 import com.ecommerce.productorder.domain.entity.Customer;
-
 import java.time.LocalDateTime;
 
 public record CustomerResponse(
@@ -18,13 +17,7 @@ public record CustomerResponse(
     Boolean emailVerified,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    Long orderCount
-) {
-    public record AddressResponse(
-        String streetAddress,
-        String city,
-        String state,
-        String postalCode,
-        String country
-    ) {}
+    Long orderCount) {
+  public record AddressResponse(
+      String streetAddress, String city, String state, String postalCode, String country) {}
 }

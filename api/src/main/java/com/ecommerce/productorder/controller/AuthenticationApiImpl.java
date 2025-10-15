@@ -24,91 +24,94 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthenticationApiImpl implements AuthenticationApi {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
-    private final CustomerService customerService;    
-    public AuthenticationApiImpl(AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil, CustomerService customerService) {
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-        this.customerService = customerService;
-    }
+  private final AuthenticationManager authenticationManager;
+  private final UserDetailsService userDetailsService;
+  private final JwtUtil jwtUtil;
+  private final CustomerService customerService;
 
-    @Override
-    public ResponseEntity<AuthResponse> login(LoginRequest loginRequest) {
-        log.info("Login attempt for user: {}", loginRequest.getUsername());
-        
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-            );
-            
-            UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
-            String token = jwtUtil.generateToken(userDetails);
-            
-            log.info("Login successful for user: {}", loginRequest.getUsername());
-            
-            return ResponseEntity.ok(new AuthResponse()
-                    .token(token)
-                    .username(loginRequest.getUsername())
-                    .message("Login successful")
-                    .role(null));
-                    
-        } catch (AuthenticationException e) {
-            log.error("Authentication failed for user: {}", loginRequest.getUsername(), e);
-            return ResponseEntity.badRequest()
-                    .body(new AuthResponse()
-                            .message("Invalid credentials"));
-        } catch (Exception e) {
-            log.error("Unexpected error during login for user: {}", loginRequest.getUsername(), e);
-            return ResponseEntity.badRequest()
-                    .body(new AuthResponse()
-                            .message("Login failed: " + e.getMessage()));
-        }
-    }
+  public AuthenticationApiImpl(
+      AuthenticationManager authenticationManager,
+      UserDetailsService userDetailsService,
+      JwtUtil jwtUtil,
+      CustomerService customerService) {
+    this.authenticationManager = authenticationManager;
+    this.userDetailsService = userDetailsService;
+    this.jwtUtil = jwtUtil;
+    this.customerService = customerService;
+  }
 
-    @Override
-    public ResponseEntity<AuthResponse> register(RegisterRequest registerRequest) {
-        log.info("Registration request for user: {}", registerRequest.getUsername());
-        try {
-            CreateCustomerRequest.AddressDto addressDto = new CreateCustomerRequest.AddressDto();
-            addressDto.setStreetAddress(registerRequest.getStreetAddress());
-            addressDto.setCity(registerRequest.getCity());
-            addressDto.setState(registerRequest.getState());
-            addressDto.setPostalCode(registerRequest.getPostalCode());
-            addressDto.setCountry(registerRequest.getCountry());
-            
-            CreateCustomerRequest createRequest = new CreateCustomerRequest();
-            createRequest.setUsername(registerRequest.getUsername());
-            createRequest.setPassword(registerRequest.getPassword());
-            createRequest.setEmail(registerRequest.getEmail());
-            createRequest.setFirstName(registerRequest.getFirstName());
-            createRequest.setLastName(registerRequest.getLastName());
-            createRequest.setPhoneNumber(registerRequest.getPhoneNumber());
-            createRequest.setAddress(addressDto);
-            createRequest.setRole(Customer.CustomerRole.CUSTOMER);
+  @Override
+  public ResponseEntity<AuthResponse> login(LoginRequest loginRequest) {
+    log.info("Login attempt for user: {}", loginRequest.getUsername());
 
-            CustomerResponse customerResponse = customerService.createCustomer(createRequest);
-            log.info("Customer registered successfully: {}", registerRequest.getUsername());
-            
-            return ResponseEntity.status(201).body(new AuthResponse()
-                    .username(customerResponse.username())
-                    .message("Registration successful. Please login."));
-                    
-        } catch (Exception e) {
-            log.error("Registration failed for user: {}", registerRequest.getUsername(), e);
-            return ResponseEntity.badRequest()
-                    .body(new AuthResponse()
-                            .message("Registration failed: " + e.getMessage()));
-        }
-    }
+    try {
+      Authentication authentication =
+          authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                  loginRequest.getUsername(), loginRequest.getPassword()));
 
-    @Override
-    public ResponseEntity<MessageResponse> healthCheck() {
-        return ResponseEntity.ok(new MessageResponse()
-                .message("Auth service is running")
-                .success(true));
+      UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+      String token = jwtUtil.generateToken(userDetails);
+
+      log.info("Login successful for user: {}", loginRequest.getUsername());
+
+      return ResponseEntity.ok(
+          new AuthResponse()
+              .token(token)
+              .username(loginRequest.getUsername())
+              .message("Login successful")
+              .role(null));
+
+    } catch (AuthenticationException e) {
+      log.error("Authentication failed for user: {}", loginRequest.getUsername(), e);
+      return ResponseEntity.badRequest().body(new AuthResponse().message("Invalid credentials"));
+    } catch (Exception e) {
+      log.error("Unexpected error during login for user: {}", loginRequest.getUsername(), e);
+      return ResponseEntity.badRequest()
+          .body(new AuthResponse().message("Login failed: " + e.getMessage()));
     }
+  }
+
+  @Override
+  public ResponseEntity<AuthResponse> register(RegisterRequest registerRequest) {
+    log.info("Registration request for user: {}", registerRequest.getUsername());
+    try {
+      CreateCustomerRequest.AddressDto addressDto = new CreateCustomerRequest.AddressDto();
+      addressDto.setStreetAddress(registerRequest.getStreetAddress());
+      addressDto.setCity(registerRequest.getCity());
+      addressDto.setState(registerRequest.getState());
+      addressDto.setPostalCode(registerRequest.getPostalCode());
+      addressDto.setCountry(registerRequest.getCountry());
+
+      CreateCustomerRequest createRequest = new CreateCustomerRequest();
+      createRequest.setUsername(registerRequest.getUsername());
+      createRequest.setPassword(registerRequest.getPassword());
+      createRequest.setEmail(registerRequest.getEmail());
+      createRequest.setFirstName(registerRequest.getFirstName());
+      createRequest.setLastName(registerRequest.getLastName());
+      createRequest.setPhoneNumber(registerRequest.getPhoneNumber());
+      createRequest.setAddress(addressDto);
+      createRequest.setRole(Customer.CustomerRole.CUSTOMER);
+
+      CustomerResponse customerResponse = customerService.createCustomer(createRequest);
+      log.info("Customer registered successfully: {}", registerRequest.getUsername());
+
+      return ResponseEntity.status(201)
+          .body(
+              new AuthResponse()
+                  .username(customerResponse.username())
+                  .message("Registration successful. Please login."));
+
+    } catch (Exception e) {
+      log.error("Registration failed for user: {}", registerRequest.getUsername(), e);
+      return ResponseEntity.badRequest()
+          .body(new AuthResponse().message("Registration failed: " + e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<MessageResponse> healthCheck() {
+    return ResponseEntity.ok(
+        new MessageResponse().message("Auth service is running").success(true));
+  }
 }
-

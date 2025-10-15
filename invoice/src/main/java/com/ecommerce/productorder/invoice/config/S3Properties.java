@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class S3Properties {
-    private String bucketName;
-    private String region;
-    private String accessKey;
-    private String secretKey;
+  private String bucketName;
+  private String region;
+  private String accessKey;
+  private String secretKey;
 }
-
