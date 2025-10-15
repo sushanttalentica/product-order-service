@@ -140,18 +140,14 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     
 
     private boolean simulatePaymentResult(ProcessPaymentRequest request) {
-        // Use effective amount from payment entity via request hint if provided
-        // Fallback to request.getAmount() for backward compatibility
-        // Since server uses order total, request amount may be null. Assume thresholds around payment entity totals.
-        BigDecimal effectiveAmount = new BigDecimal("1000"); // neutral default for success-rate thresholding
-        // Simulate different success rates based on amount
-        double successRate = effectiveAmount.compareTo(new BigDecimal("1000")) > 0 ? 0.7 : 0.9;
-        return random.nextDouble() < successRate;
+        // Always succeed for testing
+        return true;
     }
     
 
     private boolean simulateRefundResult() {
-        return random.nextDouble() < 0.95; // 95% success rate for refunds
+        // Always succeed for testing
+        return true;
     }
     
 

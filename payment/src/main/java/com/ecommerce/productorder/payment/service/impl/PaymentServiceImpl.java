@@ -142,8 +142,10 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with ID: " + paymentId));
         
-        // Convert string refund amount to BigDecimal
-        java.math.BigDecimal refundAmountDecimal = new java.math.BigDecimal(refundAmount);
+        // Convert string refund amount to BigDecimal, default to full payment amount if null
+        BigDecimal refundAmountDecimal = (refundAmount != null && !refundAmount.trim().isEmpty()) 
+                ? new BigDecimal(refundAmount) 
+                : payment.getAmount();
         
         try {
             // Validate refund amount
