@@ -1,10 +1,9 @@
 package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.api.PaymentsApi;
-import com.ecommerce.productorder.api.model.MessageResponse;
-import com.ecommerce.productorder.api.model.PaymentRequest;
-import com.ecommerce.productorder.api.model.PaymentResponse;
-import com.ecommerce.productorder.api.model.PaymentStatistics;
+import com.ecommerce.productorder.api.model.*;
+import com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest;
+import com.ecommerce.productorder.payment.dto.response.PaymentResponse;
 import com.ecommerce.productorder.payment.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,10 +27,10 @@ public class PaymentsApiImpl implements PaymentsApi {
     }
 
     @Override
-    public ResponseEntity<PaymentResponse> processPayment(PaymentRequest paymentRequest) {
+    public ResponseEntity<PaymentResponseApi> processPayment(PaymentRequest paymentRequest) {
         log.info("Processing payment for order: {}", paymentRequest.getOrderId());
-        com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest dtoRequest = 
-                new com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest();
+        ProcessPaymentRequest dtoRequest = 
+                new ProcessPaymentRequest();
         dtoRequest.setOrderId(paymentRequest.getOrderId());
         dtoRequest.setCustomerId(paymentRequest.getCustomerId());
         dtoRequest.setPaymentMethod(paymentRequest.getPaymentMethod() != null ? paymentRequest.getPaymentMethod().name() : null);
@@ -53,13 +52,13 @@ public class PaymentsApiImpl implements PaymentsApi {
 
     @Override
     public ResponseEntity<Object> getAllPayments(Integer page, Integer size) {
-        Page<com.ecommerce.productorder.payment.dto.response.PaymentResponse> paymentsPage = 
+        Page<PaymentResponse> paymentsPage = 
                 paymentService.getAllPayments(PageRequest.of(page, size));
         return ResponseEntity.ok(paymentsPage);
     }
 
     @Override
-    public ResponseEntity<PaymentResponse> getPaymentById(String paymentId) {
+    public ResponseEntity<PaymentResponseApi> getPaymentById(String paymentId) {
         return paymentService.getPaymentById(paymentId)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -76,7 +75,7 @@ public class PaymentsApiImpl implements PaymentsApi {
     }
 
     @Override
-    public ResponseEntity<PaymentResponse> getPaymentByOrderId(Long orderId) {
+    public ResponseEntity<PaymentResponseApi> getPaymentByOrderId(Long orderId) {
         return paymentService.getPaymentByOrderId(orderId)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -84,7 +83,7 @@ public class PaymentsApiImpl implements PaymentsApi {
     }
 
     @Override
-    public ResponseEntity<List<PaymentResponse>> getPaymentsByCustomer(Long customerId) {
+    public ResponseEntity<List<PaymentResponseApi>> getPaymentsByCustomer(Long customerId) {
         var payments = paymentService.getPaymentsByCustomerId(customerId);
         return ResponseEntity.ok(payments.stream()
                 .map(this::convertToApiModel)
@@ -92,7 +91,7 @@ public class PaymentsApiImpl implements PaymentsApi {
     }
 
     @Override
-    public ResponseEntity<PaymentResponse> refundPayment(String paymentId) {
+    public ResponseEntity<PaymentResponseApi> refundPayment(String paymentId) {
         log.info("Refunding payment: {}", paymentId);
         var response = paymentService.refundPayment(paymentId, null);
         return ResponseEntity.ok(convertToApiModel(response));
@@ -109,8 +108,8 @@ public class PaymentsApiImpl implements PaymentsApi {
         return ResponseEntity.ok(apiStats);
     }
 
-    private PaymentResponse convertToApiModel(com.ecommerce.productorder.payment.dto.response.PaymentResponse dto) {
-        var apiModel = new PaymentResponse();
+    private PaymentResponseApi convertToApiModel(PaymentResponse dto) {
+        var apiModel = new PaymentResponseApi();
         apiModel.setId(dto.id());
         apiModel.setPaymentId(dto.paymentId());
         apiModel.setOrderId(dto.orderId());

@@ -6,6 +6,7 @@ import com.ecommerce.productorder.domain.entity.Customer;
 import com.ecommerce.productorder.domain.service.CustomerService;
 import com.ecommerce.productorder.dto.request.CreateCustomerRequest;
 import com.ecommerce.productorder.dto.request.UpdateCustomerRequest;
+import com.ecommerce.productorder.dto.response.CustomerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,7 @@ public class CustomersApiImpl implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> createCustomer(RegisterRequest registerRequest) {
+    public ResponseEntity<CustomerResponseApi> createCustomer(RegisterRequest registerRequest) {
         log.info("Creating customer: {}", registerRequest.getUsername());
         
         CreateCustomerRequest.AddressDto addressDto = new CreateCustomerRequest.AddressDto();
@@ -53,13 +54,13 @@ public class CustomersApiImpl implements CustomersApi {
 
     @Override
     public ResponseEntity<Object> getAllCustomers(Integer page, Integer size) {
-        Page<com.ecommerce.productorder.dto.response.CustomerResponse> customersPage = 
+        Page<CustomerResponse> customersPage = 
                 customerService.getAllCustomers(PageRequest.of(page, size));
         return ResponseEntity.ok(customersPage.map(this::convertToApiModel));
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> getCustomerById(Long id) {
+    public ResponseEntity<CustomerResponseApi> getCustomerById(Long id) {
         return customerService.getCustomerById(id)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -67,20 +68,20 @@ public class CustomersApiImpl implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> updateCustomer(
-            Long id, com.ecommerce.productorder.api.model.UpdateCustomerRequest updateCustomerRequest) {
+    public ResponseEntity<CustomerResponseApi> updateCustomer(
+            Long id, UpdateCustomerRequestApi updateCustomerRequest) {
         log.info("Updating customer: {}", id);
         
-        com.ecommerce.productorder.dto.request.UpdateCustomerRequest.AddressDto addressDto = 
-                new com.ecommerce.productorder.dto.request.UpdateCustomerRequest.AddressDto();
+        UpdateCustomerRequest.AddressDto addressDto = 
+                new UpdateCustomerRequest.AddressDto();
         addressDto.setStreetAddress(updateCustomerRequest.getStreetAddress());
         addressDto.setCity(updateCustomerRequest.getCity());
         addressDto.setState(updateCustomerRequest.getState());
         addressDto.setPostalCode(updateCustomerRequest.getPostalCode());
         addressDto.setCountry(updateCustomerRequest.getCountry());
         
-        com.ecommerce.productorder.dto.request.UpdateCustomerRequest dtoRequest = 
-                new com.ecommerce.productorder.dto.request.UpdateCustomerRequest();
+        UpdateCustomerRequest dtoRequest = 
+                new UpdateCustomerRequest();
         dtoRequest.setFirstName(updateCustomerRequest.getFirstName());
         dtoRequest.setLastName(updateCustomerRequest.getLastName());
         dtoRequest.setPhoneNumber(updateCustomerRequest.getPhoneNumber());
@@ -100,7 +101,7 @@ public class CustomersApiImpl implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> getCustomerByUsername(String username) {
+    public ResponseEntity<CustomerResponseApi> getCustomerByUsername(String username) {
         return customerService.getCustomerByUsername(username)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -108,21 +109,21 @@ public class CustomersApiImpl implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> activateCustomer(Long id) {
+    public ResponseEntity<CustomerResponseApi> activateCustomer(Long id) {
         log.info("Activating customer: {}", id);
         var response = customerService.activateCustomer(id);
         return ResponseEntity.ok(convertToApiModel(response));
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> deactivateCustomer(Long id) {
+    public ResponseEntity<CustomerResponseApi> deactivateCustomer(Long id) {
         log.info("Deactivating customer: {}", id);
         var response = customerService.deactivateCustomer(id);
         return ResponseEntity.ok(convertToApiModel(response));
     }
 
     @Override
-    public ResponseEntity<CustomerResponse> verifyCustomerEmail(Long id) {
+    public ResponseEntity<CustomerResponseApi> verifyCustomerEmail(Long id) {
         log.info("Verifying email for customer: {}", id);
         var response = customerService.verifyCustomerEmail(id);
         return ResponseEntity.ok(convertToApiModel(response));
@@ -130,34 +131,34 @@ public class CustomersApiImpl implements CustomersApi {
 
     @Override
     public ResponseEntity<Object> searchCustomers(String keyword, Integer page, Integer size) {
-        Page<com.ecommerce.productorder.dto.response.CustomerResponse> customersPage = 
+        Page<CustomerResponse> customersPage = 
                 customerService.searchCustomers(keyword, keyword, null, null, PageRequest.of(page, size));
         return ResponseEntity.ok(customersPage);
     }
 
     @Override
     public ResponseEntity<Object> getCustomersByRole(String role, Integer page, Integer size) {
-        List<com.ecommerce.productorder.dto.response.CustomerResponse> customers = 
+        List<CustomerResponse> customers = 
                 customerService.getCustomersByRole(Customer.CustomerRole.valueOf(role));
         return ResponseEntity.ok(customers);
     }
 
     @Override
     public ResponseEntity<Object> getActiveCustomers(Integer page, Integer size) {
-        List<com.ecommerce.productorder.dto.response.CustomerResponse> customers = 
+        List<CustomerResponse> customers = 
                 customerService.getActiveCustomers();
         return ResponseEntity.ok(customers);
     }
 
     @Override
     public ResponseEntity<Object> getCustomersByCity(String city, Integer page, Integer size) {
-        List<com.ecommerce.productorder.dto.response.CustomerResponse> customers = 
+        List<CustomerResponse> customers = 
                 customerService.getCustomersByCity(city);
         return ResponseEntity.ok(customers);
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.CustomerResponse>> getTopCustomers(Integer limit) {
+    public ResponseEntity<List<CustomerResponseApi>> getTopCustomers(Integer limit) {
         var customers = customerService.getTopCustomersByOrderCount(PageRequest.of(0, limit));
         return ResponseEntity.ok(customers.stream()
                 .map(this::convertToApiModel)
@@ -173,9 +174,9 @@ public class CustomersApiImpl implements CustomersApi {
         return ResponseEntity.ok(apiStats);
     }
 
-    private com.ecommerce.productorder.api.model.CustomerResponse convertToApiModel(
-            com.ecommerce.productorder.dto.response.CustomerResponse dto) {
-        var apiModel = new com.ecommerce.productorder.api.model.CustomerResponse();
+    private CustomerResponseApi convertToApiModel(
+            CustomerResponse dto) {
+        var apiModel = new CustomerResponseApi();
         apiModel.setId(dto.id());
         apiModel.setUsername(dto.username());
         apiModel.setEmail(dto.email());
@@ -191,7 +192,7 @@ public class CustomersApiImpl implements CustomersApi {
         apiModel.setOrderCount(dto.orderCount());
         
         if (dto.address() != null) {
-            var address = new AddressResponse();
+            var address = new AddressResponseApi();
             address.setStreetAddress(dto.address().streetAddress());
             address.setCity(dto.address().city());
             address.setState(dto.address().state());

@@ -109,7 +109,7 @@ components:
           type: string
 
     # Customer
-    CustomerResponse:
+    CustomerResponseApi:
       type: object
       properties:
         id:
@@ -128,7 +128,7 @@ components:
         phoneNumber:
           type: string
         address:
-          $ref: '#/components/schemas/AddressResponse'
+          $ref: '#/components/schemas/AddressResponseApi'
         role:
           type: string
         isActive:
@@ -145,7 +145,7 @@ components:
           type: integer
           format: int64
 
-    AddressResponse:
+    AddressResponseApi:
       type: object
       properties:
         streetAddress:
@@ -159,7 +159,7 @@ components:
         country:
           type: string
 
-    UpdateCustomerRequest:
+    UpdateCustomerRequestApi:
       type: object
       properties:
         firstName:
@@ -193,7 +193,7 @@ components:
           format: int64
 
     # Product
-    ProductResponse:
+    ProductResponseApi:
       type: object
       properties:
         id:
@@ -212,7 +212,7 @@ components:
         isActive:
           type: boolean
         category:
-          $ref: '#/components/schemas/CategoryResponse'
+          $ref: '#/components/schemas/CategoryResponseApi'
         createdAt:
           type: string
           format: date-time
@@ -220,7 +220,7 @@ components:
           type: string
           format: date-time
 
-    CreateProductRequest:
+    CreateProductRequestApi:
       type: object
       required:
         - name
@@ -245,7 +245,7 @@ components:
         isActive:
           type: boolean
 
-    UpdateProductRequest:
+    UpdateProductRequestApi:
       type: object
       properties:
         name:
@@ -271,7 +271,7 @@ components:
           type: integer
 
     # Category
-    CategoryResponse:
+    CategoryResponseApi:
       type: object
       properties:
         id:
@@ -285,7 +285,7 @@ components:
           type: boolean
 
     # Order
-    OrderResponse:
+    OrderResponseApi:
       type: object
       properties:
         id:
@@ -307,7 +307,7 @@ components:
         orderItems:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItemResponse'
+            $ref: '#/components/schemas/OrderItemResponseApi'
         createdAt:
           type: string
           format: date-time
@@ -315,7 +315,7 @@ components:
           type: string
           format: date-time
 
-    CreateOrderRequest:
+    CreateOrderRequestApi:
       type: object
       required:
         - customerId
@@ -333,9 +333,9 @@ components:
         orderItems:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItemRequest'
+            $ref: '#/components/schemas/OrderItemRequestApi'
 
-    OrderItemRequest:
+    OrderItemRequestApi:
       type: object
       required:
         - productId
@@ -348,7 +348,7 @@ components:
           type: integer
           minimum: 1
 
-    OrderItemResponse:
+    OrderItemResponseApi:
       type: object
       properties:
         id:
@@ -444,7 +444,7 @@ components:
           type: string
           maxLength: 50
 
-    PaymentResponse:
+    PaymentResponseApi:
       type: object
       properties:
         id:
@@ -564,14 +564,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProductRequest'
+              $ref: '#/components/schemas/CreateProductRequestApi'
       responses:
         '201':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductResponse'
+                $ref: '#/components/schemas/ProductResponseApi'
 
     get:
       tags: [Products]
@@ -612,7 +612,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductResponse'
+                $ref: '#/components/schemas/ProductResponseApi'
 
     put:
       tags: [Products]
@@ -631,14 +631,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProductRequest'
+              $ref: '#/components/schemas/UpdateProductRequestApi'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductResponse'
+                $ref: '#/components/schemas/ProductResponseApi'
 
     delete:
       tags: [Products]
@@ -676,7 +676,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductResponse'
+                $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/search:
     get:
@@ -696,7 +696,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductResponse'
+                  $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/category/{categoryId}:
     get:
@@ -717,7 +717,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductResponse'
+                  $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/price-range:
     get:
@@ -742,7 +742,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductResponse'
+                  $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/search/advanced:
     get:
@@ -778,7 +778,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductResponse'
+                  $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/low-stock:
     get:
@@ -800,7 +800,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductResponse'
+                  $ref: '#/components/schemas/ProductResponseApi'
 
   /api/v1/products/{productId}/stock:
     patch:
@@ -827,7 +827,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductResponse'
+                $ref: '#/components/schemas/ProductResponseApi'
 
   # Orders
   /api/v1/orders:
@@ -841,14 +841,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
+              $ref: '#/components/schemas/CreateOrderRequestApi'
       responses:
         '201':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderResponse'
+                $ref: '#/components/schemas/OrderResponseApi'
 
     get:
       tags: [Orders]
@@ -893,7 +893,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderResponse'
+                $ref: '#/components/schemas/OrderResponseApi'
 
     delete:
       tags: [Orders]
@@ -936,7 +936,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderResponse'
+                  $ref: '#/components/schemas/OrderResponseApi'
 
   /api/v1/orders/status/{status}:
     get:
@@ -958,7 +958,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderResponse'
+                  $ref: '#/components/schemas/OrderResponseApi'
 
   /api/v1/orders/{orderId}/status:
     patch:
@@ -984,7 +984,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderResponse'
+                $ref: '#/components/schemas/OrderResponseApi'
 
   /api/v1/orders/date-range:
     get:
@@ -1013,7 +1013,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderResponse'
+                  $ref: '#/components/schemas/OrderResponseApi'
 
   /api/v1/orders/amount-range:
     get:
@@ -1040,7 +1040,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderResponse'
+                  $ref: '#/components/schemas/OrderResponseApi'
 
   /api/v1/orders/statistics:
     get:
@@ -1070,7 +1070,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderResponse'
+                  $ref: '#/components/schemas/OrderResponseApi'
 
   # Customers
   /api/v1/customers:
@@ -1091,7 +1091,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
     get:
       tags: [Customers]
@@ -1136,7 +1136,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
     put:
       tags: [Customers]
@@ -1155,14 +1155,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCustomerRequest'
+              $ref: '#/components/schemas/UpdateCustomerRequestApi'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
     delete:
       tags: [Customers]
@@ -1202,7 +1202,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
   /api/v1/customers/{id}/activate:
     patch:
@@ -1223,7 +1223,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
   /api/v1/customers/{id}/deactivate:
     patch:
@@ -1244,7 +1244,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
   /api/v1/customers/{id}/verify-email:
     patch:
@@ -1265,7 +1265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/CustomerResponseApi'
 
   /api/v1/customers/search:
     get:
@@ -1402,7 +1402,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CustomerResponse'
+                  $ref: '#/components/schemas/CustomerResponseApi'
 
   /api/v1/customers/statistics:
     get:
@@ -1437,7 +1437,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentResponse'
+                $ref: '#/components/schemas/PaymentResponseApi'
 
     get:
       tags: [Payments]
@@ -1481,7 +1481,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentResponse'
+                $ref: '#/components/schemas/PaymentResponseApi'
 
     delete:
       tags: [Payments]
@@ -1521,7 +1521,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentResponse'
+                $ref: '#/components/schemas/PaymentResponseApi'
 
   /api/v1/payments/customer/{customerId}:
     get:
@@ -1544,7 +1544,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PaymentResponse'
+                  $ref: '#/components/schemas/PaymentResponseApi'
 
   /api/v1/payments/{paymentId}/refund:
     post:
@@ -1564,7 +1564,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentResponse'
+                $ref: '#/components/schemas/PaymentResponseApi'
 
   /api/v1/payments/statistics:
     get:
@@ -1679,7 +1679,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CategoryResponse'
+                  $ref: '#/components/schemas/CategoryResponseApi'
 
   /api/v1/categories/{categoryId}:
     get:
@@ -1698,4 +1698,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CategoryResponse'
+                $ref: '#/components/schemas/CategoryResponseApi'

@@ -1,12 +1,11 @@
 package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.api.ProductsApi;
-import com.ecommerce.productorder.api.model.CreateProductRequest;
-import com.ecommerce.productorder.api.model.MessageResponse;
-import com.ecommerce.productorder.api.model.ProductResponse;
-import com.ecommerce.productorder.api.model.UpdateProductRequest;
-import com.ecommerce.productorder.api.model.UpdateStockRequest;
+import com.ecommerce.productorder.api.model.*;
 import com.ecommerce.productorder.domain.service.ProductService;
+import com.ecommerce.productorder.dto.request.CreateProductRequest;
+import com.ecommerce.productorder.dto.request.UpdateProductRequest;
+import com.ecommerce.productorder.dto.response.ProductResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,10 +28,10 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductResponse> createProduct(CreateProductRequest createProductRequest) {
+    public ResponseEntity<ProductResponseApi> createProduct(CreateProductRequestApi createProductRequest) {
         log.info("Creating product: {}", createProductRequest.getName());
-        com.ecommerce.productorder.dto.request.CreateProductRequest dtoRequest = 
-                new com.ecommerce.productorder.dto.request.CreateProductRequest();
+        CreateProductRequest dtoRequest = 
+                new CreateProductRequest();
         dtoRequest.setName(createProductRequest.getName());
         dtoRequest.setDescription(createProductRequest.getDescription());
         dtoRequest.setPrice(createProductRequest.getPrice());
@@ -46,13 +45,13 @@ public class ProductsApiImpl implements ProductsApi {
 
     @Override
     public ResponseEntity<Object> getAllProducts(Integer page, Integer size) {
-        Page<com.ecommerce.productorder.dto.response.ProductResponse> productsPage = 
+        Page<ProductResponse> productsPage = 
                 productService.getAllProducts(PageRequest.of(page, size));
         return ResponseEntity.ok(productsPage);
     }
 
     @Override
-    public ResponseEntity<ProductResponse> getProductById(Long productId) {
+    public ResponseEntity<ProductResponseApi> getProductById(Long productId) {
         return productService.getProductById(productId)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -60,10 +59,10 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductResponse> updateProduct(Long productId, UpdateProductRequest updateProductRequest) {
+    public ResponseEntity<ProductResponseApi> updateProduct(Long productId, UpdateProductRequestApi updateProductRequest) {
         log.info("Updating product: {}", productId);
-        com.ecommerce.productorder.dto.request.UpdateProductRequest dtoRequest = 
-                new com.ecommerce.productorder.dto.request.UpdateProductRequest();
+        UpdateProductRequest dtoRequest = 
+                new UpdateProductRequest();
         dtoRequest.setName(updateProductRequest.getName());
         dtoRequest.setDescription(updateProductRequest.getDescription());
         dtoRequest.setPrice(updateProductRequest.getPrice());
@@ -85,7 +84,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductResponse> getProductBySku(String sku) {
+    public ResponseEntity<ProductResponseApi> getProductBySku(String sku) {
         return productService.getProductBySku(sku)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -93,7 +92,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponse>> searchProducts(String keyword) {
+    public ResponseEntity<List<ProductResponseApi>> searchProducts(String keyword) {
         var products = productService.searchProductsByName(keyword, PageRequest.of(0, 100));
         return ResponseEntity.ok(products.stream()
                 .map(this::convertToApiModel)
@@ -101,7 +100,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(Long categoryId) {
+    public ResponseEntity<List<ProductResponseApi>> getProductsByCategory(Long categoryId) {
         var products = productService.getProductsByCategory(categoryId, PageRequest.of(0, 100));
         return ResponseEntity.ok(products.stream()
                 .map(this::convertToApiModel)
@@ -109,7 +108,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponse>> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+    public ResponseEntity<List<ProductResponseApi>> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         var products = productService.getProductsByPriceRange(minPrice, maxPrice, PageRequest.of(0, 100));
         return ResponseEntity.ok(products.stream()
                 .map(this::convertToApiModel)
@@ -117,7 +116,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponse>> advancedSearchProducts(
+    public ResponseEntity<List<ProductResponseApi>> advancedSearchProducts(
             String name, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean isActive) {
         var products = productService.searchProducts(name, categoryId, minPrice, maxPrice, PageRequest.of(0, 100));
         return ResponseEntity.ok(products.stream()
@@ -126,7 +125,7 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponse>> getLowStockProducts(Integer threshold) {
+    public ResponseEntity<List<ProductResponseApi>> getLowStockProducts(Integer threshold) {
         var products = productService.getProductsWithLowStock(threshold);
         return ResponseEntity.ok(products.stream()
                 .map(this::convertToApiModel)
@@ -134,14 +133,14 @@ public class ProductsApiImpl implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductResponse> updateProductStock(Long productId, UpdateStockRequest updateStockRequest) {
+    public ResponseEntity<ProductResponseApi> updateProductStock(Long productId, UpdateStockRequest updateStockRequest) {
         log.info("Updating stock for product: {}", productId);
         var response = productService.updateProductStock(productId, updateStockRequest.getStockQuantity());
         return ResponseEntity.ok(convertToApiModel(response));
     }
 
-    private ProductResponse convertToApiModel(com.ecommerce.productorder.dto.response.ProductResponse dto) {
-        var apiModel = new ProductResponse();
+    private ProductResponseApi convertToApiModel(ProductResponse dto) {
+        var apiModel = new ProductResponseApi();
         apiModel.setId(dto.id());
         apiModel.setName(dto.name());
         apiModel.setDescription(dto.description());
@@ -153,7 +152,7 @@ public class ProductsApiImpl implements ProductsApi {
         apiModel.setUpdatedAt(dto.updatedAt() != null ? dto.updatedAt().atOffset(ZoneOffset.UTC) : null);
         
         if (dto.category() != null) {
-            var category = new com.ecommerce.productorder.api.model.CategoryResponse();
+            var category = new CategoryResponseApi();
             category.setId(dto.category().id());
             category.setName(dto.category().name());
             category.setDescription(dto.category().description());

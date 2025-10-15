@@ -1,7 +1,7 @@
 package com.ecommerce.productorder.controller;
 
 import com.ecommerce.productorder.api.CategoriesApi;
-import com.ecommerce.productorder.api.model.CategoryResponse;
+import com.ecommerce.productorder.api.model.*;
 import com.ecommerce.productorder.domain.entity.Category;
 import com.ecommerce.productorder.domain.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class CategoriesApiImpl implements CategoriesApi {
     }
 
     @Override
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponseApi>> getAllCategories() {
         log.info("Getting all categories");
         List<Category> categories = categoryRepository.findAll();
         return ResponseEntity.ok(categories.stream()
@@ -30,15 +30,15 @@ public class CategoriesApiImpl implements CategoriesApi {
     }
 
     @Override
-    public ResponseEntity<CategoryResponse> getCategoryById(Long categoryId) {
+    public ResponseEntity<CategoryResponseApi> getCategoryById(Long categoryId) {
         log.info("Getting category by ID: {}", categoryId);
         return categoryRepository.findById(categoryId)
                 .map(category -> ResponseEntity.ok(convertToApiModel(category)))
                 .orElse(ResponseEntity.status(404).body(null));
     }
 
-    private CategoryResponse convertToApiModel(Category entity) {
-        var apiModel = new CategoryResponse();
+    private CategoryResponseApi convertToApiModel(Category entity) {
+        var apiModel = new CategoryResponseApi();
         apiModel.setId(entity.getId());
         apiModel.setName(entity.getName());
         apiModel.setDescription(entity.getDescription());

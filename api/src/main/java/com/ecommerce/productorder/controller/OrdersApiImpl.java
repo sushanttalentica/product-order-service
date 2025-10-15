@@ -3,6 +3,8 @@ package com.ecommerce.productorder.controller;
 import com.ecommerce.productorder.api.OrdersApi;
 import com.ecommerce.productorder.api.model.*;
 import com.ecommerce.productorder.domain.service.OrderService;
+import com.ecommerce.productorder.dto.request.CreateOrderRequest;
+import com.ecommerce.productorder.dto.response.OrderResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,18 +27,18 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<OrderResponse> createOrder(CreateOrderRequest createOrderRequest) {
+    public ResponseEntity<OrderResponseApi> createOrder(CreateOrderRequestApi createOrderRequest) {
         log.info("Creating order for customer: {}", createOrderRequest.getCustomerId());
         
-        com.ecommerce.productorder.dto.request.CreateOrderRequest dtoRequest = 
-                new com.ecommerce.productorder.dto.request.CreateOrderRequest();
+        CreateOrderRequest dtoRequest = 
+                new CreateOrderRequest();
         dtoRequest.setCustomerId(createOrderRequest.getCustomerId());
         dtoRequest.setCustomerEmail(createOrderRequest.getCustomerEmail());
         dtoRequest.setShippingAddress(createOrderRequest.getShippingAddress());
         dtoRequest.setOrderItems(createOrderRequest.getOrderItems().stream()
                 .map(item -> {
-                    com.ecommerce.productorder.dto.request.CreateOrderRequest.OrderItemRequest orderItem = 
-                            new com.ecommerce.productorder.dto.request.CreateOrderRequest.OrderItemRequest();
+                    CreateOrderRequest.OrderItemRequest orderItem = 
+                            new CreateOrderRequest.OrderItemRequest();
                     orderItem.setProductId(item.getProductId());
                     orderItem.setQuantity(item.getQuantity());
                     return orderItem;
@@ -49,13 +51,13 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     public ResponseEntity<Object> getAllOrders(Integer page, Integer size) {
-        Page<com.ecommerce.productorder.dto.response.OrderResponse> ordersPage = 
+        Page<OrderResponse> ordersPage = 
                 orderService.getAllOrders(PageRequest.of(page, size));
         return ResponseEntity.ok(ordersPage);
     }
 
     @Override
-    public ResponseEntity<OrderResponse> getOrderById(Long orderId) {
+    public ResponseEntity<OrderResponseApi> getOrderById(Long orderId) {
         return orderService.getOrderById(orderId)
                 .map(this::convertToApiModel)
                 .map(ResponseEntity::ok)
@@ -72,7 +74,7 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.OrderResponse>> getOrdersByCustomer(Long customerId) {
+    public ResponseEntity<List<OrderResponseApi>> getOrdersByCustomer(Long customerId) {
         var orders = orderService.getOrdersByCustomerId(customerId, PageRequest.of(0, 100));
         return ResponseEntity.ok(orders.stream()
                 .map(this::convertToApiModel)
@@ -80,7 +82,7 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.OrderResponse>> getOrdersByStatus(String status) {
+    public ResponseEntity<List<OrderResponseApi>> getOrdersByStatus(String status) {
         var orders = orderService.getOrdersByStatus(status, PageRequest.of(0, 100));
         return ResponseEntity.ok(orders.stream()
                 .map(this::convertToApiModel)
@@ -88,14 +90,14 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<OrderResponse> updateOrderStatus(Long orderId, String status) {
+    public ResponseEntity<OrderResponseApi> updateOrderStatus(Long orderId, String status) {
         log.info("Updating order {} status to: {}", orderId, status);
         var response = orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(convertToApiModel(response));
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.OrderResponse>> getOrdersByDateRange(
+    public ResponseEntity<List<OrderResponseApi>> getOrdersByDateRange(
             OffsetDateTime startDate, OffsetDateTime endDate) {
         var orders = orderService.getOrdersByDateRange(
                 startDate.toString(), 
@@ -107,7 +109,7 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.OrderResponse>> getOrdersByAmountRange(
+    public ResponseEntity<List<OrderResponseApi>> getOrdersByAmountRange(
             BigDecimal minAmount, BigDecimal maxAmount) {
         var orders = orderService.getOrdersByAmountRange(
                 minAmount.toString(), 
@@ -129,16 +131,16 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<List<com.ecommerce.productorder.api.model.OrderResponse>> getOrdersNeedingAttention() {
+    public ResponseEntity<List<OrderResponseApi>> getOrdersNeedingAttention() {
         var orders = orderService.getOrdersNeedingAttention();
         return ResponseEntity.ok(orders.stream()
                 .map(this::convertToApiModel)
                 .collect(Collectors.toList()));
     }
 
-    private com.ecommerce.productorder.api.model.OrderResponse convertToApiModel(
-            com.ecommerce.productorder.dto.response.OrderResponse dto) {
-        var apiModel = new com.ecommerce.productorder.api.model.OrderResponse();
+    private OrderResponseApi convertToApiModel(
+            OrderResponse dto) {
+        var apiModel = new OrderResponseApi();
         apiModel.setId(dto.id());
         apiModel.setOrderNumber(dto.orderNumber());
         apiModel.setCustomerId(dto.customerId());
@@ -152,7 +154,7 @@ public class OrdersApiImpl implements OrdersApi {
         if (dto.orderItems() != null) {
             apiModel.setOrderItems(dto.orderItems().stream()
                     .map(item -> {
-                        var apiItem = new OrderItemResponse();
+                        var apiItem = new OrderItemResponseApi();
                         apiItem.setId(item.id());
                         apiItem.setQuantity(item.quantity());
                         apiItem.setUnitPrice(item.unitPrice());
