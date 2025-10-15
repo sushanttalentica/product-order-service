@@ -42,7 +42,7 @@ public class CategoriesApiImpl implements CategoriesApi {
         apiModel.setId(entity.getId());
         apiModel.setName(entity.getName());
         apiModel.setDescription(entity.getDescription());
-        apiModel.setIsActive(entity.getIsActive());
+        apiModel.setIsActive(entity.getActive());
         return apiModel;
     }
 }

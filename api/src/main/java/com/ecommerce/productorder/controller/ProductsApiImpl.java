@@ -67,7 +67,7 @@ public class ProductsApiImpl implements ProductsApi {
         dtoRequest.setDescription(updateProductRequest.getDescription());
         dtoRequest.setPrice(updateProductRequest.getPrice());
         dtoRequest.setStockQuantity(updateProductRequest.getStockQuantity());
-        dtoRequest.setIsActive(updateProductRequest.getIsActive());
+        dtoRequest.setActive(updateProductRequest.getIsActive());
         dtoRequest.setCategoryId(updateProductRequest.getCategoryId());
         
         var response = productService.updateProduct(productId, dtoRequest);
@@ -147,7 +147,7 @@ public class ProductsApiImpl implements ProductsApi {
         apiModel.setPrice(dto.price());
         apiModel.setStockQuantity(dto.stockQuantity());
         apiModel.setSku(dto.sku());
-        apiModel.setIsActive(dto.isActive());
+        apiModel.setIsActive(dto.active());
         apiModel.setCreatedAt(dto.createdAt() != null ? dto.createdAt().atOffset(ZoneOffset.UTC) : null);
         apiModel.setUpdatedAt(dto.updatedAt() != null ? dto.updatedAt().atOffset(ZoneOffset.UTC) : null);
         
@@ -156,7 +156,7 @@ public class ProductsApiImpl implements ProductsApi {
             category.setId(dto.category().id());
             category.setName(dto.category().name());
             category.setDescription(dto.category().description());
-            category.setIsActive(dto.category().isActive());
+            category.setIsActive(dto.category().active());
             apiModel.setCategory(category);
         }
         

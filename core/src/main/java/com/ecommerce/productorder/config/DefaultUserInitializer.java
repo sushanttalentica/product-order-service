@@ -52,7 +52,7 @@ public class DefaultUserInitializer implements CommandLineRunner {
         admin.setFirstName("Admin");
         admin.setLastName("User");
         admin.setRole(Customer.CustomerRole.ADMIN);
-        admin.setIsActive(true);
+        admin.setActive(true);
         admin.setEmailVerified(true);
 
         customerRepository.save(admin);
@@ -74,7 +74,7 @@ public class DefaultUserInitializer implements CommandLineRunner {
         customer.setFirstName("Customer");
         customer.setLastName("User");
         customer.setRole(Customer.CustomerRole.CUSTOMER);
-        customer.setIsActive(true);
+        customer.setActive(true);
         customer.setEmailVerified(true);
 
         customerRepository.save(customer);

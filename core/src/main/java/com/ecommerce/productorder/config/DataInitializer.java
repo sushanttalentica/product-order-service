@@ -36,21 +36,21 @@ public class DataInitializer implements CommandLineRunner {
             Category electronics = new Category();
             electronics.setName("Electronics");
             electronics.setDescription("Electronic devices and gadgets");
-            electronics.setIsActive(true);
+            electronics.setActive(true);
             categoryRepository.save(electronics);
             log.info("Created Electronics category");
 
             Category clothing = new Category();
             clothing.setName("Clothing");
             clothing.setDescription("Fashion and apparel");
-            clothing.setIsActive(true);
+            clothing.setActive(true);
             categoryRepository.save(clothing);
             log.info("Created Clothing category");
 
             Category books = new Category();
             books.setName("Books");
             books.setDescription("Books and literature");
-            books.setIsActive(true);
+            books.setActive(true);
             categoryRepository.save(books);
             log.info("Created Books category");
 
@@ -62,7 +62,7 @@ public class DataInitializer implements CommandLineRunner {
                 iphone.setPrice(new BigDecimal("999.99"));
                 iphone.setStockQuantity(50);
                 iphone.setSku("IPHONE15-001");
-                iphone.setIsActive(true);
+                iphone.setActive(true);
                 iphone.setCategory(electronics);
                 productRepository.save(iphone);
                 log.info("Created iPhone 15 product");
@@ -73,7 +73,7 @@ public class DataInitializer implements CommandLineRunner {
                 macbook.setPrice(new BigDecimal("1999.99"));
                 macbook.setStockQuantity(25);
                 macbook.setSku("MBP-001");
-                macbook.setIsActive(true);
+                macbook.setActive(true);
                 macbook.setCategory(electronics);
                 productRepository.save(macbook);
                 log.info("Created MacBook Pro product");
@@ -84,7 +84,7 @@ public class DataInitializer implements CommandLineRunner {
                 tshirt.setPrice(new BigDecimal("29.99"));
                 tshirt.setStockQuantity(100);
                 tshirt.setSku("TSHIRT-001");
-                tshirt.setIsActive(true);
+                tshirt.setActive(true);
                 tshirt.setCategory(clothing);
                 productRepository.save(tshirt);
                 log.info("Created T-Shirt product");
@@ -95,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
                 book.setPrice(new BigDecimal("49.99"));
                 book.setStockQuantity(75);
                 book.setSku("BOOK-001");
-                book.setIsActive(true);
+                book.setActive(true);
                 book.setCategory(books);
                 productRepository.save(book);
                 log.info("Created Programming Book product");

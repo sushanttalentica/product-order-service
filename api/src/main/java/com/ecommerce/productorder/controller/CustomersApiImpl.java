@@ -185,7 +185,7 @@ public class CustomersApiImpl implements CustomersApi {
         apiModel.setFullName(dto.fullName());
         apiModel.setPhoneNumber(dto.phoneNumber());
         apiModel.setRole(dto.role() != null ? dto.role().name() : null);
-        apiModel.setIsActive(dto.isActive());
+        apiModel.setIsActive(dto.active());
         apiModel.setEmailVerified(dto.emailVerified());
         apiModel.setCreatedAt(dto.createdAt() != null ? dto.createdAt().atOffset(ZoneOffset.UTC) : null);
         apiModel.setUpdatedAt(dto.updatedAt() != null ? dto.updatedAt().atOffset(ZoneOffset.UTC) : null);

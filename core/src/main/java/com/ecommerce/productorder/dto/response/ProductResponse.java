@@ -10,7 +10,7 @@ public record ProductResponse(
     BigDecimal price,
     Integer stockQuantity,
     String sku,
-    Boolean isActive,
+    Boolean active,
     CategoryResponse category,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
@@ -19,6 +19,6 @@ public record ProductResponse(
         Long id,
         String name,
         String description,
-        Boolean isActive
+        Boolean active
     ) {}
 }

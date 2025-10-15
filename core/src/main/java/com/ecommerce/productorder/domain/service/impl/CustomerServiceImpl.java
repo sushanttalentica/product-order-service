@@ -136,7 +136,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + id));
 
-        customer.setIsActive(true);
+        customer.setActive(true);
         Customer updatedCustomer = customerRepository.save(customer);
         log.info("Customer activated successfully with ID: {}", id);
 
@@ -150,7 +150,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + id));
 
-        customer.setIsActive(false);
+        customer.setActive(false);
         Customer updatedCustomer = customerRepository.save(customer);
         log.info("Customer deactivated successfully with ID: {}", id);
 
@@ -196,7 +196,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     public List<CustomerResponse> getActiveCustomers() {
         log.debug("Retrieving active customers");
-        return customerRepository.findByIsActiveTrue()
+        return customerRepository.findByActiveTrue()
                 .stream()
                 .map(customerMapper::toResponse)
                 .collect(Collectors.toList());
@@ -261,7 +261,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(readOnly = true)
     public long getActiveCustomerCount() {
-        return customerRepository.countByIsActiveTrue();
+        return customerRepository.countByActiveTrue();
     }
 
     @Override

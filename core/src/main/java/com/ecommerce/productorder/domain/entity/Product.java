@@ -40,7 +40,7 @@ public class Product {
     private String sku;
     
     @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Boolean active = true;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -62,7 +62,7 @@ public class Product {
     }
     
     public Product(Long id, Long version, String name, String description, BigDecimal price,
-                  Integer stockQuantity, String sku, Boolean isActive, Category category,
+                  Integer stockQuantity, String sku, Boolean active, Category category,
                   List<OrderItem> orderItems, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.version = version;
@@ -71,15 +71,15 @@ public class Product {
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.sku = sku;
-        this.isActive = isActive;
+        this.active = active;
         this.category = category;
         this.orderItems = orderItems;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    
+
     public boolean isAvailableForPurchase() {
-        return isActive != null && isActive && stockQuantity > 0;
+        return active != null && active && stockQuantity > 0;
     }
     
     /**

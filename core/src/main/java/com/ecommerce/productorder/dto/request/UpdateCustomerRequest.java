@@ -26,7 +26,7 @@ public class UpdateCustomerRequest {
 
     private AddressDto address;
 
-    private Boolean isActive;
+    private Boolean active;
 
     private Boolean emailVerified;
 
@@ -63,14 +63,14 @@ public class UpdateCustomerRequest {
     public UpdateCustomerRequest() {}
     
     public UpdateCustomerRequest(String password, String email, String firstName, String lastName,
-                                 String phoneNumber, AddressDto address, Boolean isActive, Boolean emailVerified) {
+                                 String phoneNumber, AddressDto address, Boolean active, Boolean emailVerified) {
         this.password = password;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isActive = isActive;
+        this.active = active;
         this.emailVerified = emailVerified;
     }
 }

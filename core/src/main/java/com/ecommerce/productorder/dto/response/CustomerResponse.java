@@ -14,7 +14,7 @@ public record CustomerResponse(
     String phoneNumber,
     AddressResponse address,
     Customer.CustomerRole role,
-    Boolean isActive,
+    Boolean active,
     Boolean emailVerified,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,

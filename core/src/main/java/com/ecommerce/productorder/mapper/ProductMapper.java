@@ -23,7 +23,7 @@ public class ProductMapper {
         product.setPrice(request.getPrice());
         product.setStockQuantity(request.getStockQuantity());
         product.setSku(request.getSku());
-        product.setIsActive(true);
+        product.setActive(true);
         return product;
     }
 
@@ -38,7 +38,7 @@ public class ProductMapper {
                     product.getCategory().getId(),
                     product.getCategory().getName(),
                     product.getCategory().getDescription(),
-                    product.getCategory().getIsActive()
+                    product.getCategory().getActive()
             );
         }
 
@@ -49,7 +49,7 @@ public class ProductMapper {
                 product.getPrice(),
                 product.getStockQuantity(),
                 product.getSku(),
-                product.getIsActive(),
+                product.getActive(),
                 categoryResponse,
                 product.getCreatedAt(),
                 product.getUpdatedAt()
@@ -68,7 +68,7 @@ public class ProductMapper {
         product.setPrice(request.getPrice() != null ? request.getPrice() : existingProduct.getPrice());
         product.setStockQuantity(request.getStockQuantity() != null ? request.getStockQuantity() : existingProduct.getStockQuantity());
         product.setSku(existingProduct.getSku());
-        product.setIsActive(request.getIsActive() != null ? request.getIsActive() : existingProduct.getIsActive());
+        product.setActive(request.getActive() != null ? request.getActive() : existingProduct.getActive());
         product.setCategory(existingProduct.getCategory());
         product.setVersion(existingProduct.getVersion());
         product.setCreatedAt(existingProduct.getCreatedAt());

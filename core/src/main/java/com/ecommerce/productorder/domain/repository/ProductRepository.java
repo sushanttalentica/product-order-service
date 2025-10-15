@@ -15,20 +15,20 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Page<Product> findByCategoryIdAndIsActiveTrue(Long categoryId, Pageable pageable);
+    Page<Product> findByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
 
-    Page<Product> findByIsActiveTrue(Pageable pageable);
+    Page<Product> findByActiveTrue(Pageable pageable);
 
-    Page<Product> findByNameContainingIgnoreCaseAndIsActiveTrue(String name, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name, Pageable pageable);
 
-    Page<Product> findByPriceBetweenAndIsActiveTrue(java.math.BigDecimal minPrice, 
+    Page<Product> findByPriceBetweenAndActiveTrue(java.math.BigDecimal minPrice, 
                                                    java.math.BigDecimal maxPrice, 
                                                    Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE p.stockQuantity <= :threshold AND p.isActive = true")
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity <= :threshold AND p.active = true")
     List<Product> findProductsWithLowStock(@Param("threshold") Integer threshold);
 
-    Optional<Product> findBySkuAndIsActiveTrue(String sku);
+    Optional<Product> findBySkuAndActiveTrue(String sku);
 
     @Query("""
         SELECT p FROM Product p 
@@ -36,7 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         AND (:categoryId IS NULL OR p.category.id = :categoryId) 
         AND (:minPrice IS NULL OR p.price >= :minPrice) 
         AND (:maxPrice IS NULL OR p.price <= :maxPrice) 
-        AND p.isActive = true
+        AND p.active = true
         """)
     Page<Product> findProductsByCriteria(@Param("name") String name,
                                        @Param("categoryId") Long categoryId,
@@ -44,9 +44,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                        @Param("maxPrice") java.math.BigDecimal maxPrice,
                                        Pageable pageable);
 
-    boolean existsBySkuAndIsActiveTrue(String sku);
+    boolean existsBySkuAndActiveTrue(String sku);
 
-    Page<Product> findByCategoryNameContainingIgnoreCaseAndIsActiveTrue(String categoryName, Pageable pageable);
+    Page<Product> findByCategoryNameContainingIgnoreCaseAndActiveTrue(String categoryName, Pageable pageable);
     
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

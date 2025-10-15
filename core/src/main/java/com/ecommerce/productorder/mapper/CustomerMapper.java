@@ -34,7 +34,7 @@ public class CustomerMapper {
         customer.setPhoneNumber(request.getPhoneNumber());
         customer.setAddress(address);
         customer.setRole(request.getRole());
-        customer.setIsActive(true);
+        customer.setActive(true);
         customer.setEmailVerified(false);
         return customer;
     }
@@ -66,7 +66,7 @@ public class CustomerMapper {
                 customer.getPhoneNumber(),
                 addressResponse,
                 customer.getRole(),
-                customer.getIsActive(),
+                customer.getActive(),
                 customer.getEmailVerified(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt(),
@@ -96,8 +96,8 @@ public class CustomerMapper {
             ? createUpdatedAddress(existingCustomer.getAddress(), request.getAddress()) 
             : existingCustomer.getAddress());
         updatedCustomer.setRole(existingCustomer.getRole());
-        updatedCustomer.setIsActive(request.getIsActive() != null 
-            ? request.getIsActive() : existingCustomer.getIsActive());
+        updatedCustomer.setActive(request.getActive() != null 
+            ? request.getActive() : existingCustomer.getActive());
         updatedCustomer.setEmailVerified(request.getEmailVerified() != null 
             ? request.getEmailVerified() : existingCustomer.getEmailVerified());
         updatedCustomer.setCreatedAt(existingCustomer.getCreatedAt());

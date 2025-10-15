@@ -47,10 +47,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new User(
                 customer.getUsername(),
                 customer.getPassword(),
-                customer.getIsActive(),
+                customer.getActive(),
                 true, // accountNonExpired
                 true, // credentialsNonExpired
-                !customer.getIsActive().equals(false), // accountNonLocked
+                !customer.getActive().equals(false), // accountNonLocked
                 getAuthority(customer.getRole().name())
         );
     }

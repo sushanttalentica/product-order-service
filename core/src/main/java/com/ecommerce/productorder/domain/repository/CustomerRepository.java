@@ -35,7 +35,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     /**
      * Find active customers
      */
-    List<Customer> findByIsActiveTrue();
+    List<Customer> findByActiveTrue();
 
     /**
      * Find customers by role
@@ -45,7 +45,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     /**
      * Find active customers by role
      */
-    List<Customer> findByRoleAndIsActiveTrue(Customer.CustomerRole role);
+    List<Customer> findByRoleAndActiveTrue(Customer.CustomerRole role);
 
     /**
      * Find customers by first name containing (case insensitive)
@@ -95,7 +95,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     /**
      * Count active customers
      */
-    long countByIsActiveTrue();
+    long countByActiveTrue();
 
     /**
      * Find customers created after date
@@ -119,7 +119,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
            "(:name IS NULL OR LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
            "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
            "(:role IS NULL OR c.role = :role) AND " +
-           "(:isActive IS NULL OR c.isActive = :isActive)")
+           "(:isActive IS NULL OR c.active = :isActive)")
     Page<Customer> searchCustomers(
             @Param("name") String name,
             @Param("email") String email,
@@ -130,13 +130,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     /**
      * Find top customers by order count
      */
-    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.isActive = true " +
+    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true " +
            "GROUP BY c.id ORDER BY COUNT(o.id) DESC")
     Page<Customer> findTopCustomersByOrderCount(Pageable pageable);
 
     /**
      * Find customers with no orders
      */
-    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.isActive = true AND o.id IS NULL")
+    @Query("SELECT c FROM Customer c LEFT JOIN c.orders o WHERE c.active = true AND o.id IS NULL")
     List<Customer> findCustomersWithNoOrders();
 }

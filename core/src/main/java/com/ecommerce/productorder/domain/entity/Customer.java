@@ -55,7 +55,7 @@ public class Customer {
     private CustomerRole role = CustomerRole.CUSTOMER;
 
     @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Boolean active = true;
 
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
@@ -76,7 +76,7 @@ public class Customer {
     
     public Customer(Long id, String username, String password, String email,
                    String firstName, String lastName, String phoneNumber, Address address,
-                   CustomerRole role, Boolean isActive, Boolean emailVerified,
+                   CustomerRole role, Boolean active, Boolean emailVerified,
                    LocalDateTime createdAt, LocalDateTime updatedAt, List<Order> orders) {
         this.id = id;
         this.username = username;
@@ -87,7 +87,7 @@ public class Customer {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.role = role;
-        this.isActive = isActive;
+        this.active = active;
         this.emailVerified = emailVerified;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -145,6 +145,6 @@ public class Customer {
     }
 
     public boolean isActiveCustomer() {
-        return isActive && hasRole(CustomerRole.CUSTOMER);
+        return active && hasRole(CustomerRole.CUSTOMER);
     }
 }

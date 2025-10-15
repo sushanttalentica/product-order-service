@@ -10,17 +10,17 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<Category> findByNameAndIsActiveTrue(String name);
+    Optional<Category> findByNameAndActiveTrue(String name);
 
-    List<Category> findByIsActiveTrue();
+    List<Category> findByActiveTrue();
 
-    boolean existsByNameAndIsActiveTrue(String name);
+    boolean existsByNameAndActiveTrue(String name);
 
     @Query("SELECT c FROM Category c LEFT JOIN c.products p " +
-           "WHERE c.isActive = true " +
-           "GROUP BY c.id, c.name, c.description, c.isActive, c.createdAt, c.updatedAt " +
+           "WHERE c.active = true " +
+           "GROUP BY c.id, c.name, c.description, c.active, c.createdAt, c.updatedAt " +
            "HAVING COUNT(p) > 0")
     List<Category> findCategoriesWithProducts();
 
-    Optional<Category> findByNameIgnoreCaseAndIsActiveTrue(String name);
+    Optional<Category> findByNameIgnoreCaseAndActiveTrue(String name);
 }

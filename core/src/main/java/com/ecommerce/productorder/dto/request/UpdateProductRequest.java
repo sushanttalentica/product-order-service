@@ -30,18 +30,18 @@ public class UpdateProductRequest {
     @Positive(message = "Category ID must be positive")
     private Long categoryId;
     
-    private Boolean isActive;
+    private Boolean active;
     
     public UpdateProductRequest() {}
     
     public UpdateProductRequest(String name, String description, BigDecimal price, 
-                                Integer stockQuantity, String sku, Long categoryId, Boolean isActive) {
+                                Integer stockQuantity, String sku, Long categoryId, Boolean active) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.sku = sku;
         this.categoryId = categoryId;
-        this.isActive = isActive;
+        this.active = active;
     }
 }

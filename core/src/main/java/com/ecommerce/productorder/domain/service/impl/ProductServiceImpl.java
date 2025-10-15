@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Creating product with name: {}", request.getName());
         
         // Business rule: Check if SKU already exists
-        if (productRepository.existsBySkuAndIsActiveTrue(request.getSku())) {
+        if (productRepository.existsBySkuAndActiveTrue(request.getSku())) {
             throw new BusinessException("Product with SKU " + request.getSku() + " already exists");
         }
         
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
         
         // Check SKU uniqueness if SKU is being updated
         if (request.getSku() != null && !request.getSku().equals(product.getSku())) {
-            if (productRepository.existsBySkuAndIsActiveTrue(request.getSku())) {
+            if (productRepository.existsBySkuAndActiveTrue(request.getSku())) {
                 throw new BusinessException("Product with SKU " + request.getSku() + " already exists");
             }
         }
@@ -129,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
     public Optional<ProductResponse> getProductBySku(String sku) {
         log.debug("Retrieving product with SKU: {}", sku);
         
-        return productRepository.findBySkuAndIsActiveTrue(sku)
+        return productRepository.findBySkuAndActiveTrue(sku)
                 .map(productMapper::toResponse);
     }
     
@@ -139,7 +139,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         log.debug("Retrieving all products with pagination: {}", pageable);
         
-        return productRepository.findByIsActiveTrue(pageable)
+        return productRepository.findByActiveTrue(pageable)
                 .map(productMapper::toResponse);
     }
     
@@ -148,7 +148,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> searchProductsByName(String name, Pageable pageable) {
         log.debug("Searching products by name: {}", name);
         
-        return productRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(name, pageable)
+        return productRepository.findByNameContainingIgnoreCaseAndActiveTrue(name, pageable)
                 .map(productMapper::toResponse);
     }
     
@@ -157,7 +157,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> getProductsByCategory(Long categoryId, Pageable pageable) {
         log.debug("Retrieving products by category: {}", categoryId);
         
-        return productRepository.findByCategoryIdAndIsActiveTrue(categoryId, pageable)
+        return productRepository.findByCategoryIdAndActiveTrue(categoryId, pageable)
                 .map(productMapper::toResponse);
     }
     
@@ -168,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
                                                        Pageable pageable) {
         log.debug("Retrieving products by price range: {} - {}", minPrice, maxPrice);
         
-        return productRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice, pageable)
+        return productRepository.findByPriceBetweenAndActiveTrue(minPrice, maxPrice, pageable)
                 .map(productMapper::toResponse);
     }
     
@@ -195,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
         
         // Soft delete - set isActive to false
-        product.setIsActive(false);
+        product.setActive(false);
         productRepository.save(product);
         
         log.info("Product deleted successfully with id: {}", productId);

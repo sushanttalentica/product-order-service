@@ -27,7 +27,7 @@ public class Category {
     private String description;
     
     @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Boolean active = true;
     
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("category")
@@ -44,18 +44,18 @@ public class Category {
     public Category() {
     }
     
-    public Category(Long id, String name, String description, Boolean isActive,
+    public Category(Long id, String name, String description, Boolean active,
                    List<Product> products, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.isActive = isActive;
+        this.active = active;
         this.products = products;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public boolean isAvailableForProducts() {
-        return isActive != null && isActive;
+        return active != null && active;
     }
 }
