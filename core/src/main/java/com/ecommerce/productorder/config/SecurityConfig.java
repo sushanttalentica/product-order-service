@@ -3,6 +3,7 @@ package com.ecommerce.productorder.config;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -84,20 +85,55 @@ public class SecurityConfig {
                     // Public endpoints - Application
                     .requestMatchers(new AntPathRequestMatcher("/api/v1/auth/**"))
                     .permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/customers"))
-                    .permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products"))
-                    .permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products/**"))
-                    .permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**"))
-                    .permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/actuator/**"))
                     .permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/h2-console/**"))
                     .permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/test/**"))
+                    // Products - Public read, Admin write
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/products", HttpMethod.GET.name()))
                     .permitAll()
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.GET.name()))
+                    .permitAll()
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/categories/**", HttpMethod.GET.name()))
+                    .permitAll()
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/products", HttpMethod.POST.name()))
+                    .hasRole("ADMIN")
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.PUT.name()))
+                    .hasRole("ADMIN")
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.DELETE.name()))
+                    .hasRole("ADMIN")
+                    // Customers - Admin can manage all, users can manage own
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/customers", HttpMethod.GET.name()))
+                    .hasRole("ADMIN")
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.GET.name()))
+                    .authenticated()
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.PUT.name()))
+                    .authenticated()
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.DELETE.name()))
+                    .hasRole("ADMIN")
+                    // Orders - Users can create/view own, Admin can view all
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/orders/**"))
+                    .authenticated()
+                    // Payments - Authenticated users
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/payments/**"))
+                    .authenticated()
+                    // Invoices - Authenticated users
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/invoices/**"))
+                    .authenticated()
+                    // Payment Statistics - Admin only
+                    .requestMatchers(
+                        new AntPathRequestMatcher("/api/v1/payments/statistics", HttpMethod.GET.name()))
+                    .hasRole("ADMIN")
                     // Protected endpoints
                     .anyRequest()
                     .authenticated())
