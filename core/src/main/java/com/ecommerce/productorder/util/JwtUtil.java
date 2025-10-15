@@ -26,6 +26,11 @@ public class JwtUtil {
 
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
+    claims.put(
+        "roles",
+        userDetails.getAuthorities().stream()
+            .map(authority -> authority.getAuthority())
+            .toList());
     return createToken(claims, userDetails.getUsername());
   }
 
@@ -76,6 +81,13 @@ public class JwtUtil {
 
   public Boolean validateToken(String token, UserDetails userDetails) {
     final String username = getUsernameFromToken(token);
-    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    boolean isValid = (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    log.debug(
+        "Token validation for user {}: {} (username match: {}, not expired: {})",
+        username,
+        isValid,
+        username.equals(userDetails.getUsername()),
+        !isTokenExpired(token));
+    return isValid;
   }
 }

@@ -40,9 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             || uri.contains("/webjars")
             || uri.contains("/actuator")
             || uri.contains("/h2-console")
-            || path.startsWith("/api/v1/auth/")
-            || path.startsWith("/api/v1/products")
-            || path.startsWith("/api/v1/categories");
+            || path.startsWith("/api/v1/auth/");
 
     if (uri.contains("api-docs")) {
       log.info("shouldNotFilter check - URI: {}, ServletPath: {}, Skip: {}", uri, path, skip);
@@ -74,6 +72,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     // Once we get the token validate it.
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+      log.debug("Loaded user: {} with authorities: {}", username, userDetails.getAuthorities());
 
       // if token is valid configure Spring Security to manually set authentication
       if (jwtUtil.validateToken(jwtToken, userDetails)) {
@@ -83,10 +82,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         usernamePasswordAuthenticationToken.setDetails(
             new WebAuthenticationDetailsSource().buildDetails(request));
 
-        // After setting the Authentication in the context, we specify
-        // that the current user is authenticated. So it passes the
-        // Spring Security Configurations successfully.
+        log.debug(
+            "Setting authentication for user: {} with authorities: {}",
+            username,
+            userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+      } else {
+        log.warn("Token validation failed for user: {}", username);
       }
     }
 

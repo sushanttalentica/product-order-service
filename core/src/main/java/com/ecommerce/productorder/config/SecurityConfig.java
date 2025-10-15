@@ -89,51 +89,16 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/h2-console/**"))
                     .permitAll()
-                    // Products - Public read, Admin write
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/products", HttpMethod.GET.name()))
+                    // Products & Categories - Public read access
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products", "GET"))
                     .permitAll()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.GET.name()))
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products/**", "GET"))
                     .permitAll()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/categories/**", HttpMethod.GET.name()))
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**", "GET"))
                     .permitAll()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/products", HttpMethod.POST.name()))
-                    .hasRole("ADMIN")
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.PUT.name()))
-                    .hasRole("ADMIN")
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/products/**", HttpMethod.DELETE.name()))
-                    .hasRole("ADMIN")
-                    // Customers - Admin can manage all, users can manage own
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/customers", HttpMethod.GET.name()))
-                    .hasRole("ADMIN")
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.GET.name()))
+                    // API endpoints - Authentication required, RBAC at method level via @PreAuthorize
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
                     .authenticated()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.PUT.name()))
-                    .authenticated()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/customers/**", HttpMethod.DELETE.name()))
-                    .hasRole("ADMIN")
-                    // Orders - Users can create/view own, Admin can view all
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/orders/**"))
-                    .authenticated()
-                    // Payments - Authenticated users
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/payments/**"))
-                    .authenticated()
-                    // Invoices - Authenticated users
-                    .requestMatchers(new AntPathRequestMatcher("/api/v1/invoices/**"))
-                    .authenticated()
-                    // Payment Statistics - Admin only
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/api/v1/payments/statistics", HttpMethod.GET.name()))
-                    .hasRole("ADMIN")
                     // Protected endpoints
                     .anyRequest()
                     .authenticated())

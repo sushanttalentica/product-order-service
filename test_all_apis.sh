@@ -6,15 +6,24 @@ TIMESTAMP=$(date +%s)
 echo "🧪 COMPREHENSIVE API TEST SUITE - ALL APIS"
 echo "==========================================="
 
-# Test 1: Get Categories
+# Test 1: Get Categories (Public)
 echo -e "\n✅ Test 1: Get Categories"
 CATEGORIES=$(curl -s "$BASE_URL/categories")
 echo "Categories: $(echo $CATEGORIES | python3 -c "import sys, json; print(len(json.load(sys.stdin)))")"
 
-# Test 2: Create Product
-echo -e "\n✅ Test 2: Create Product"
+# Login as ADMIN for product management
+echo -e "\n📝 Login as ADMIN (for product operations)"
+ADMIN_LOGIN=$(curl -s -X POST "$BASE_URL/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}')
+ADMIN_TOKEN=$(echo $ADMIN_LOGIN | python3 -c "import sys, json; print(json.load(sys.stdin)['token'])")
+echo "✅ Admin token received: ${ADMIN_TOKEN:0:30}..."
+
+# Test 2: Create Product (Admin only)
+echo -e "\n✅ Test 2: Create Product (as Admin)"
 PRODUCT_RESPONSE=$(curl -s -X POST "$BASE_URL/products" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
   -d '{
     "name": "Test Product '$TIMESTAMP'",
     "description": "Test Description",
@@ -26,10 +35,11 @@ PRODUCT_RESPONSE=$(curl -s -X POST "$BASE_URL/products" \
 PRODUCT_ID=$(echo $PRODUCT_RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])")
 echo "✅ Product Created - ID: $PRODUCT_ID"
 
-# Test 3: Update Product
-echo -e "\n✅ Test 3: Update Product"
+# Test 3: Update Product (Admin only)
+echo -e "\n✅ Test 3: Update Product (as Admin)"
 curl -s -X PUT "$BASE_URL/products/$PRODUCT_ID" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
   -d '{
     "name": "Updated Product",
     "description": "Updated Description",
@@ -158,9 +168,10 @@ INVOICE_RESPONSE=$(curl -s -X POST "$BASE_URL/invoices/order/$ORDER_ID" \
 INVOICE_URL=$(echo $INVOICE_RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin).get('url', 'N/A'))")
 echo "✅ Invoice URL: $INVOICE_URL"
 
-# Test 16: Delete Product (do this before customer to avoid cascade issues)
-echo -e "\n✅ Test 16: Delete Product"
-DELETE_PRODUCT=$(curl -s -X DELETE "$BASE_URL/products/$PRODUCT_ID")
+# Test 16: Delete Product (Admin only)
+echo -e "\n✅ Test 16: Delete Product (as Admin)"
+DELETE_PRODUCT=$(curl -s -X DELETE "$BASE_URL/products/$PRODUCT_ID" \
+  -H "Authorization: Bearer $ADMIN_TOKEN")
 echo "✅ Product Deleted: $(echo $DELETE_PRODUCT | python3 -c "import sys, json; print(json.load(sys.stdin)['message'])")"
 
 # Test 17: Delete Customer (last, after invoice)

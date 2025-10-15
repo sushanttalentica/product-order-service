@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +28,7 @@ public class ProductsApiImpl implements ProductsApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductResponseApi> createProduct(
       CreateProductRequestApi createProductRequest) {
     log.info("Creating product: {}", createProductRequest.getName());
@@ -58,6 +60,7 @@ public class ProductsApiImpl implements ProductsApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductResponseApi> updateProduct(
       Long productId, UpdateProductRequestApi updateProductRequest) {
     log.info("Updating product: {}", productId);
@@ -74,6 +77,7 @@ public class ProductsApiImpl implements ProductsApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<MessageResponse> deleteProduct(Long productId) {
     log.info("Deleting product: {}", productId);
     productService.deleteProduct(productId);

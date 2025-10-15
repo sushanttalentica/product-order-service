@@ -40,6 +40,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   private UserDetails mapCustomerToUserDetails(Customer customer) {
     log.info("Found customer in database: {}", customer.getUsername());
+    List<SimpleGrantedAuthority> authorities = getAuthority(customer.getRole().name());
+    log.info("User {} has authorities: {}", customer.getUsername(), authorities);
 
     return new User(
         customer.getUsername(),
@@ -48,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         true, // accountNonExpired
         true, // credentialsNonExpired
         !customer.getActive().equals(false), // accountNonLocked
-        getAuthority(customer.getRole().name()));
+        authorities);
   }
 
   private List<SimpleGrantedAuthority> getAuthority(String role) {

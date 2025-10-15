@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,6 +53,7 @@ public class CustomersApiImpl implements CustomersApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> getAllCustomers(Integer page, Integer size) {
     Page<CustomerResponse> customersPage =
         customerService.getAllCustomers(PageRequest.of(page, size));
@@ -90,6 +92,7 @@ public class CustomersApiImpl implements CustomersApi {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<MessageResponse> deleteCustomer(Long id) {
     log.info("Deleting customer: {}", id);
     customerService.deleteCustomer(id);
