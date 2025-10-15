@@ -1,52 +1,47 @@
 # Multi-stage Docker build for Product Order Service
-# 
-# Build stage
+# Multi-module Maven project structure
 FROM maven:3.9-eclipse-temurin-21 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy pom.xml first for better layer caching
 COPY pom.xml .
+COPY .mvn .mvn
 
-# Download dependencies
-RUN mvn dependency:go-offline -B
+COPY core/pom.xml core/
+COPY payment/pom.xml payment/
+COPY invoice/pom.xml invoice/
+COPY inventory/pom.xml inventory/
+COPY notification/pom.xml notification/
+COPY api/pom.xml api/
+COPY application/pom.xml application/
 
-# Copy source code
-COPY src ./src
+COPY core/src core/src
+COPY payment/src payment/src
+COPY invoice/src invoice/src
+COPY inventory/src inventory/src
+COPY notification/src notification/src
+COPY api/src api/src
+COPY application/src application/src
 
-# Build application
 RUN mvn clean package -DskipTests
 
-# Runtime stage
 FROM eclipse-temurin:21-jre-jammy
 
-# Install necessary packages
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Set working directory
 WORKDIR /app
 
-# Copy JAR file from build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/application/target/application-*.jar app.jar
 
-# Change ownership to non-root user
 RUN chown -R appuser:appuser /app
 
-# Switch to non-root user
 USER appuser
 
-# Expose port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/product-order-service/actuator/health || exit 1
 
-# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
