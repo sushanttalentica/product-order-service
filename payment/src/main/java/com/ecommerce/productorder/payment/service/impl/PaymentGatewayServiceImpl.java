@@ -1,6 +1,8 @@
 package com.ecommerce.productorder.payment.service.impl;
 
 import com.ecommerce.productorder.payment.domain.entity.Payment;
+import com.ecommerce.productorder.payment.domain.entity.Payment.PaymentMethod;
+import com.ecommerce.productorder.payment.domain.entity.Payment.PaymentStatus;
 import com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest;
 import com.ecommerce.productorder.payment.dto.response.PaymentResponse;
 import com.ecommerce.productorder.payment.service.PaymentGatewayService;
@@ -202,8 +204,8 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         payment.getOrderId(),
         payment.getCustomerId(),
         payment.getAmount(),
-        "COMPLETED",
-        payment.getPaymentMethod().name(),
+        PaymentStatus.COMPLETED,
+        payment.getPaymentMethod(),
         transactionId,
         gatewayResponse,
         null,
@@ -222,8 +224,8 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         payment.getOrderId(),
         payment.getCustomerId(),
         payment.getAmount(),
-        "REFUNDED",
-        payment.getPaymentMethod().name(),
+        PaymentStatus.REFUNDED,
+        payment.getPaymentMethod(),
         transactionId,
         gatewayResponse,
         null,
@@ -239,8 +241,8 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
         payment.getOrderId(),
         payment.getCustomerId(),
         payment.getAmount(),
-        "FAILED",
-        payment.getPaymentMethod().name(),
+        PaymentStatus.FAILED,
+        payment.getPaymentMethod(),
         null,
         null,
         failureReason,

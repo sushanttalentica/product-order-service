@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PaymentEventPublisherImpl implements PaymentEventPublisher {
+public class KafkaPaymentEventPublisherImpl implements PaymentEventPublisher {
 
   private final KafkaTemplate<String, Object> kafkaTemplate;
   private final KafkaTopicsProperties kafkaTopics;
 
-  public PaymentEventPublisherImpl(
+  public KafkaPaymentEventPublisherImpl(
       KafkaTemplate<String, Object> kafkaTemplate, KafkaTopicsProperties kafkaTopics) {
     this.kafkaTemplate = kafkaTemplate;
     this.kafkaTopics = kafkaTopics;

@@ -11,10 +11,10 @@ server:
     max-connections: 10000
     connection-timeout: 20000
 
-# gRPC Server Configuration
-grpc:
-  server:
-    port: 9090
+# gRPC Server Configuration (disabled for now)
+# grpc:
+#   server:
+#     port: 9091
 
 spring:
   application:
