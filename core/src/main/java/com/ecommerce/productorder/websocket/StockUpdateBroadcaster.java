@@ -1,5 +1,6 @@
 package com.ecommerce.productorder.websocket;
 
+import com.ecommerce.productorder.util.Constants;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,11 +23,11 @@ public class StockUpdateBroadcaster {
       containerFactory = "kafkaListenerContainerFactory")
   public void handleStockUpdateEvent(Map<String, Object> event) {
     try {
-      Long productId = ((Number) event.get("productId")).longValue();
-      Integer newStock = ((Number) event.get("stockQuantity")).intValue();
+      Long productId = ((Number) event.get(Constants.PRODUCT_ID_FIELD)).longValue();
+      Integer newStock = ((Number) event.get(Constants.STOCK_QUANTITY_FIELD)).intValue();
       Long timestamp =
-          event.containsKey("timestamp")
-              ? ((Number) event.get("timestamp")).longValue()
+          event.containsKey(Constants.TIMESTAMP_FIELD)
+              ? ((Number) event.get(Constants.TIMESTAMP_FIELD)).longValue()
               : System.currentTimeMillis();
 
       log.info("Broadcasting stock update for product ID: {} to {} units", productId, newStock);
@@ -34,16 +35,16 @@ public class StockUpdateBroadcaster {
       // Create broadcast message
       Map<String, Object> broadcastMessage =
           Map.of(
-              "productId", productId,
-              "stockQuantity", newStock,
-              "timestamp", timestamp,
-              "message", newStock < 10 ? "Low stock!" : "Stock updated");
+              Constants.PRODUCT_ID_FIELD, productId,
+              Constants.STOCK_QUANTITY_FIELD, newStock,
+              Constants.TIMESTAMP_FIELD, timestamp,
+              Constants.MESSAGE_FIELD, newStock < Constants.LOW_STOCK_THRESHOLD ? Constants.LOW_STOCK_MESSAGE : Constants.STOCK_UPDATED_MESSAGE);
 
       // Broadcast to all clients subscribed to this product
-      messagingTemplate.convertAndSend("/topic/stock/" + productId, broadcastMessage);
+      messagingTemplate.convertAndSend(Constants.WEBSOCKET_STOCK_TOPIC_PREFIX + productId, broadcastMessage);
 
       // Broadcast to general stock updates channel
-      messagingTemplate.convertAndSend("/topic/stock/all", broadcastMessage);
+      messagingTemplate.convertAndSend(Constants.WEBSOCKET_STOCK_ALL_TOPIC, broadcastMessage);
 
       log.debug("Stock update broadcasted successfully for product ID: {}", productId);
 
@@ -58,24 +59,24 @@ public class StockUpdateBroadcaster {
       containerFactory = "kafkaListenerContainerFactory")
   public void handleOrderCreatedEvent(Map<String, Object> event) {
     try {
-      Long customerId = ((Number) event.get("customerId")).longValue();
-      Long orderId = ((Number) event.get("orderId")).longValue();
+      Long customerId = ((Number) event.get(Constants.CUSTOMER_ID_FIELD)).longValue();
+      Long orderId = ((Number) event.get(Constants.ORDER_ID_FIELD)).longValue();
 
       log.info("Broadcasting order created notification to customer ID: {}", customerId);
 
       Map<String, Object> notification =
           Map.of(
-              "orderId",
+              Constants.ORDER_ID_FIELD,
               orderId,
-              "customerId",
+              Constants.CUSTOMER_ID_FIELD,
               customerId,
-              "message",
-              "Your order has been created successfully!",
-              "timestamp",
+              Constants.MESSAGE_FIELD,
+              Constants.ORDER_CREATED_MESSAGE,
+              Constants.TIMESTAMP_FIELD,
               System.currentTimeMillis());
 
       // Send to specific customer
-      messagingTemplate.convertAndSend("/topic/customer/" + customerId + "/orders", notification);
+      messagingTemplate.convertAndSend(Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_PREFIX + customerId + Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_SUFFIX, notification);
 
     } catch (Exception e) {
       log.error("Error broadcasting order created event: {}", event, e);
