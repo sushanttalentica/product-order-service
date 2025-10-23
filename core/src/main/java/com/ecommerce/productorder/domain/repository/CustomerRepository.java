@@ -44,7 +44,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
   // Find customers by full name containing (case insensitive)
   @Query(
-      "SELECT c FROM Customer c WHERE LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))")
+      "SELECT c FROM Customer c WHERE LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE"
+          + " LOWER(CONCAT('%', :name, '%'))")
   List<Customer> findByFullNameContainingIgnoreCase(@Param("name") String name);
 
   // Find customers by city
@@ -78,11 +79,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
   // Advanced search with pagination
   @Query(
-      "SELECT c FROM Customer c WHERE "
-          + "(:name IS NULL OR LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))) AND "
-          + "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND "
-          + "(:role IS NULL OR c.role = :role) AND "
-          + "(:isActive IS NULL OR c.active = :isActive)")
+      "SELECT c FROM Customer c WHERE (:name IS NULL OR LOWER(CONCAT(c.firstName, ' ', c.lastName))"
+          + " LIKE LOWER(CONCAT('%', :name, '%'))) AND (:email IS NULL OR LOWER(c.email) LIKE"
+          + " LOWER(CONCAT('%', :email, '%'))) AND (:role IS NULL OR c.role = :role) AND (:isActive"
+          + " IS NULL OR c.active = :isActive)")
   Page<Customer> searchCustomers(
       @Param("name") String name,
       @Param("email") String email,

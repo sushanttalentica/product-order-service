@@ -38,10 +38,14 @@ public class StockUpdateBroadcaster {
               Constants.PRODUCT_ID_FIELD, productId,
               Constants.STOCK_QUANTITY_FIELD, newStock,
               Constants.TIMESTAMP_FIELD, timestamp,
-              Constants.MESSAGE_FIELD, newStock < Constants.LOW_STOCK_THRESHOLD ? Constants.LOW_STOCK_MESSAGE : Constants.STOCK_UPDATED_MESSAGE);
+              Constants.MESSAGE_FIELD,
+                  newStock < Constants.LOW_STOCK_THRESHOLD
+                      ? Constants.LOW_STOCK_MESSAGE
+                      : Constants.STOCK_UPDATED_MESSAGE);
 
       // Broadcast to all clients subscribed to this product
-      messagingTemplate.convertAndSend(Constants.WEBSOCKET_STOCK_TOPIC_PREFIX + productId, broadcastMessage);
+      messagingTemplate.convertAndSend(
+          Constants.WEBSOCKET_STOCK_TOPIC_PREFIX + productId, broadcastMessage);
 
       // Broadcast to general stock updates channel
       messagingTemplate.convertAndSend(Constants.WEBSOCKET_STOCK_ALL_TOPIC, broadcastMessage);
@@ -57,8 +61,13 @@ public class StockUpdateBroadcaster {
       topics = "order.created",
       groupId = "websocket-broadcaster",
       containerFactory = "kafkaListenerContainerFactory")
-  public void handleOrderCreatedEvent(Map<String, Object> event) {
+  public void handleOrderCreatedEvent(String eventDataJson) {
     try {
+      // Parse JSON string to Map
+      com.fasterxml.jackson.databind.ObjectMapper mapper =
+          new com.fasterxml.jackson.databind.ObjectMapper();
+      Map<String, Object> event = mapper.readValue(eventDataJson, Map.class);
+
       Long customerId = ((Number) event.get(Constants.CUSTOMER_ID_FIELD)).longValue();
       Long orderId = ((Number) event.get(Constants.ORDER_ID_FIELD)).longValue();
 
@@ -76,10 +85,14 @@ public class StockUpdateBroadcaster {
               System.currentTimeMillis());
 
       // Send to specific customer
-      messagingTemplate.convertAndSend(Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_PREFIX + customerId + Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_SUFFIX, notification);
+      messagingTemplate.convertAndSend(
+          Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_PREFIX
+              + customerId
+              + Constants.WEBSOCKET_CUSTOMER_ORDERS_TOPIC_SUFFIX,
+          notification);
 
     } catch (Exception e) {
-      log.error("Error broadcasting order created event: {}", event, e);
+      log.error("Error broadcasting order created event: {}", eventDataJson, e);
     }
   }
 }

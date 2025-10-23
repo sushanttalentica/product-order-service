@@ -7,7 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-// Initializes default admin and customer users if they do not exist
+/**
+ * CommandLineRunner for dummy data generation. Initializes default admin and customer users for
+ * testing and demonstration purposes.
+ */
 @Component
 @Slf4j
 public class DefaultUserInitializer implements CommandLineRunner {
@@ -25,10 +28,10 @@ public class DefaultUserInitializer implements CommandLineRunner {
   public void run(String... args) throws Exception {
     log.info("Initializing default users...");
 
-    // Create default admin user
+    // Create default admin user (dummy data)
     createDefaultAdmin();
 
-    // Create default customer user
+    // Create default customer user (dummy)
     createDefaultCustomer();
 
     log.info("Default users initialization completed");

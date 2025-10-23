@@ -25,12 +25,23 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
   public PdfGeneratorServiceImpl() {}
 
   @Override
+  public byte[] generateInvoice(Order order) {
+    return generateInvoicePdf(order);
+  }
+
+  @Override
+  public String getContentType() {
+    return "application/pdf";
+  }
+
+  @Override
   public byte[] generateInvoicePdf(Order order) {
+    // Validate order first
+    validateOrderForPdf(order);
+    
     log.info("Generating PDF invoice for order ID: {}", order.getId());
 
     try {
-      // Validate order
-      validateOrderForPdf(order);
 
       // Create PDF using iText
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -115,11 +126,12 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
 
   @Override
   public byte[] generateReceiptPdf(Order order) {
+    // Validate order first
+    validateOrderForPdf(order);
+    
     log.info("Generating PDF receipt for order ID: {}", order.getId());
 
     try {
-      // Validate order
-      validateOrderForPdf(order);
 
       // Generate PDF content
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -145,11 +157,12 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
 
   @Override
   public byte[] generateShippingLabelPdf(Order order) {
+    // Validate order first
+    validateOrderForPdf(order);
+    
     log.info("Generating PDF shipping label for order ID: {}", order.getId());
 
     try {
-      // Validate order
-      validateOrderForPdf(order);
 
       // Generate PDF content
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -190,34 +203,10 @@ public class PdfGeneratorServiceImpl implements PdfGeneratorService {
         || order.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Order total amount must be greater than zero");
     }
-  }
 
-  private String createInvoiceContent(Order order) {
-    StringBuilder content = new StringBuilder();
-
-    // Invoice header
-    content.append("INVOICE\n");
-    content.append("=======\n\n");
-
-    // Invoice details
-    content.append("Invoice Number: ").append(order.getOrderNumber()).append("\n");
-    content
-        .append("Date: ")
-        .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-        .append("\n");
-    content.append("Customer ID: ").append(order.getCustomerId()).append("\n");
-    content.append("Customer Email: ").append(order.getCustomerEmail()).append("\n");
-    content.append("Order Status: ").append(order.getStatus()).append("\n");
-    content.append("Total Amount: $").append(order.getTotalAmount()).append("\n");
-
-    if (order.getShippingAddress() != null) {
-      content.append("Shipping Address: ").append(order.getShippingAddress()).append("\n");
+    if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+      throw new IllegalArgumentException("Order items cannot be null or empty");
     }
-
-    content.append("\n");
-    content.append("Thank you for your business!\n");
-
-    return content.toString();
   }
 
   private String createReceiptContent(Order order) {

@@ -65,12 +65,12 @@ public final class Constants {
   public static final String WEBSOCKET_STOCK_ALL_TOPIC = "/topic/stock/all";
   public static final String WEBSOCKET_CUSTOMER_ORDERS_TOPIC_PREFIX = "/topic/customer/";
   public static final String WEBSOCKET_CUSTOMER_ORDERS_TOPIC_SUFFIX = "/orders";
-  
+
   // Stock Update Messages
   public static final String LOW_STOCK_MESSAGE = "Low stock!";
   public static final String STOCK_UPDATED_MESSAGE = "Stock updated";
   public static final String ORDER_CREATED_MESSAGE = "Your order has been created successfully!";
-  
+
   // Event Field Names
   public static final String PRODUCT_ID_FIELD = "productId";
   public static final String MESSAGE_FIELD = "message";
@@ -78,7 +78,7 @@ public final class Constants {
   public static final String CUSTOMER_ID_FIELD = "customerId";
   public static final String ORDER_ID_FIELD = "orderId";
   public static final String TIMESTAMP_FIELD = "timestamp";
-  
+
   // Stock Threshold
   public static final int LOW_STOCK_THRESHOLD = 10;
 }

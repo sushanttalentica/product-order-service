@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    com.ecommerce.productorder.invoice: DEBUG
+    org.springframework.test: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Test S3 configuration
+invoice:
+  s3:
+    bucket-name: test-bucket
+    region: us-east-1
+    access-key: test-access-key
+    secret-key: test-secret-key
+    endpoint: https://s3.amazonaws.com
+
+# Disable security for tests
+security:
+  jwt:
+    secret: test-secret-key-for-testing-only
+    expiration: 86400000

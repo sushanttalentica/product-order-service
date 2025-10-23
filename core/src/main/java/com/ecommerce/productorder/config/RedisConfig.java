@@ -28,10 +28,11 @@ public class RedisConfig {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
     objectMapper.registerModule(new ParameterNamesModule());
-    objectMapper.activateDefaultTyping(
-        LaissezFaireSubTypeValidator.instance,
-        ObjectMapper.DefaultTyping.NON_FINAL,
-        JsonTypeInfo.As.PROPERTY);
+    // Disable default typing for Spring Data types to avoid serialization issues
+    objectMapper.configure(
+        com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper.configure(
+        com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
     GenericJackson2JsonRedisSerializer serializer =
         new GenericJackson2JsonRedisSerializer(objectMapper);

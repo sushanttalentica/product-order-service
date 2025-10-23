@@ -2,7 +2,11 @@ package com.ecommerce.productorder.invoice.service;
 
 import com.ecommerce.productorder.domain.entity.Order;
 
-public interface PdfGeneratorService {
+/**
+ * PDF-specific implementation of InvoiceGeneratorService. This interface provides PDF-specific
+ * functionality while maintaining the generic InvoiceGeneratorService contract.
+ */
+public interface PdfGeneratorService extends InvoiceGeneratorService {
 
   byte[] generateInvoicePdf(Order order);
 

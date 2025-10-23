@@ -128,8 +128,8 @@ public class PaymentsApiImpl implements PaymentsApi {
     apiModel.setOrderId(dto.orderId());
     apiModel.setCustomerId(dto.customerId());
     apiModel.setAmount(dto.amount());
-    apiModel.setStatus(dto.status());
-    apiModel.setPaymentMethod(dto.paymentMethod());
+    apiModel.setStatus(dto.status().name());
+    apiModel.setPaymentMethod(dto.paymentMethod().name());
     apiModel.setTransactionId(dto.transactionId());
     apiModel.setGatewayResponse(dto.gatewayResponse());
     apiModel.setFailureReason(dto.failureReason());

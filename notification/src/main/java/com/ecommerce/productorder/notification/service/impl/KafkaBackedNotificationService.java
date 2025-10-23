@@ -5,6 +5,7 @@ import com.ecommerce.productorder.domain.repository.OrderRepository;
 import com.ecommerce.productorder.exception.ResourceNotFoundException;
 import com.ecommerce.productorder.notification.model.NotificationChannel;
 import com.ecommerce.productorder.notification.model.NotificationRequest;
+import com.ecommerce.productorder.notification.model.NotificationStatusPattern;
 import com.ecommerce.productorder.notification.model.NotificationType;
 import com.ecommerce.productorder.notification.service.NotificationService;
 import java.time.LocalDateTime;
@@ -16,12 +17,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class NotificationServiceImpl implements NotificationService {
+public class KafkaBackedNotificationService implements NotificationService {
 
   private final KafkaTemplate<String, Object> kafkaTemplate;
   private final OrderRepository orderRepository;
 
-  public NotificationServiceImpl(
+  public KafkaBackedNotificationService(
       KafkaTemplate<String, Object> kafkaTemplate, OrderRepository orderRepository) {
     this.kafkaTemplate = kafkaTemplate;
     this.orderRepository = orderRepository;
@@ -62,7 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.ORDER_CONFIRMATION,
             channels,
             order.getCustomerEmail(),
-            "Order Confirmation - " + order.getOrderNumber(),
+            NotificationStatusPattern.ORDER_CONFIRMATION.format(order.getOrderNumber()),
             Map.of(
                 "orderId",
                 order.getId(),
@@ -85,7 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.ORDER_STATUS_UPDATE,
             channels,
             order.getCustomerEmail(),
-            "Order Status Update - " + order.getOrderNumber(),
+            NotificationStatusPattern.ORDER_STATUS_UPDATE.format(order.getOrderNumber()),
             Map.of(
                 "orderId",
                 order.getId(),
@@ -105,7 +106,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.ORDER_CANCELLATION,
             channels,
             order.getCustomerEmail(),
-            "Order Cancelled - " + order.getOrderNumber(),
+            NotificationStatusPattern.ORDER_CANCELLATION.format(order.getOrderNumber()),
             Map.of(
                 "orderId",
                 order.getId(),
@@ -124,7 +125,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.PAYMENT_CONFIRMATION,
             channels,
             order.getCustomerEmail(),
-            "Payment Confirmed - " + order.getOrderNumber(),
+            NotificationStatusPattern.PAYMENT_CONFIRMATION.format(order.getOrderNumber()),
             Map.of(
                 "orderId",
                 order.getId(),
@@ -144,7 +145,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.INVOICE,
             channels,
             order.getCustomerEmail(),
-            "Invoice - " + order.getOrderNumber(),
+            NotificationStatusPattern.INVOICE.format(order.getOrderNumber()),
             Map.of(
                 "orderId",
                 order.getId(),
@@ -168,7 +169,7 @@ public class NotificationServiceImpl implements NotificationService {
             NotificationType.LOW_STOCK_ALERT,
             channels,
             "admin@ecommerce.com",
-            "Low Stock Alert - " + productName,
+            NotificationStatusPattern.LOW_STOCK_ALERT.format(productName),
             Map.of(
                 "productName", productName, "currentStock", currentStock, "threshold", threshold)));
   }
@@ -179,8 +180,13 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @KafkaListener(topics = "order.created", groupId = "notification-service")
-  public void handleOrderCreatedEvent(Map<String, Object> eventData) {
+  public void handleOrderCreatedEvent(String eventDataJson) {
     try {
+      // Parse JSON string to Map
+      com.fasterxml.jackson.databind.ObjectMapper mapper =
+          new com.fasterxml.jackson.databind.ObjectMapper();
+      Map<String, Object> eventData = mapper.readValue(eventDataJson, Map.class);
+
       Long orderId = Long.valueOf(eventData.get("orderId").toString());
       Order order =
           orderRepository
@@ -194,8 +200,13 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @KafkaListener(topics = "payment.processed", groupId = "notification-service")
-  public void handlePaymentProcessedEvent(Map<String, Object> eventData) {
+  public void handlePaymentProcessedEvent(String eventDataJson) {
     try {
+      // Parse JSON string to Map
+      com.fasterxml.jackson.databind.ObjectMapper mapper =
+          new com.fasterxml.jackson.databind.ObjectMapper();
+      Map<String, Object> eventData = mapper.readValue(eventDataJson, Map.class);
+
       Long orderId = Long.valueOf(eventData.get("orderId").toString());
       Order order =
           orderRepository

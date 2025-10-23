@@ -312,10 +312,15 @@ public class InventoryServiceImpl implements InventoryService {
   }
 
   @KafkaListener(topics = "order.created", groupId = "inventory-service")
-  public void handleOrderCreatedEvent(Map<String, Object> eventData) {
-    log.info("Received order created event: {}", eventData);
+  public void handleOrderCreatedEvent(String eventDataJson) {
+    log.info("Received order created event: {}", eventDataJson);
 
     try {
+      // Parse JSON string to Map
+      com.fasterxml.jackson.databind.ObjectMapper mapper =
+          new com.fasterxml.jackson.databind.ObjectMapper();
+      Map<String, Object> eventData = mapper.readValue(eventDataJson, Map.class);
+
       Long orderId = Long.valueOf(eventData.get("orderId").toString());
       Order order =
           orderRepository

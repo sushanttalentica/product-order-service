@@ -9,7 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-// Creates sample categories and products for testing
+/**
+ * CommandLineRunner for demo/dummy data generation. Creates sample categories and products for
+ * testing and demonstration purposes. This generates dummy data to make the application immediately
+ * usable for demos.
+ */
 @Component
 @Slf4j
 public class DataInitializer implements CommandLineRunner {
@@ -29,7 +33,7 @@ public class DataInitializer implements CommandLineRunner {
     log.info("Starting data initialization...");
     log.info("Initializing test data...");
 
-    // Always create test data for testing
+    // Always create test data for testing (dummy data)
     log.info("Creating test categories and products...");
     Category electronics = new Category();
     electronics.setName("Electronics");
@@ -52,7 +56,7 @@ public class DataInitializer implements CommandLineRunner {
     categoryRepository.save(books);
     log.info("Created Books category");
 
-    // Create products (always create for testing)
+    // Create products (always create for testing - dummy data)
     log.info("Creating products...");
     Product iphone = new Product();
     iphone.setName("iPhone 15");

@@ -3,9 +3,9 @@ package com.ecommerce.productorder.invoice.service.impl;
 import com.ecommerce.productorder.domain.entity.Order;
 import com.ecommerce.productorder.invoice.domain.entity.Invoice;
 import com.ecommerce.productorder.invoice.domain.repository.InvoiceRepository;
+import com.ecommerce.productorder.invoice.service.InvoiceGeneratorService;
 import com.ecommerce.productorder.invoice.service.InvoiceService;
-import com.ecommerce.productorder.invoice.service.PdfGeneratorService;
-import com.ecommerce.productorder.invoice.service.S3Service;
+import com.ecommerce.productorder.invoice.service.ObjectStoreService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,46 +19,48 @@ import org.springframework.transaction.annotation.Transactional;
 public class InvoiceServiceImpl implements InvoiceService {
 
   private final InvoiceRepository invoiceRepository;
-  private final PdfGeneratorService pdfGeneratorService;
-  private final S3Service s3Service;
+  private final InvoiceGeneratorService invoiceGeneratorService;
+  private final ObjectStoreService objectStoreService;
 
   public InvoiceServiceImpl(
       InvoiceRepository invoiceRepository,
-      PdfGeneratorService pdfGeneratorService,
-      S3Service s3Service) {
+      InvoiceGeneratorService invoiceGeneratorService,
+      ObjectStoreService objectStoreService) {
     this.invoiceRepository = invoiceRepository;
-    this.pdfGeneratorService = pdfGeneratorService;
-    this.s3Service = s3Service;
+    this.invoiceGeneratorService = invoiceGeneratorService;
+    this.objectStoreService = objectStoreService;
   }
 
   @Override
   @Transactional
   public Optional<String> generateInvoice(Order order) {
+    // Validate order first
+    validateOrderForInvoice(order);
+    
     log.info("Generating invoice for order ID: {}", order.getId());
 
     try {
-      // Validate order
-      validateOrderForInvoice(order);
-
       // Check if invoice already exists
       if (invoiceExists(order.getId())) {
         log.warn("Invoice already exists for order ID: {}", order.getId());
         return getInvoiceUrl(order.getId());
       }
 
-      // Generate PDF content
-      byte[] pdfContent = pdfGeneratorService.generateInvoicePdf(order);
+      // Generate invoice content
+      byte[] content = invoiceGeneratorService.generateInvoice(order);
 
-      // Upload to S3
-      String s3Key = generateS3Key(order);
-      String s3Url = s3Service.uploadFile(s3Key, pdfContent, "application/pdf");
+      // Upload to object store
+      String objectKey = generateObjectKey(order);
+      String objectUrl =
+          objectStoreService.uploadFile(
+              objectKey, content, invoiceGeneratorService.getContentType());
 
       // Save invoice record
-      Invoice invoice = createInvoiceEntity(order, s3Key, s3Url);
+      Invoice invoice = createInvoiceEntity(order, objectKey, objectUrl);
       invoiceRepository.save(invoice);
 
       log.info("Invoice generated successfully for order ID: {}", order.getId());
-      return Optional.of(s3Url);
+      return Optional.of(objectUrl);
 
     } catch (Exception e) {
       log.error("Error generating invoice for order ID: {}", order.getId(), e);
@@ -70,8 +72,12 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Transactional(readOnly = true)
   public Optional<String> getInvoiceUrl(Long orderId) {
     log.debug("Retrieving invoice URL for order ID: {}", orderId);
+    
+    if (orderId == null) {
+      throw new IllegalArgumentException("Order ID cannot be null");
+    }
 
-    return invoiceRepository.findByOrderId(orderId).map(Invoice::getS3Url);
+    return invoiceRepository.findByOrderId(orderId).map(Invoice::getObjectUrl);
   }
 
   @Override
@@ -79,14 +85,18 @@ public class InvoiceServiceImpl implements InvoiceService {
   public boolean deleteInvoice(Long orderId) {
     log.info("Deleting invoice for order ID: {}", orderId);
 
+    if (orderId == null) {
+      throw new IllegalArgumentException("Order ID cannot be null");
+    }
+
     try {
       Optional<Invoice> invoiceOpt = invoiceRepository.findByOrderId(orderId);
 
       if (invoiceOpt.isPresent()) {
         Invoice invoice = invoiceOpt.get();
 
-        // Delete from S3
-        s3Service.deleteFile(invoice.getS3Key());
+        // Delete from object store
+        objectStoreService.deleteFile(invoice.getObjectKey());
 
         // Delete from database
         invoiceRepository.delete(invoice);
@@ -107,6 +117,9 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Override
   @Transactional(readOnly = true)
   public boolean invoiceExists(Long orderId) {
+    if (orderId == null) {
+      throw new IllegalArgumentException("Order ID cannot be null");
+    }
     return invoiceRepository.findByOrderId(orderId).isPresent();
   }
 
@@ -127,18 +140,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
   }
 
-  private String generateS3Key(Order order) {
+  private String generateObjectKey(Order order) {
     return String.format("invoices/%d/%s.pdf", order.getId(), UUID.randomUUID().toString());
   }
 
-  private Invoice createInvoiceEntity(Order order, String s3Key, String s3Url) {
+  private Invoice createInvoiceEntity(Order order, String objectKey, String objectUrl) {
     Invoice invoice = new Invoice();
     invoice.setOrderId(order.getId());
     invoice.setCustomerId(order.getCustomerId());
     invoice.setCustomerEmail(order.getCustomerEmail());
     invoice.setTotalAmount(order.getTotalAmount());
-    invoice.setS3Key(s3Key);
-    invoice.setS3Url(s3Url);
+    invoice.setObjectKey(objectKey);
+    invoice.setObjectUrl(objectUrl);
     invoice.setStatus(Invoice.InvoiceStatus.GENERATED);
     invoice.setGeneratedAt(LocalDateTime.now());
     return invoice;

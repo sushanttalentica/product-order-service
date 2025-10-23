@@ -30,11 +30,11 @@ public class Invoice {
   @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
   private BigDecimal totalAmount;
 
-  @Column(name = "s3_key", nullable = false, length = 500)
-  private String s3Key;
+  @Column(name = "object_key", nullable = false, length = 500)
+  private String objectKey;
 
-  @Column(name = "s3_url", nullable = false, length = 1000)
-  private String s3Url;
+  @Column(name = "object_url", nullable = false, length = 1000)
+  private String objectUrl;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
@@ -51,6 +51,9 @@ public class Invoice {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Column(name = "failure_reason", length = 500)
+  private String failureReason;
+
   public Invoice() {}
 
   public Invoice(
@@ -59,8 +62,8 @@ public class Invoice {
       Long customerId,
       String customerEmail,
       BigDecimal totalAmount,
-      String s3Key,
-      String s3Url,
+      String objectKey,
+      String objectUrl,
       InvoiceStatus status,
       LocalDateTime generatedAt,
       LocalDateTime createdAt,
@@ -70,8 +73,8 @@ public class Invoice {
     this.customerId = customerId;
     this.customerEmail = customerEmail;
     this.totalAmount = totalAmount;
-    this.s3Key = s3Key;
-    this.s3Url = s3Url;
+    this.objectKey = objectKey;
+    this.objectUrl = objectUrl;
     this.status = status;
     this.generatedAt = generatedAt;
     this.createdAt = createdAt;
@@ -96,6 +99,7 @@ public class Invoice {
 
   public void markAsFailed(String failureReason) {
     this.status = InvoiceStatus.FAILED;
+    this.failureReason = failureReason;
   }
 
   // Enum representing invoice status states

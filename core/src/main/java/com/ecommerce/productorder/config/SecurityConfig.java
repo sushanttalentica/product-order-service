@@ -3,7 +3,6 @@ package com.ecommerce.productorder.config;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -96,7 +95,25 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**", "GET"))
                     .permitAll()
-                    // API endpoints - Authentication required, RBAC at method level via @PreAuthorize
+                    // Admin-only endpoints (must come before general /api/v1/** rule)
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/customers", "GET"))
+                    .hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/customers/**", "DELETE"))
+                    .hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products", "POST"))
+                    .hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products/**", "PUT"))
+                    .hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/products/**", "DELETE"))
+                    .hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/invoices/**"))
+                    .hasRole("ADMIN")
+                    // Customer and Admin endpoints
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/orders/**"))
+                    .hasAnyRole("CUSTOMER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher("/api/v1/payments/**"))
+                    .hasAnyRole("CUSTOMER", "ADMIN")
+                    // All other API endpoints require authentication
                     .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
                     .authenticated()
                     // Protected endpoints

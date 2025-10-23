@@ -1,7 +1,6 @@
 package com.ecommerce.productorder.payment.service.impl;
 
 import com.ecommerce.productorder.payment.domain.entity.Payment;
-import com.ecommerce.productorder.payment.domain.entity.Payment.PaymentMethod;
 import com.ecommerce.productorder.payment.domain.entity.Payment.PaymentStatus;
 import com.ecommerce.productorder.payment.dto.request.ProcessPaymentRequest;
 import com.ecommerce.productorder.payment.dto.response.PaymentResponse;
